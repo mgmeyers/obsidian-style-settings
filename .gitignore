@@ -8,4 +8,6 @@ package-lock.json
 
 # build
 main.js
+data.json
+.DS_Store
 *.js.map

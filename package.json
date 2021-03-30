@@ -1,7 +1,7 @@
 {
-  "name": "obsidian-sample-plugin",
-  "version": "0.9.7",
-  "description": "This is a sample plugin for Obsidian (https://obsidian.md)",
+  "name": "obsidian-style-settings",
+  "version": "0.0.1",
+  "description": "Offers controls for adjusting theme, plugin, and CSS snippet styles.",
   "main": "main.js",
   "scripts": {
     "dev": "rollup --config rollup.config.js -w",
@@ -19,5 +19,12 @@
     "rollup": "^2.32.1",
     "tslib": "^2.0.3",
     "typescript": "^4.0.3"
+  },
+  "dependencies": {
+    "@simonwep/pickr": "^1.8.0",
+    "@types/chroma-js": "^2.1.3",
+    "chroma-js": "^2.1.1",
+    "rollup-plugin-css-only": "^3.1.0",
+    "yaml": "^1.10.2"
   }
 }
