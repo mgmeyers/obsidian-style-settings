@@ -3,21 +3,22 @@ import {
   Setting,
   SliderComponent,
   TextComponent,
+  debounce,
 } from "obsidian";
 import { CSSSettingsManager } from "./SettingsManager";
 import Pickr from "@simonwep/pickr";
 
-const resetTooltip = "Revert to default"
+const resetTooltip = "Revert to default";
 
 function sanitizeText(str: string): string {
-  if (str === '') {
-    return `""`
+  if (str === "") {
+    return `""`;
   }
 
-  return str.replace(/[;<>]/g, '')
+  return str.replace(/[;<>]/g, "");
 }
 
-export type CleanupFunction = void | (() => void)
+export type CleanupFunction = void | (() => void);
 
 interface Meta {
   id: string;
@@ -61,7 +62,7 @@ export function createClassToggle(opts: {
 
   new Setting(containerEl)
     .setName(config.title)
-    .setDesc((config.description || ""))
+    .setDesc(config.description || "")
     .addToggle((toggle) => {
       const value = settingsManager.getSetting(sectionId, config.id);
 
@@ -94,22 +95,28 @@ export function createVariableText(opts: {
   const { sectionId, config, containerEl, settingsManager } = opts;
   let textComponent: TextComponent;
 
+  if (typeof config.default !== "string") {
+    return console.error(`Error: ${config.title} missing default value`);
+  }
+
   new Setting(containerEl)
     .setName(config.title)
-    .setDesc((config.description || "") + ` (default: ${sanitizeText(config.default)})`)
+    .setDesc(
+      (config.description || "") + ` (default: ${sanitizeText(config.default)})`
+    )
     .addText((text) => {
       const value = settingsManager.getSetting(sectionId, config.id);
-      let debounceTimer = 0;
+      const onChange = debounce(
+        (value: string) => {
+          settingsManager.setSetting(sectionId, config.id, sanitizeText(value));
+        },
+        250,
+        true
+      );
 
       text
         .setValue(value ? value.toString() : config.default)
-        .onChange((value) => {
-          clearTimeout(debounceTimer);
-
-          debounceTimer = window.setTimeout(() => {
-            settingsManager.setSetting(sectionId, config.id, sanitizeText(value));
-          }, 50);
-        });
+        .onChange(onChange);
 
       textComponent = text;
     })
@@ -136,29 +143,33 @@ export function createVariableNumber(opts: {
   const { sectionId, config, containerEl, settingsManager } = opts;
   let textComponent: TextComponent;
 
+  if (typeof config.default !== "number") {
+    return console.error(`Error: ${config.title} missing default value`);
+  }
+
   new Setting(containerEl)
     .setName(config.title)
     .setDesc((config.description || "") + ` (default: ${config.default})`)
     .addText((text) => {
       const value = settingsManager.getSetting(sectionId, config.id);
-      let debounceTimer = 0;
+      const onChange = debounce(
+        (value: string) => {
+          const isFloat = /\./.test(value);
+          settingsManager.setSetting(
+            sectionId,
+            config.id,
+            isFloat ? parseFloat(value) : parseInt(value, 10)
+          );
+        },
+        250,
+        true
+      );
 
       text
         .setValue(
           value !== undefined ? value.toString() : config.default.toString()
         )
-        .onChange((value) => {
-          clearTimeout(debounceTimer);
-
-          debounceTimer = window.setTimeout(() => {
-            const isFloat = /\./.test(value);
-            settingsManager.setSetting(
-              sectionId,
-              config.id,
-              isFloat ? parseFloat(value) : parseInt(value, 10)
-            );
-          }, 50);
-        });
+        .onChange(onChange);
 
       textComponent = text;
     })
@@ -188,23 +199,27 @@ export function createVariableNumberSlider(opts: {
   const { sectionId, config, containerEl, settingsManager } = opts;
   let sliderComponent: SliderComponent;
 
+  if (typeof config.default !== "number") {
+    return console.error(`Error: ${config.title} missing default value`);
+  }
+
   new Setting(containerEl)
     .setName(config.title)
     .setDesc((config.description || "") + ` (default: ${config.default})`)
     .addSlider((slider) => {
       const value = settingsManager.getSetting(sectionId, config.id);
-      let debounceTimer = 0;
+      const onChange = debounce(
+        (value: number) => {
+          settingsManager.setSetting(sectionId, config.id, value);
+        },
+        250,
+        true
+      );
 
       slider
         .setLimits(config.min, config.max, config.step)
         .setValue(value !== undefined ? (value as number) : config.default)
-        .onChange((value) => {
-          clearTimeout(debounceTimer);
-
-          debounceTimer = window.setTimeout(() => {
-            settingsManager.setSetting(sectionId, config.id, value);
-          }, 50);
-        });
+        .onChange(onChange);
 
       sliderComponent = slider;
     })
@@ -231,6 +246,10 @@ export function createVariableSelect(opts: {
 }): CleanupFunction {
   const { sectionId, config, containerEl, settingsManager } = opts;
   let dropdownComponent: DropdownComponent;
+
+  if (typeof config.default !== "string") {
+    return console.error(`Error: ${config.title} missing default value`);
+  }
 
   new Setting(containerEl)
     .setName(config.title)
@@ -278,14 +297,18 @@ export function createVariableColor(opts: {
 }): CleanupFunction {
   const { sectionId, config, containerEl, settingsManager } = opts;
 
+  if (typeof config.default !== "string" || config.default[0] !== "#") {
+    return console.error(
+      `Error: ${config.title} missing default value, or value is not in hex format`
+    );
+  }
+
   const s = new Setting(containerEl)
     .setName(config.title)
     .setDesc((config.description || "") + ` (default: ${config.default})`);
 
   const value = settingsManager.getSetting(sectionId, config.id);
-  const colorPicker = document.createElement("div");
-
-  colorPicker.className = "pickr";
+  const colorPicker = createDiv({ cls: "picker" });
 
   s.controlEl.append(colorPicker);
 
@@ -332,17 +355,16 @@ export function createVariableColor(opts: {
       instance.hide();
     });
 
-    s
-    .addExtraButton((b) => {
-      b.setIcon("reset");
-      b.onClick(() => {
-        pickr.setColor(config.default)
-        settingsManager.clearSetting(sectionId, config.id);
-      });
-      b.setTooltip(resetTooltip);
+  s.addExtraButton((b) => {
+    b.setIcon("reset");
+    b.onClick(() => {
+      pickr.setColor(config.default);
+      settingsManager.clearSetting(sectionId, config.id);
     });
+    b.setTooltip(resetTooltip);
+  });
 
-    return () => pickr.destroyAndRemove()
+  return () => pickr.destroyAndRemove();
 }
 
 export type CSSSetting =

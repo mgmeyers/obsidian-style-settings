@@ -263,8 +263,8 @@ nanopop@^2.1.0:
   integrity sha512-jGTwpFRexSH+fxappnGQtN9dspgE2ipa1aOjtR24igG0pv6JCxImIAmrLRHX+zUF5+1wtsFVbKyfP51kIGAVNw==
 
 "obsidian@https://github.com/obsidianmd/obsidian-api/tarball/master":
-  version "0.9.21"
-  resolved "https://github.com/obsidianmd/obsidian-api/tarball/master#92aca642c3274431b4e94bdd5a2aedee3301e03f"
+  version "0.11.7"
+  resolved "https://github.com/obsidianmd/obsidian-api/tarball/master#28c00facf01a4f832d3e4ffb879139c7a627aa52"
   dependencies:
     "@types/codemirror" "0.0.98"
 
@@ -311,9 +311,9 @@ rollup-plugin-css-only@^3.1.0:
     "@rollup/pluginutils" "4"
 
 rollup@^2.32.1:
-  version "2.43.1"
-  resolved "https://registry.yarnpkg.com/rollup/-/rollup-2.43.1.tgz#9e5c9208c2011de227ac6c93101e11dc12e88e04"
-  integrity sha512-kvRE6VJbiv4d8m2nGeccc3qRpzOMghAhu2KeITjyZVCjneIFLPQ3zm2Wmqnl0LcUg3FvDaV0MfKnG4NCMbiSfw==
+  version "2.44.0"
+  resolved "https://registry.yarnpkg.com/rollup/-/rollup-2.44.0.tgz#8da324d1c4fd12beef9ae6e12f4068265b6d95eb"
+  integrity sha512-rGSF4pLwvuaH/x4nAS+zP6UNn5YUDWf/TeEU5IoXSZKBbKRNTCI3qMnYXKZgrC0D2KzS2baiOZt1OlqhMu5rnQ==
   optionalDependencies:
     fsevents "~2.3.1"
 
