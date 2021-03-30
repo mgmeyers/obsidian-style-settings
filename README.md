@@ -4,7 +4,7 @@ This plugin offers snippet, theme, and plugin CSS files to define a dynamic set 
 
 Configurable settings are defined by a comment at the top of the CSS file. These comments must begin with `/* @settings` and contain YAML with `name`, `id`, and `settings` properties.
 
-![Example 01](screenshots/example01.png)
+<img src="https://raw.githubusercontent.com/mgmeyers/obsidian-style-settings/main/screenshots/example01.png" alt="Example output of plugin" />
 
 ```css
 /* @settings
