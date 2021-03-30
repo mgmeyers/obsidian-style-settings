@@ -3,7 +3,7 @@
   "name": "Style Settings",
   "version": "0.0.1",
   "minAppVersion": "0.11.5",
-  "description": "Offers controls for adjusting theme, plugin, and CSS snippet styles.",
+  "description": "Offers controls for adjusting theme, plugin, and snippet CSS variables.",
   "author": "mgmeyers",
   "authorUrl": "https://github.com/mgmeyers/obsidian-style-settings",
   "isDesktopOnly": false
