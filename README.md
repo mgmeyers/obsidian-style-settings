@@ -1,6 +1,6 @@
 # Obsidian Style Settings Plugin
 
-This plugin offers snippet, theme, and plugin CSS files to define a dynamic set of configuration options. It allows both toggling classes on and off the `body` element, as well as setting numeric, string, and color CSS variables.
+This plugin allows snippet, theme, and plugin CSS files to define a dynamic set of configuration options. It then allows users to see all of the tweakable settings in one settings pane. It allows both toggling classes on and off the `body` element, as well as setting numeric, string, and color CSS variables.
 
 Configurable settings are defined by a comment at the top of the CSS file. These comments must begin with `/* @settings` and contain YAML with `name`, `id`, and `settings` properties.
 
@@ -32,6 +32,8 @@ settings:
 
 */
 ```
+
+See [example.css](example.css) for a more detailed example taken from the [California Coast Theme](https://github.com/mgmeyers/obsidian-california-coast-theme).
 
 Each setting definition must be separated by a dash (`-`). There are 7 setting types.
 
