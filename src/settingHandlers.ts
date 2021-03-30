@@ -268,7 +268,6 @@ export interface VariableColor extends Meta {
     | "rgb-values"
     | "rgb-split"
     | "hex";
-  var: string;
 }
 
 export function createVariableColor(opts: {
