@@ -26,31 +26,33 @@ export default class CSSSettingsPlugin extends Plugin {
 
     this.addSettingTab(this.settingsTab);
 
-    this.app.workspace.on("css-change", () => {
-      const styleSheets = document.styleSheets;
-      const settingsList: ParsedCSSSettings[] = [];
+    this.registerEvent(
+      this.app.workspace.on("css-change", () => {
+        const styleSheets = document.styleSheets;
+        const settingsList: ParsedCSSSettings[] = [];
 
-      for (let i = 0, len = styleSheets.length; i < len; i++) {
-        const sheet = styleSheets.item(i);
-        const text = sheet.ownerNode.textContent.trim();
-        const match = text.match(settingRegExp);
+        for (let i = 0, len = styleSheets.length; i < len; i++) {
+          const sheet = styleSheets.item(i);
+          const text = sheet.ownerNode.textContent.trim();
+          const match = text.match(settingRegExp);
 
-        if (match && match.length) {
-          try {
-            const str = match[1].trim();
-            const settings = parse(str);
+          if (match && match.length) {
+            try {
+              const str = match[1].trim();
+              const settings = parse(str);
 
-            if (settings.name && settings.id && settings.settings) {
-              settingsList.push(settings as ParsedCSSSettings);
+              if (settings.name && settings.id && settings.settings) {
+                settingsList.push(settings as ParsedCSSSettings);
+              }
+            } catch (e) {
+              console.error("Error parsing style settings: ", e);
             }
-          } catch (e) {
-            console.error('Error parsing style settings: ', e);
           }
         }
-      }
 
-      this.settingsTab.generate(settingsList);
-    });
+        this.settingsTab.generate(settingsList);
+      })
+    );
 
     this.app.workspace.trigger("css-change");
 
@@ -76,7 +78,7 @@ class CSSSettingsTab extends PluginSettingTab {
   display(): void {}
 
   cleanup() {
-    this.cleanupFns.forEach(fn => fn && fn())
+    this.cleanupFns.forEach((fn) => fn && fn());
   }
 
   generate(settings: ParsedCSSSettings[]) {
@@ -87,7 +89,7 @@ class CSSSettingsTab extends PluginSettingTab {
 
     plugin.settingsManager.setConfig(settings);
 
-    const cleanupFns: CleanupFunction[] = []
+    const cleanupFns: CleanupFunction[] = [];
 
     settings.forEach((s) => {
       createHeading({
@@ -108,12 +110,12 @@ class CSSSettingsTab extends PluginSettingTab {
           settingsManager: plugin.settingsManager,
         });
 
-        if (typeof cleanup === 'function') {
-          cleanupFns.push(cleanup)
+        if (typeof cleanup === "function") {
+          cleanupFns.push(cleanup);
         }
       });
     });
 
-    this.cleanupFns = cleanupFns
+    this.cleanupFns = cleanupFns;
   }
 }
