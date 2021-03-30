@@ -1,0 +1,339 @@
+/* @settings
+
+name: California Coast Theme
+id: obsidian-california-coast-theme
+settings:
+    - 
+        id: accent-color-title
+        title: Accent Color
+        type: heading
+        level: 3
+    - 
+        id: accent
+        title: Accent Color
+        type: variable-color
+        format: hsl-split
+        default: '#007AFF'
+    - 
+        id: fancy-cursor
+        title: Accented cursor
+        description: The editor cursor takes on your accent color
+        type: class-toggle
+
+    - 
+        id: custom-fonts
+        title: Custom Fonts
+        type: heading
+        level: 3
+    - 
+        id: text
+        title: UI font
+        description: Font used for the user interface
+        type: variable-text
+        default: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif
+    - 
+        id: text-editor
+        title: Body font
+        description: Font used for the editor and preview
+        type: variable-text
+        default: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif
+    -
+        id: editor-font-features
+        title: Body font features
+        description: eg. "ss01", "cv05", "cv07", "case"
+        type: variable-text
+        default: ""
+    - 
+        id: font-monospace
+        title: Monospace font
+        description: Used for code blocks, front matter, etc
+        type: variable-text
+        default: Menlo, SFMono-Regular, Consolas, "Roboto Mono", monospace
+    
+    - 
+        id: typography
+        title: Typography
+        type: heading
+        level: 3
+    - 
+        id: cc-pretty-editor
+        title: Enhanced Editor Typography
+        description: Adds WYSIWYG-like functionality to editor mode
+        type: class-toggle
+    - 
+        id: cc-pretty-preview
+        title: Enhanced Preview Typography
+        description: Adds context aware padding between text elements in preview mode (requires the "contextual typography" plugin)
+        type: class-toggle
+    - 
+        id: line-width
+        title: Line width
+        description: The maximum line width in rem units (1rem = Body font size)
+        type: variable-number
+        default: 42
+    - 
+        id: editor-font-size
+        title: Body font size
+        description: Font size in px of the main text
+        type: variable-number
+        default: 18
+    - 
+        id: editor-line-height
+        title: Body line height
+        description: Line height of the main text, expects a decimal value
+        type: variable-number
+        default: 1.88889  
+    
+    - 
+        id: level-1-headings
+        title: Level 1 Headings
+        type: heading
+        level: 4
+    - 
+        id: h1-size
+        title: H1 font size
+        description: Accepts any CSS font-size value
+        type: variable-text
+        default: 1.602rem
+    - 
+        id: h1-line-height
+        title: H1 line height
+        description: Accepts decimal values
+        type: variable-number
+        default: 1.4
+    - 
+        id: h1-margin-top
+        title: H1 top margin
+        description: Accepts decimal values representing the number of lines to add before the heading
+        type: variable-number
+        default: 4
+    - 
+        id: h1-margin-bottom
+        title: H1 bottom margin
+        description: Accepts decimal values representing the number of lines to add below the heading
+        type: variable-number
+        default: 1
+    - 
+        id: h1-weight
+        title: H1 font weight
+        description: Accepts numbers represeting the CSS font-weight
+        type: variable-number
+        default: 500
+    - 
+        id: h1-style
+        title: H1 font style
+        description: Accepts any CSS font-style value
+        type: variable-text
+        default: normal
+    
+    - 
+        id: level-2-headings
+        title: Level 2 Headings
+        type: heading
+        level: 4
+    - 
+        id: h2-size
+        title: H2 font size
+        description: Accepts any CSS font-size value
+        type: variable-text
+        default: 1.424rem
+    - 
+        id: h2-line-height
+        title: H2 line height
+        description: Accepts decimal values
+        type: variable-number
+        default: 1.4
+    - 
+        id: h2-margin-top
+        title: H2 top margin
+        description: Accepts decimal values representing the number of lines to add before the heading
+        type: variable-number
+        default: 2.5
+    - 
+        id: h2-margin-bottom
+        title: H2 bottom margin
+        description: Accepts decimal values representing the number of lines to add below the heading
+        type: variable-number
+        default: 0.5
+    - 
+        id: h2-weight
+        title: H2 font weight
+        description: Accepts numbers represeting the CSS font-weight
+        type: variable-number
+        default: 500
+    - 
+        id: h2-style
+        title: H2 font style
+        description: Accepts any CSS font-style value
+        type: variable-text
+        default: normal
+
+    - 
+        id: level-3-headings
+        title: Level 3 Headings
+        type: heading
+        level: 4
+    - 
+        id: h3-size
+        title: H3 font size
+        description: Accepts any CSS font-size value
+        type: variable-text
+        default: 1.266rem
+    - 
+        id: h3-line-height
+        title: H3 line height
+        description: Accepts decimal values
+        type: variable-number
+        default: 1.4
+    - 
+        id: h3-margin-top
+        title: H3 top margin
+        description: Accepts decimal values representing the number of lines to add before the heading
+        type: variable-number
+        default: 2
+    - 
+        id: h3-margin-bottom
+        title: H3 bottom margin
+        description: Accepts decimal values representing the number of lines to add below the heading
+        type: variable-number
+        default: 0.4
+    - 
+        id: h3-weight
+        title: H3 font weight
+        description: Accepts numbers represeting the CSS font-weight
+        type: variable-number
+        default: 500
+    - 
+        id: h3-style
+        title: H3 font style
+        description: Accepts any CSS font-style value
+        type: variable-text
+        default: normal
+    
+    - 
+        id: level-4-headings
+        title: Level 4 Headings
+        type: heading
+        level: 4
+    - 
+        id: h4-size
+        title: H4 font size
+        description: Accepts any CSS font-size value
+        type: variable-text
+        default: 1.125rem
+    - 
+        id: h4-line-height
+        title: H4 line height
+        description: Accepts decimal values
+        type: variable-number
+        default: 1.5
+    - 
+        id: h4-margin-top
+        title: H4 top margin
+        description: Accepts decimal values representing the number of lines to add before the heading
+        type: variable-number
+        default: 1.5
+    - 
+        id: h4-margin-bottom
+        title: H4 bottom margin
+        description: Accepts decimal values representing the number of lines to add below the heading
+        type: variable-number
+        default: 0.5
+    - 
+        id: h4-weight
+        title: H4 font weight
+        description: Accepts numbers represeting the CSS font-weight
+        type: variable-number
+        default: 500
+    - 
+        id: h4-style
+        title: H4 font style
+        description: Accepts any CSS font-style value
+        type: variable-text
+        default: normal
+    
+    - 
+        id: level-5-headings
+        title: Level 5 Headings
+        type: heading
+        level: 4
+    - 
+        id: h5-size
+        title: H5 font size
+        description: Accepts any CSS font-size value
+        type: variable-text
+        default: 1rem
+    - 
+        id: h5-line-height
+        title: H5 line height
+        description: Accepts decimal values
+        type: variable-number
+        default: 1.5
+    - 
+        id: h5-margin-top
+        title: H5 top margin
+        description: Accepts decimal values representing the number of lines to add before the heading
+        type: variable-number
+        default: 1.5
+    - 
+        id: h5-margin-bottom
+        title: H5 bottom margin
+        description: Accepts decimal values representing the number of lines to add below the heading
+        type: variable-number
+        default: 0.5
+    - 
+        id: h5-weight
+        title: H5 font weight
+        description: Accepts numbers represeting the CSS font-weight
+        type: variable-number
+        default: 500
+    - 
+        id: h5-style
+        title: H5 font style
+        description: Accepts any CSS font-style value
+        type: variable-text
+        default: normal
+    
+    - 
+        id: level-6-headings
+        title: Level 6 Headings
+        type: heading
+        level: 4
+    - 
+        id: h6-size
+        title: H6 font size
+        description: Accepts any CSS font-size value
+        type: variable-text
+        default: 1rem
+    - 
+        id: h6-line-height
+        title: H6 line height
+        description: Accepts decimal values
+        type: variable-number
+        default: 1.5
+    - 
+        id: h6-margin-top
+        title: H6 top margin
+        description: Accepts decimal values representing the number of lines to add before the heading
+        type: variable-number
+        default: 1.5
+    - 
+        id: h6-margin-bottom
+        title: H6 bottom margin
+        description: Accepts decimal values representing the number of lines to add below the heading
+        type: variable-number
+        default: 0.5
+    - 
+        id: h6-weight
+        title: H6 font weight
+        description: Accepts numbers represeting the CSS font-weight
+        type: variable-number
+        default: 500
+    - 
+        id: h6-style
+        title: H6 font style
+        description: Accepts any CSS font-style value
+        type: variable-text
+        default: italic
+
+*/
