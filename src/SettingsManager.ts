@@ -196,7 +196,7 @@ export class CSSSettingsManager {
     for (const key in this.settings) {
       const [sectionId, settingId] = key.split('@@');
 
-      if (!this.config[sectionId] || !this.config[sectionId][settingId]) {
+      if (this.config[sectionId] && !this.config[sectionId][settingId]) {
         delete this.settings[key]
         pruned = true;
       }
