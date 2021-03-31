@@ -1,7 +1,6 @@
 # Intellij
 *.iml
 .idea
-
 # npm
 node_modules
 package-lock.json
@@ -11,3 +10,4 @@ main.js
 data.json
 .DS_Store
 *.js.map
+.env
