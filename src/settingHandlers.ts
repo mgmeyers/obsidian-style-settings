@@ -8,7 +8,7 @@ import {
 import { CSSSettingsManager } from "./SettingsManager";
 import Pickr from "@simonwep/pickr";
 
-const resetTooltip = "Revert to default";
+const resetTooltip = "Restore default";
 
 function sanitizeText(str: string): string {
   if (str === "") {
