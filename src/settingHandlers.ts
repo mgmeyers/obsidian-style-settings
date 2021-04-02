@@ -18,6 +18,28 @@ function sanitizeText(str: string): string {
   return str.replace(/[;<>]/g, "");
 }
 
+function createDescription(description: string | undefined, def: string) {
+  const fragment = createFragment();
+
+  if (description) {
+    fragment.appendChild(document.createTextNode(description));
+  }
+
+  if (def) {
+    const small = createEl("small")
+    small.appendChild(createEl('strong', { text: "Default: " }))
+    small.appendChild(document.createTextNode(def))
+
+    const p = createEl('p')
+
+    p.appendChild(small)
+
+    fragment.appendChild(p);
+  }
+
+  return fragment;
+}
+
 export type CleanupFunction = void | (() => void);
 
 interface Meta {
@@ -101,9 +123,7 @@ export function createVariableText(opts: {
 
   new Setting(containerEl)
     .setName(config.title)
-    .setDesc(
-      (config.description || "") + ` (default: ${sanitizeText(config.default)})`
-    )
+    .setDesc(createDescription(config.description, config.default))
     .addText((text) => {
       const value = settingsManager.getSetting(sectionId, config.id);
       const onChange = debounce(
@@ -149,7 +169,7 @@ export function createVariableNumber(opts: {
 
   new Setting(containerEl)
     .setName(config.title)
-    .setDesc((config.description || "") + ` (default: ${config.default})`)
+    .setDesc(createDescription(config.description, config.default.toString(10)))
     .addText((text) => {
       const value = settingsManager.getSetting(sectionId, config.id);
       const onChange = debounce(
@@ -205,7 +225,7 @@ export function createVariableNumberSlider(opts: {
 
   new Setting(containerEl)
     .setName(config.title)
-    .setDesc((config.description || "") + ` (default: ${config.default})`)
+    .setDesc(createDescription(config.description, config.default.toString(10)))
     .addSlider((slider) => {
       const value = settingsManager.getSetting(sectionId, config.id);
       const onChange = debounce(
@@ -253,7 +273,7 @@ export function createVariableSelect(opts: {
 
   new Setting(containerEl)
     .setName(config.title)
-    .setDesc((config.description || "") + ` (default: ${config.default})`)
+    .setDesc(createDescription(config.description, config.default))
     .addDropdown((dropdown) => {
       const value = settingsManager.getSetting(sectionId, config.id);
 
@@ -305,7 +325,7 @@ export function createVariableColor(opts: {
 
   const s = new Setting(containerEl)
     .setName(config.title)
-    .setDesc((config.description || "") + ` (default: ${config.default})`);
+    .setDesc(createDescription(config.description, config.default));
 
   const value = settingsManager.getSetting(sectionId, config.id);
   const colorPicker = createDiv({ cls: "picker" });
