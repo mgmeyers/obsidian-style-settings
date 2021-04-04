@@ -33,7 +33,7 @@ settings:
 */
 ```
 
-See [example.css](example.css) for a more detailed example taken from the [California Coast Theme](https://github.com/mgmeyers/obsidian-california-coast-theme).
+See [here](https://github.com/mgmeyers/obsidian-california-coast-theme/blob/main/src/000-css-settings.css) for a more detailed example taken from the [California Coast Theme](https://github.com/mgmeyers/obsidian-california-coast-theme).
 
 Each setting definition must be separated by a dash (`-`). There are 7 setting types.
 
