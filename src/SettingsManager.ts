@@ -12,6 +12,8 @@ import {
 } from "./settingHandlers";
 import chroma from "chroma-js";
 
+type VariableKV = Array<{ key: string; value: string }>
+
 export type SettingValue = number | string | boolean;
 
 export interface CSSSettings {
@@ -28,7 +30,7 @@ function generateColorVariables(
   key: string,
   format: ColorFormat,
   colorStr: string
-): Array<{ key: string; value: string }> {
+): VariableKV {
   switch (format) {
     case "hex":
       return [{ key, value: colorStr }];
@@ -104,8 +106,10 @@ function generateColorVariables(
 function getCSSVariables(
   settings: CSSSettings,
   config: MappedSettings
-): Array<{ key: string; value: string }> {
-  const vars: Array<{ key: string; value: string }> = [];
+): [VariableKV, VariableKV, VariableKV] {
+  const vars: VariableKV = [];
+  const themedLight: VariableKV = [];
+  const themedDark: VariableKV = [];
 
   for (const key in settings) {
     const [sectionId, settingId, modifier] = key.split("@@");
@@ -160,9 +164,9 @@ function getCSSVariables(
                 modifier === "light" ? "default-light" : "default-dark"
               ];
 
-        vars.push(
+        (modifier === "light" ? themedLight : themedDark).push(
           ...generateColorVariables(
-            `${setting.id}-${modifier}`,
+            setting.id,
             (setting as VariableColor).format,
             color
           )
@@ -171,7 +175,7 @@ function getCSSVariables(
     }
   }
 
-  return vars;
+  return [vars, themedLight, themedDark];
 }
 
 export class CSSSettingsManager {
@@ -203,11 +207,23 @@ export class CSSSettingsManager {
   }
 
   setCSSVariables() {
-    const vars = getCSSVariables(this.settings, this.config);
+    const [vars, themedLight, themedDark] = getCSSVariables(this.settings, this.config);
 
     this.styleTag.innerText = `
       body.css-settings-manager {
         ${vars.reduce((combined, current) => {
+          return combined + `--${current.key}: ${current.value}; `;
+        }, "")}
+      }
+
+      body.theme-light.css-settings-manager {
+        ${themedLight.reduce((combined, current) => {
+          return combined + `--${current.key}: ${current.value}; `;
+        }, "")}
+      }
+
+      body.theme-dark.css-settings-manager {
+        ${themedDark.reduce((combined, current) => {
           return combined + `--${current.key}: ${current.value}; `;
         }, "")}
       }

@@ -255,11 +255,9 @@ settings:
 This will output the variables:
 
 ```
---accent-light: #007AFF;
---accent-dark: #2DB253;
+body.theme-light.css-settings-manager { --accent: #007AFF; } 
+body.theme-dark.css-settings-manager { --accent: #2DB253; }
 ```
-
-The format for themed color variables follows this pattern, except for split formats as noted below: `--${setting-id}-${light|dark}`
 
 ### `variable-color` formatting options
 
@@ -299,17 +297,6 @@ This will output:
 --accent-b: 255;
 ```
 
-For themed color variables, this will output: 
-
-```
---accent-light-r: 0;
---accent-light-g: 122;
---accent-light-b: 255;
---accent-dark-r: 0;
---accent-dark-g: 122;
---accent-dark-b: 255;
-```
-
 - `hsl`
 
 This will output:
@@ -334,15 +321,4 @@ This will output:
 --accent-h: 211;
 --accent-s: 100%;
 --accent-l: 50%;
-```
-
-For themed color variables, this will output: 
-
-```
---accent-light-h: 211;
---accent-light-s: 100%;
---accent-light-l: 50%;
---accent-dark-h: 211;
---accent-dark-s: 100%;
---accent-dark-l: 50%;
 ```
