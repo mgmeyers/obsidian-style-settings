@@ -4,6 +4,7 @@ import {
   SliderComponent,
   TextComponent,
   debounce,
+  ButtonComponent,
 } from "obsidian";
 import { CSSSettingsManager } from "./SettingsManager";
 import Pickr from "@simonwep/pickr";
@@ -26,13 +27,13 @@ function createDescription(description: string | undefined, def: string) {
   }
 
   if (def) {
-    const small = createEl("small")
-    small.appendChild(createEl('strong', { text: "Default: " }))
-    small.appendChild(document.createTextNode(def))
+    const small = createEl("small");
+    small.appendChild(createEl("strong", { text: "Default: " }));
+    small.appendChild(document.createTextNode(def));
 
-    const p = createEl('p')
+    const p = createEl("p");
 
-    p.appendChild(small)
+    p.appendChild(small);
 
     fragment.appendChild(p);
   }
@@ -297,16 +298,18 @@ export function createVariableSelect(opts: {
     });
 }
 
+export type ColorFormat =
+  | "hsl"
+  | "hsl-values"
+  | "hsl-split"
+  | "rgb"
+  | "rgb-values"
+  | "rgb-split"
+  | "hex";
+
 export interface VariableColor extends Meta {
   default: string;
-  format:
-    | "hsl"
-    | "hsl-values"
-    | "hsl-split"
-    | "rgb"
-    | "rgb-values"
-    | "rgb-split"
-    | "hex";
+  format: ColorFormat;
 }
 
 export function createVariableColor(opts: {
@@ -387,6 +390,187 @@ export function createVariableColor(opts: {
   return () => pickr.destroyAndRemove();
 }
 
+export interface VariableThemedColor extends Meta {
+  "default-light": string;
+  "default-dark": string;
+  format: ColorFormat;
+}
+
+export function createVariableThemedColor(opts: {
+  sectionId: string;
+  config: VariableThemedColor;
+  containerEl: HTMLElement;
+  settingsManager: CSSSettingsManager;
+}): CleanupFunction {
+  const { sectionId, config, containerEl, settingsManager } = opts;
+
+  if (
+    typeof config["default-light"] !== "string" ||
+    config["default-light"][0] !== "#"
+  ) {
+    return console.error(
+      `Error: ${config.title} missing default light value, or value is not in hex format`
+    );
+  }
+
+  if (
+    typeof config["default-dark"] !== "string" ||
+    config["default-dark"][0] !== "#"
+  ) {
+    return console.error(
+      `Error: ${config.title} missing default dark value, or value is not in hex format`
+    );
+  }
+
+  const desc = createFragment();
+
+  if (config.description) {
+    desc.appendChild(document.createTextNode(config.description));
+  }
+
+  const light = createEl("small");
+  const dark = createEl("small");
+  const p = createEl("p");
+
+  light.appendChild(createEl("strong", { text: "Default (light): " }));
+  light.appendChild(document.createTextNode(config["default-light"]));
+
+  p.appendChild(light);
+  p.appendChild(createEl("br"));
+
+  dark.appendChild(createEl("strong", { text: "Default (dark): " }));
+  dark.appendChild(document.createTextNode(config["default-dark"]));
+
+  p.appendChild(dark);
+  desc.appendChild(p);
+
+  const s = new Setting(containerEl).setName(config.title).setDesc(desc);
+
+  const idLight = `${config.id}@@light`;
+  const idDark = `${config.id}@@dark`;
+
+  const valueLight = settingsManager.getSetting(sectionId, idLight);
+  const valueDark = settingsManager.getSetting(sectionId, idDark);
+  const colorPickerLight = createDiv({ cls: "picker" });
+  const colorPickerDark = createDiv({ cls: "picker" });
+
+  const wrapper = createDiv({ cls: "themed-color-wrapper" });
+  const wrapperLight = createDiv({ cls: "theme-light" });
+  const buttonLight = createDiv({ cls: "pickr-reset" });
+  const wrapperDark = createDiv({ cls: "theme-dark" });
+  const buttonDark = createDiv({ cls: "pickr-reset" });
+
+  wrapperLight.appendChild(colorPickerLight);
+  wrapperLight.appendChild(buttonLight);
+  wrapperDark.appendChild(colorPickerDark);
+  wrapperDark.appendChild(buttonDark);
+  wrapper.appendChild(wrapperLight);
+  wrapper.appendChild(wrapperDark);
+  s.controlEl.appendChild(wrapper);
+
+  const swatchesLight: string[] = [];
+  const swatchesDark: string[] = [];
+
+  if (config["default-light"]) {
+    swatchesLight.push(config["default-light"]);
+  }
+
+  if (valueLight !== undefined) {
+    swatchesLight.push(valueLight as string);
+  }
+
+  if (config["default-dark"]) {
+    swatchesLight.push(config["default-dark"]);
+  }
+
+  if (valueDark !== undefined) {
+    swatchesDark.push(valueDark as string);
+  }
+
+  const onCancel = (instance: Pickr) => {
+    instance.hide();
+  };
+
+  const pickrLight = Pickr.create({
+    el: colorPickerLight,
+    theme: "nano",
+    swatches: swatchesLight,
+    lockOpacity: true,
+    default:
+      valueLight !== undefined
+        ? (valueLight as string)
+        : config["default-light"],
+    position: "left-middle",
+    components: {
+      preview: true,
+      hue: true,
+      interaction: {
+        input: true,
+        cancel: true,
+        save: true,
+      },
+    },
+  })
+    .on("save", (color: Pickr.HSVaColor, instance: Pickr) => {
+      if (!color) return;
+
+      settingsManager.setSetting(sectionId, idLight, color.toHEXA().toString());
+
+      instance.hide();
+      instance.addSwatch(color.toHEXA().toString());
+    })
+    .on("cancel", onCancel);
+
+  const pickrDark = Pickr.create({
+    el: colorPickerDark,
+    theme: "nano",
+    swatches: swatchesDark,
+    lockOpacity: true,
+    default:
+      valueDark !== undefined ? (valueDark as string) : config["default-dark"],
+    position: "left-middle",
+    components: {
+      preview: true,
+      hue: true,
+      interaction: {
+        input: true,
+        cancel: true,
+        save: true,
+      },
+    },
+  })
+    .on("save", (color: Pickr.HSVaColor, instance: Pickr) => {
+      if (!color) return;
+
+      settingsManager.setSetting(sectionId, idDark, color.toHEXA().toString());
+
+      instance.hide();
+      instance.addSwatch(color.toHEXA().toString());
+    })
+    .on("cancel", onCancel);
+
+  new ButtonComponent(buttonLight)
+    .setIcon("reset")
+    .onClick(() => {
+      pickrLight.setColor(config["default-light"]);
+      settingsManager.clearSetting(sectionId, idLight);
+    })
+    .setTooltip(resetTooltip);
+
+  new ButtonComponent(buttonDark)
+    .setIcon("reset")
+    .onClick(() => {
+      pickrDark.setColor(config["default-dark"]);
+      settingsManager.clearSetting(sectionId, idDark);
+    })
+    .setTooltip(resetTooltip);
+
+  return () => {
+    pickrLight.destroyAndRemove();
+    pickrDark.destroyAndRemove();
+  };
+}
+
 export type CSSSetting =
   | Heading
   | ClassToggle
@@ -394,7 +578,8 @@ export type CSSSetting =
   | VariableNumber
   | VariableNumberSlider
   | VariableSelect
-  | VariableColor;
+  | VariableColor
+  | VariableThemedColor;
 
 export interface ParsedCSSSettings {
   name: string;
@@ -455,6 +640,13 @@ export function createSetting(opts: {
       return createVariableColor({
         sectionId,
         config: setting as VariableColor,
+        containerEl,
+        settingsManager,
+      });
+    case "variable-themed-color":
+      return createVariableThemedColor({
+        sectionId,
+        config: setting as VariableThemedColor,
         containerEl,
         settingsManager,
       });
