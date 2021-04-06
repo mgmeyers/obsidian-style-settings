@@ -212,7 +212,7 @@ This will output the variable:
 
 ## `variable-color`
 
-`variable-color` creates a color picker with a variety of formatting options. A `default` attribute is required in `hex` format. **Note: hex color values must be wrapped in quotes.** A `format` attribute is also required.
+`variable-color` creates a color picker with a variety of output format options. A `default` attribute is required in `hex` format. **Note: hex color values must be wrapped in quotes.** A `format` attribute is also required. Optionally, setting `opacity` to `true` will enable opacity support in all output formats.
 
 ```css
 /* @settings
@@ -225,6 +225,7 @@ settings:
         title: Accent Color
         type: variable-color
         format: hex
+        opacity: false
         default: '#007AFF'
 
 */
@@ -251,6 +252,7 @@ settings:
         title: Accent Color
         type: variable-themed-color
         format: hex
+        opacity: false
         default-light: '#007AFF'
         default-dark: '#2DB253'
 
@@ -270,31 +272,41 @@ There are 7 formatting options:
 
 - `hex`
 
-This will output the color in hex format:
-
 ```
 --accent: #007AFF;
 ```
 
-- `rgb`
+When `opacity` is set to `true`:
 
-This will output:
+```
+--accent: #007AFFFF;
+```
+
+- `rgb`
 
 ```
 --accent: rgb(0, 122, 255);
 ```
 
-- `rgb-values`
+When `opacity` is set to `true`:
 
-This will output:
+```
+--accent: rgba(0, 122, 255, 1);
+```
+
+- `rgb-values`
 
 ```
 --accent: 0, 122, 255;
 ```
 
-- `rgb-split`
+When `opacity` is set to `true`:
 
-This will output:
+```
+--accent: 0, 122, 255, 1;
+```
+
+- `rgb-split`
 
 ```
 --accent-r: 0;
@@ -302,28 +314,52 @@ This will output:
 --accent-b: 255;
 ```
 
-- `hsl`
+When `opacity` is set to `true`:
 
-This will output:
+```
+--accent-r: 0;
+--accent-g: 122;
+--accent-b: 255;
+--accent-a: 1;
+```
+
+- `hsl`
 
 ```
 --accent: hsl(211, 100%, 50%);
 ```
 
-- `hsl-values`
+When `opacity` is set to `true`:
 
-This will output:
+```
+--accent: hsla(211, 100%, 50%, 1);
+```
+
+- `hsl-values`
 
 ```
 --accent: 211, 100%, 50%;
 ```
 
-- `hsl-split`
+When `opacity` is set to `true`:
 
-This will output:
+```
+--accent: 211, 100%, 50%, 1;
+```
+
+- `hsl-split`
 
 ```
 --accent-h: 211;
 --accent-s: 100%;
 --accent-l: 50%;
+```
+
+When `opacity` is set to `true`:
+
+```
+--accent-h: 211;
+--accent-s: 100%;
+--accent-l: 50%;
+--accent-a: 1;
 ```

@@ -29,8 +29,11 @@ export interface MappedSettings {
 function generateColorVariables(
   key: string,
   format: ColorFormat,
-  colorStr: string
+  colorStr: string,
+  opacity: boolean | undefined
 ): VariableKV {
+  const parsedColor = chroma(colorStr);
+
   switch (format) {
     case "hex":
       return [{ key, value: colorStr }];
@@ -38,21 +41,22 @@ function generateColorVariables(
       return [
         {
           key,
-          value: chroma(colorStr).css("hsl"),
+          value: parsedColor.css("hsl"),
         },
       ];
     case "hsl-values": {
-      const hsl = chroma(colorStr).hsl();
+      const hsl = parsedColor.hsl();
+      const alpha = opacity ? `,${parsedColor.alpha()}` : ''
       return [
         {
           key,
-          value: `${hsl[0]},${hsl[1] * 100}%,${hsl[2] * 100}%`,
+          value: `${hsl[0]},${hsl[1] * 100}%,${hsl[2] * 100}%${alpha}`,
         },
       ];
     }
     case "hsl-split": {
-      const hsl = chroma(colorStr).hsl();
-      return [
+      const hsl = parsedColor.hsl();
+      const out = [
         {
           key: `${key}-h`,
           value: hsl[0].toString(),
@@ -65,27 +69,35 @@ function generateColorVariables(
           key: `${key}-l`,
           value: (hsl[2] * 100).toString() + "%",
         },
-      ];
+      ]
+
+      if (opacity) out.push({
+        key: `${key}-a`,
+        value: parsedColor.alpha().toString(),
+      })
+
+      return out;
     }
     case "rgb":
       return [
         {
           key,
-          value: chroma(colorStr).css(),
+          value: parsedColor.css(),
         },
       ];
     case "rgb-values": {
-      const rgb = chroma(colorStr).rgb();
+      const rgb = parsedColor.rgb();
+      const alpha = opacity ? `,${parsedColor.alpha()}` : ''
       return [
         {
           key,
-          value: `${rgb[0]},${rgb[1]},${rgb[2]}`,
+          value: `${rgb[0]},${rgb[1]},${rgb[2]}${alpha}`,
         },
       ];
     }
     case "rgb-split": {
-      const rgb = chroma(colorStr).rgb();
-      return [
+      const rgb = parsedColor.rgb();
+      const out = [
         {
           key: `${key}-r`,
           value: rgb[0].toString(),
@@ -99,6 +111,13 @@ function generateColorVariables(
           value: rgb[2].toString(),
         },
       ];
+
+      if (opacity) out.push({
+        key: `${key}-a`,
+        value: parsedColor.alpha().toString(),
+      })
+
+      return out;
     }
   }
 }
@@ -150,7 +169,8 @@ function getCSSVariables(
           ...generateColorVariables(
             setting.id,
             (setting as VariableColor).format,
-            color
+            color,
+            (setting as VariableColor).opacity
           )
         );
 
@@ -167,8 +187,9 @@ function getCSSVariables(
         (modifier === "light" ? themedLight : themedDark).push(
           ...generateColorVariables(
             setting.id,
-            (setting as VariableColor).format,
-            color
+            (setting as VariableThemedColor).format,
+            color,
+            (setting as VariableThemedColor).opacity
           )
         );
       }

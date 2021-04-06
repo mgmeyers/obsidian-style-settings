@@ -310,6 +310,7 @@ export type ColorFormat =
 export interface VariableColor extends Meta {
   default: string;
   format: ColorFormat;
+  opacity?: boolean;
 }
 
 export function createVariableColor(opts: {
@@ -349,12 +350,13 @@ export function createVariableColor(opts: {
     el: colorPicker,
     theme: "nano",
     swatches,
-    lockOpacity: true,
+    lockOpacity: !config.opacity,
     default: value !== undefined ? (value as string) : config.default,
     position: "left-middle",
     components: {
       preview: true,
       hue: true,
+      opacity: !!config.opacity,
       interaction: {
         input: true,
         cancel: true,
@@ -394,6 +396,7 @@ export interface VariableThemedColor extends Meta {
   "default-light": string;
   "default-dark": string;
   format: ColorFormat;
+  opacity?: boolean;
 }
 
 export function createVariableThemedColor(opts: {
@@ -495,7 +498,7 @@ export function createVariableThemedColor(opts: {
     el: colorPickerLight,
     theme: "nano",
     swatches: swatchesLight,
-    lockOpacity: true,
+    lockOpacity: !config.opacity,
     default:
       valueLight !== undefined
         ? (valueLight as string)
@@ -504,6 +507,7 @@ export function createVariableThemedColor(opts: {
     components: {
       preview: true,
       hue: true,
+      opacity: !!config.opacity,
       interaction: {
         input: true,
         cancel: true,
@@ -525,13 +529,14 @@ export function createVariableThemedColor(opts: {
     el: colorPickerDark,
     theme: "nano",
     swatches: swatchesDark,
-    lockOpacity: true,
+    lockOpacity: !config.opacity,
     default:
       valueDark !== undefined ? (valueDark as string) : config["default-dark"],
     position: "left-middle",
     components: {
       preview: true,
       hue: true,
+      opacity: !!config.opacity,
       interaction: {
         input: true,
         cancel: true,
