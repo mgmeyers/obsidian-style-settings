@@ -12,7 +12,7 @@ import {
 } from "./settingHandlers";
 import chroma from "chroma-js";
 
-type VariableKV = Array<{ key: string; value: string }>
+type VariableKV = Array<{ key: string; value: string }>;
 
 export type SettingValue = number | string | boolean;
 
@@ -46,7 +46,7 @@ function generateColorVariables(
       ];
     case "hsl-values": {
       const hsl = parsedColor.hsl();
-      const alpha = opacity ? `,${parsedColor.alpha()}` : ''
+      const alpha = opacity ? `,${parsedColor.alpha()}` : "";
       return [
         {
           key,
@@ -69,12 +69,13 @@ function generateColorVariables(
           key: `${key}-l`,
           value: (hsl[2] * 100).toString() + "%",
         },
-      ]
+      ];
 
-      if (opacity) out.push({
-        key: `${key}-a`,
-        value: parsedColor.alpha().toString(),
-      })
+      if (opacity)
+        out.push({
+          key: `${key}-a`,
+          value: parsedColor.alpha().toString(),
+        });
 
       return out;
     }
@@ -87,7 +88,7 @@ function generateColorVariables(
       ];
     case "rgb-values": {
       const rgb = parsedColor.rgb();
-      const alpha = opacity ? `,${parsedColor.alpha()}` : ''
+      const alpha = opacity ? `,${parsedColor.alpha()}` : "";
       return [
         {
           key,
@@ -112,10 +113,11 @@ function generateColorVariables(
         },
       ];
 
-      if (opacity) out.push({
-        key: `${key}-a`,
-        value: parsedColor.alpha().toString(),
-      })
+      if (opacity)
+        out.push({
+          key: `${key}-a`,
+          value: parsedColor.alpha().toString(),
+        });
 
       return out;
     }
@@ -228,7 +230,10 @@ export class CSSSettingsManager {
   }
 
   setCSSVariables() {
-    const [vars, themedLight, themedDark] = getCSSVariables(this.settings, this.config);
+    const [vars, themedLight, themedDark] = getCSSVariables(
+      this.settings,
+      this.config
+    );
 
     this.styleTag.innerText = `
       body.css-settings-manager {

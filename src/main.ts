@@ -39,13 +39,13 @@ export default class CSSSettingsPlugin extends Plugin {
           if (match && match.length) {
             try {
               do {
-                const str = match[1].trim();
+                const str = match[1].trim().replace(/\t/g, "  ");
                 const settings = parse(str);
-  
+
                 if (settings.name && settings.id && settings.settings) {
                   settingsList.push(settings as ParsedCSSSettings);
                 }
-              } while((match = settingRegExp.exec(text)) !== null);
+              } while ((match = settingRegExp.exec(text)) !== null);
             } catch (e) {
               console.error("Error parsing style settings: ", e);
             }
