@@ -153,6 +153,7 @@ export function createVariableText(opts: {
 
 export interface VariableNumber extends Meta {
   default: number;
+  format?: string;
 }
 
 export function createVariableNumber(opts: {
@@ -209,6 +210,7 @@ export interface VariableNumberSlider extends Meta {
   min: number;
   max: number;
   step: number;
+  format?: string;
 }
 
 export function createVariableNumberSlider(opts: {

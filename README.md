@@ -122,7 +122,7 @@ This will output the variable:
 
 ## `variable-number`
 
-`variable-number` represents any numeric CSS value. The `id` of the setting will be used as the variable name. `variable-number` settings require a `default` attribute.
+`variable-number` represents any numeric CSS value. The `id` of the setting will be used as the variable name. `variable-number` settings require a `default` attribute. Optionally, a `format` attribute can be set. This value will be appended to the number. Eg `format: px` will result in `42px`
 
 ```css
 /* @settings
@@ -136,6 +136,7 @@ settings:
         description: The maximum line width in rem units
         type: variable-number
         default: 42
+        format: rem
 
 */
 ```
@@ -143,16 +144,18 @@ settings:
 This will output the variable:
 
 ```
---line-width: 42;
+--line-width: 42rem;
 ```
 
 ## `variable-number-slider`
 
-`variable-number-slider` represents any numeric CSS value. The `id` of the setting will be used as the variable name. `variable-number` settings require a `default` attribute, as well as these three attributes:
+`variable-number-slider` represents any numeric CSS value. The `id` of the setting will be used as the variable name. `variable-number-slider` settings require a `default` attribute, as well as these three attributes:
 
 - `min`: The minimum possible value of the slider
 - `max`: The maximum possible value of the slider
 - `step`: The size of each "tick" of the slider. For example, a step of 100 will only allow the slider to move in increments of 100.
+
+Optionally, a `format` attribute can be set. This value will be appended to the number. Eg `format: px` will result in `42px`
 
 ```css
 /* @settings

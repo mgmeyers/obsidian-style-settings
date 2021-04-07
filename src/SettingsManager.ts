@@ -145,20 +145,27 @@ function getCSSVariables(
     const value = settings[key];
 
     switch (setting.type) {
-      case "variable-text":
       case "variable-number":
       case "variable-number-slider":
+        const format = (setting as VariableNumber | VariableNumberSlider)
+          .format;
+        const val =
+          value !== undefined
+            ? value
+            : (setting as VariableNumber | VariableNumberSlider).default;
+        vars.push({
+          key: setting.id,
+          value: `${val}${format || ""}`,
+        });
+        continue;
+      case "variable-text":
       case "variable-select":
         vars.push({
           key: setting.id,
           value:
             value !== undefined
               ? value.toString()
-              : (setting as
-                  | VariableText
-                  | VariableNumber
-                  | VariableNumberSlider
-                  | VariableSelect).default.toString(),
+              : (setting as VariableText | VariableSelect).default.toString(),
         });
         continue;
       case "variable-color": {
