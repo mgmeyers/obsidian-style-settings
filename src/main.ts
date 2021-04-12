@@ -3,13 +3,15 @@ import { CSSSettingsManager } from "./SettingsManager";
 import {
   CleanupFunction,
   createHeading,
-  createSetting,
+  createSettings,
+  CSSSetting,
   ParsedCSSSettings,
 } from "./settingHandlers";
 import { parse } from "yaml";
 
 import "@simonwep/pickr/dist/themes/nano.min.css";
 import "./pickerOverrides.css";
+import "./settings.css";
 
 const settingRegExp = /\/\*\s*@settings[\r\n]+?([\s\S]+?)\*\//g;
 
@@ -83,6 +85,7 @@ class CSSSettingsTab extends PluginSettingTab {
     this.cleanupFns.forEach((fn) => fn && fn());
   }
 
+  // TODO: only generate on display()
   generate(settings: ParsedCSSSettings[]) {
     let { containerEl, plugin } = this;
 
@@ -94,28 +97,22 @@ class CSSSettingsTab extends PluginSettingTab {
     const cleanupFns: CleanupFunction[] = [];
 
     settings.forEach((s) => {
-      createHeading({
-        config: {
-          id: s.id,
-          type: "heading",
-          title: s.name,
-          level: 1,
-        },
+      const options: CSSSetting[] = [{
+        id: s.id,
+        type: "heading",
+        title: s.name,
+        level: 0,
+        collapsed: true,
+      }, ...s.settings]
+
+      const cleanup = createSettings({
         containerEl,
+        sectionId: s.id,
+        settings: options,
+        settingsManager: plugin.settingsManager,
       });
 
-      s.settings.forEach((setting) => {
-        const cleanup = createSetting({
-          containerEl,
-          sectionId: s.id,
-          setting,
-          settingsManager: plugin.settingsManager,
-        });
-
-        if (typeof cleanup === "function") {
-          cleanupFns.push(cleanup);
-        }
-      });
+      if (cleanup.length) cleanupFns.push(...cleanup)
     });
 
     this.cleanupFns = cleanupFns;

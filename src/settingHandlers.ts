@@ -5,6 +5,7 @@ import {
   TextComponent,
   debounce,
   ButtonComponent,
+  setIcon,
 } from "obsidian";
 import { CSSSettingsManager } from "./SettingsManager";
 import Pickr from "@simonwep/pickr";
@@ -31,11 +32,11 @@ function createDescription(description: string | undefined, def: string) {
     small.appendChild(createEl("strong", { text: "Default: " }));
     small.appendChild(document.createTextNode(def));
 
-    const p = createEl("p");
+    const div = createEl("div");
 
-    p.appendChild(small);
+    div.appendChild(small);
 
-    fragment.appendChild(p);
+    fragment.appendChild(div);
   }
 
   return fragment;
@@ -51,26 +52,33 @@ interface Meta {
 }
 
 export interface Heading extends Meta {
-  level: 1 | 2 | 3 | 4 | 5 | 6;
+  level: 0 | 1 | 2 | 3 | 4 | 5 | 6;
+  collapsed?: boolean;
 }
 
 export function createHeading(opts: {
   config: Heading;
   containerEl: HTMLElement;
 }) {
-  const level = `h${opts.config.level}` as
-    | "h1"
-    | "h2"
-    | "h3"
-    | "h4"
-    | "h5"
-    | "h6";
+  new Setting(opts.containerEl)
+    .setHeading()
+    .setClass('style-settings-heading')
+    .setName(opts.config.title)
+    .setDesc(opts.config.description ? opts.config.description : "")
+    .then((setting) => {
+      if (opts.config.collapsed) setting.settingEl.addClass('is-collapsed');
+      setting.settingEl.dataset.level = opts.config.level.toString();
 
-  opts.containerEl.createEl(level, { text: opts.config.title });
+      const iconContainer = createSpan({ cls: 'style-settings-collapse-indicator' })
 
-  if (opts.config.description) {
-    opts.containerEl.createEl("p", { text: opts.config.description });
-  }
+      setIcon(iconContainer, 'right-triangle')
+
+      setting.nameEl.prepend(iconContainer)
+
+      setting.settingEl.addEventListener('click', (e) => {
+        setting.settingEl.toggleClass('is-collapsed', !setting.settingEl.hasClass('is-collapsed'));
+      })
+    });
 }
 
 export interface ClassToggle extends Meta {}
@@ -594,68 +602,143 @@ export interface ParsedCSSSettings {
   settings: Array<CSSSetting>;
 }
 
-export function createSetting(opts: {
+export function createSettings(opts: {
   containerEl: HTMLElement;
   sectionId: string;
-  setting: CSSSetting;
+  settings: CSSSetting[];
   settingsManager: CSSSettingsManager;
-}): CleanupFunction {
-  const { containerEl, sectionId, setting, settingsManager } = opts;
+}): CleanupFunction[] {
+  const { containerEl, sectionId, settings, settingsManager } = opts;
 
-  switch (setting.type) {
-    case "heading":
-      return createHeading({
-        config: setting as Heading,
-        containerEl,
-      });
-    case "class-toggle":
-      return createClassToggle({
-        sectionId,
-        config: setting as ClassToggle,
-        containerEl,
-        settingsManager,
-      });
-    case "variable-text":
-      return createVariableText({
-        sectionId,
-        config: setting as VariableText,
-        containerEl,
-        settingsManager,
-      });
-    case "variable-number":
-      return createVariableNumber({
-        sectionId,
-        config: setting as VariableNumber,
-        containerEl,
-        settingsManager,
-      });
-    case "variable-number-slider":
-      return createVariableNumberSlider({
-        sectionId,
-        config: setting as VariableNumberSlider,
-        containerEl,
-        settingsManager,
-      });
-    case "variable-select":
-      return createVariableSelect({
-        sectionId,
-        config: setting as VariableSelect,
-        containerEl,
-        settingsManager,
-      });
-    case "variable-color":
-      return createVariableColor({
-        sectionId,
-        config: setting as VariableColor,
-        containerEl,
-        settingsManager,
-      });
-    case "variable-themed-color":
-      return createVariableThemedColor({
-        sectionId,
-        config: setting as VariableThemedColor,
-        containerEl,
-        settingsManager,
-      });
+  const containerStack: HTMLElement[] = [containerEl];
+  const cleanup: CleanupFunction[] = [];
+
+  let containerLevel = 0;
+
+  function getTargetContainer(stack: HTMLElement[]) {
+    if (!stack.length) return containerEl;
+    return stack[stack.length - 1];
   }
+
+  settings.forEach((setting) => {
+    switch (setting.type) {
+      case "heading": {
+        const config = setting as Heading;
+
+        let targetContainer = getTargetContainer(containerStack);
+
+        console.log(containerLevel, containerStack)
+
+        if (config.level > containerLevel) {
+          createHeading({
+            config,
+            containerEl: targetContainer,
+          });
+
+          targetContainer.createDiv(
+            { cls: "style-settings-container" },
+            (container) => {
+              containerStack.push(container);
+            }
+          );
+        } else if (config.level === containerLevel) {
+          containerStack.pop();
+          targetContainer = getTargetContainer(containerStack);
+
+          createHeading({
+            config,
+            containerEl: targetContainer,
+          });
+
+          targetContainer.createDiv(
+            { cls: "style-settings-container" },
+            (container) => {
+              containerStack.push(container);
+            }
+          );
+        } else {
+          containerStack.pop();
+          targetContainer = getTargetContainer(containerStack);
+
+          createHeading({
+            config,
+            containerEl: targetContainer,
+          });
+        }
+
+        containerLevel = config.level;
+
+        break;
+      }
+      case "class-toggle": {
+        createClassToggle({
+          sectionId,
+          config: setting as ClassToggle,
+          containerEl: getTargetContainer(containerStack),
+          settingsManager,
+        });
+        break;
+      }
+      case "variable-text": {
+        createVariableText({
+          sectionId,
+          config: setting as VariableText,
+          containerEl: getTargetContainer(containerStack),
+          settingsManager,
+        });
+        break;
+      }
+      case "variable-number": {
+        createVariableNumber({
+          sectionId,
+          config: setting as VariableNumber,
+          containerEl: getTargetContainer(containerStack),
+          settingsManager,
+        });
+        break;
+      }
+      case "variable-number-slider": {
+        createVariableNumberSlider({
+          sectionId,
+          config: setting as VariableNumberSlider,
+          containerEl: getTargetContainer(containerStack),
+          settingsManager,
+        });
+        break;
+      }
+      case "variable-select": {
+        createVariableSelect({
+          sectionId,
+          config: setting as VariableSelect,
+          containerEl: getTargetContainer(containerStack),
+          settingsManager,
+        });
+        break;
+      }
+      case "variable-color": {
+        cleanup.push(
+          createVariableColor({
+            sectionId,
+            config: setting as VariableColor,
+            containerEl: getTargetContainer(containerStack),
+            settingsManager,
+          })
+        );
+        break;
+      }
+      case "variable-themed-color": {
+        cleanup.push(
+          createVariableThemedColor({
+            sectionId,
+            config: setting as VariableThemedColor,
+            containerEl: getTargetContainer(containerStack),
+            settingsManager,
+          })
+        );
+        break;
+      }
+    }
+  });
+
+  return cleanup;
 }

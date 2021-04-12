@@ -58,7 +58,7 @@ All settings definitions must have these parameters:
 
 ## `heading`
 
-`heading`s can be used to organize and group settings, but do not add any functionality. Along with the required attributes, `heading`s must contain a `level` attribute:
+`heading`s can be used to organize and group settings into collapsable nested sections. Along with the required attributes, `heading`s must contain a `level` attribute between `1` and `6`, and can optionally contain a `collapsed` attribute:
 
 ```css
 /* @settings
@@ -71,6 +71,7 @@ settings:
         title: My Heading
         type: heading
         level: 2
+        collapsed: true
 
 */
 ```
