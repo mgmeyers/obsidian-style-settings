@@ -627,8 +627,6 @@ export function createSettings(opts: {
 
         let targetContainer = getTargetContainer(containerStack);
 
-        console.log(containerLevel, containerStack)
-
         if (config.level > containerLevel) {
           createHeading({
             config,
