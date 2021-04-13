@@ -9,6 +9,7 @@ import {
   VariableSelect,
   VariableText,
   ColorFormat,
+  AltFormatList,
 } from "./settingHandlers";
 import chroma from "chroma-js";
 
@@ -30,19 +31,25 @@ function generateColorVariables(
   key: string,
   format: ColorFormat,
   colorStr: string,
-  opacity: boolean | undefined
+  opacity: boolean | undefined,
+  altFormats: AltFormatList = []
 ): VariableKV {
   const parsedColor = chroma(colorStr);
+  const alts = altFormats.reduce<VariableKV>((a, alt) => {
+    a.push(...generateColorVariables(alt.id, alt.format, colorStr, opacity));
+    return a;
+  }, []);
 
   switch (format) {
     case "hex":
-      return [{ key, value: colorStr }];
+      return [{ key, value: colorStr }, ...alts];
     case "hsl":
       return [
         {
           key,
           value: parsedColor.css("hsl"),
         },
+        ...alts,
       ];
     case "hsl-values": {
       const hsl = parsedColor.hsl();
@@ -52,6 +59,7 @@ function generateColorVariables(
           key,
           value: `${hsl[0]},${hsl[1] * 100}%,${hsl[2] * 100}%${alpha}`,
         },
+        ...alts,
       ];
     }
     case "hsl-split": {
@@ -69,6 +77,7 @@ function generateColorVariables(
           key: `${key}-l`,
           value: (hsl[2] * 100).toString() + "%",
         },
+        ...alts,
       ];
 
       if (opacity)
@@ -85,6 +94,7 @@ function generateColorVariables(
           key,
           value: parsedColor.css(),
         },
+        ...alts,
       ];
     case "rgb-values": {
       const rgb = parsedColor.rgb();
@@ -94,6 +104,7 @@ function generateColorVariables(
           key,
           value: `${rgb[0]},${rgb[1]},${rgb[2]}${alpha}`,
         },
+        ...alts,
       ];
     }
     case "rgb-split": {
@@ -111,6 +122,7 @@ function generateColorVariables(
           key: `${key}-b`,
           value: rgb[2].toString(),
         },
+        ...alts,
       ];
 
       if (opacity)
@@ -169,36 +181,38 @@ function getCSSVariables(
         });
         continue;
       case "variable-color": {
+        const colorSetting = setting as VariableColor;
         const color =
-          value !== undefined
-            ? value.toString()
-            : (setting as VariableColor).default;
+          value !== undefined ? value.toString() : colorSetting.default;
 
         vars.push(
           ...generateColorVariables(
             setting.id,
-            (setting as VariableColor).format,
+            colorSetting.format,
             color,
-            (setting as VariableColor).opacity
+            colorSetting.opacity,
+            colorSetting["alt-format"]
           )
         );
 
         continue;
       }
       case "variable-themed-color": {
+        const colorSetting = setting as VariableThemedColor;
         const color =
           value !== undefined
             ? value.toString()
-            : (setting as VariableThemedColor)[
+            : colorSetting[
                 modifier === "light" ? "default-light" : "default-dark"
               ];
 
         (modifier === "light" ? themedLight : themedDark).push(
           ...generateColorVariables(
             setting.id,
-            (setting as VariableThemedColor).format,
+            colorSetting.format,
             color,
-            (setting as VariableThemedColor).opacity
+            colorSetting.opacity,
+            colorSetting["alt-format"]
           )
         );
       }
@@ -302,8 +316,21 @@ export class CSSSettingsManager {
     this.save();
   }
 
-  clearSetting(sectionId: string, settingId: string) {
+  clearSetting(
+    sectionId: string,
+    settingId: string
+  ) {
     delete this.settings[`${sectionId}@@${settingId}`];
+    this.save();
+  }
+
+  clearSection(sectionId: string) {
+    Object.keys(this.settings).forEach((key) => {
+      const [section] = key.split("@@");
+      if (section === sectionId) {
+        delete this.settings[key]
+      }
+    });
     this.save();
   }
 }

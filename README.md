@@ -216,7 +216,11 @@ This will output the variable:
 
 ## `variable-color`
 
-`variable-color` creates a color picker with a variety of output format options. A `default` attribute is required in `hex` format. **Note: hex color values must be wrapped in quotes.** A `format` attribute is also required. Optionally, setting `opacity` to `true` will enable opacity support in all output formats.
+`variable-color` creates a color picker with a variety of output format options. A `default` attribute is required in `hex` or `rgb` format. **Note: hex color values must be wrapped in quotes.** A `format` attribute is also required. 
+
+Optional parameters:
+-  Setting `opacity` to `true` will enable opacity support in all output formats.
+-  A list of alternate output formats can be supplied via the `alt-format` setting
 
 ```css
 /* @settings
@@ -228,8 +232,12 @@ settings:
         id: accent
         title: Accent Color
         type: variable-color
-        format: hex
         opacity: false
+        format: hex
+        alt-format:
+            -
+                id: accent-rgb
+                format: rgb
         default: '#007AFF'
 
 */
@@ -239,6 +247,7 @@ This will output the variable:
 
 ```
 --accent: #007AFF;
+--accent-rgb: rgb(0, 123, 255);
 ```
 
 ## `variable-themed-color`

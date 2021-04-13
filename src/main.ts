@@ -54,7 +54,7 @@ export default class CSSSettingsPlugin extends Plugin {
           }
         }
 
-        this.settingsTab.generate(settingsList);
+        this.settingsTab.setSettings(settingsList);
       })
     );
 
@@ -73,37 +73,53 @@ export default class CSSSettingsPlugin extends Plugin {
 class CSSSettingsTab extends PluginSettingTab {
   plugin: CSSSettingsPlugin;
   cleanupFns: CleanupFunction[] = [];
+  settings: ParsedCSSSettings[] = [];
 
   constructor(app: App, plugin: CSSSettingsPlugin) {
     super(app, plugin);
     this.plugin = plugin;
   }
 
-  display(): void {}
+  display(): void {
+    this.generate(this.settings);
+  }
 
   cleanup() {
     this.cleanupFns.forEach((fn) => fn && fn());
   }
 
-  // TODO: only generate on display()
+  setSettings(settings: ParsedCSSSettings[]) {
+    this.settings = settings;
+    this.plugin.settingsManager.setConfig(settings);
+
+    if (this.containerEl.parentNode) {
+      this.generate(settings);
+    }
+  }
+
   generate(settings: ParsedCSSSettings[]) {
     let { containerEl, plugin } = this;
 
     containerEl.empty();
     this.cleanup();
 
-    plugin.settingsManager.setConfig(settings);
-
     const cleanupFns: CleanupFunction[] = [];
 
     settings.forEach((s) => {
-      const options: CSSSetting[] = [{
-        id: s.id,
-        type: "heading",
-        title: s.name,
-        level: 0,
-        collapsed: true,
-      }, ...s.settings]
+      const options: CSSSetting[] = [
+        {
+          id: s.id,
+          type: "heading",
+          title: s.name,
+          level: 0,
+          collapsed: true,
+          resetFn: () => {
+            plugin.settingsManager.clearSection(s.id);
+            this.generate(this.settings)
+          },
+        },
+        ...s.settings,
+      ];
 
       const cleanup = createSettings({
         containerEl,
@@ -112,7 +128,7 @@ class CSSSettingsTab extends PluginSettingTab {
         settingsManager: plugin.settingsManager,
       });
 
-      if (cleanup.length) cleanupFns.push(...cleanup)
+      if (cleanup.length) cleanupFns.push(...cleanup);
     });
 
     this.cleanupFns = cleanupFns;
