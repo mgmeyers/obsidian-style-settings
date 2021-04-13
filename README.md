@@ -2,6 +2,8 @@
 
 This plugin allows snippet, theme, and plugin CSS files to define a set of configuration options. It then allows users to see all the tweakable settings in one settings pane. Style Settings allows both toggling classes on and off the `body` element, as well as setting numeric, string, and color CSS variables.
 
+**[This CSS Snippet](obsidian-default-theme.css) can be used to adjust every CSS variable of the default Obsidian theme.**
+
 Configurable settings are defined by comments within CSS files beginning with `/* @settings`. These comments must contain YAML with `name`, `id`, and `settings` properties. Style Settings will scan all CSS loaded by Obsidian for these comments.
 
 For example, adding this to a CSS snippet in your vault:
@@ -36,9 +38,6 @@ settings:
 will result in:
 
 <img src="https://raw.githubusercontent.com/mgmeyers/obsidian-style-settings/main/screenshots/example01.png" alt="Example output of plugin" />
-
-
-See [here](https://github.com/mgmeyers/obsidian-california-coast-theme/blob/main/src/000-css-settings.css) for a more detailed example taken from the [California Coast Theme](https://github.com/mgmeyers/obsidian-california-coast-theme).
 
 Each setting definition must be separated by a dash (`-`). There are 7 setting types.
 
