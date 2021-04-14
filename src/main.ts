@@ -55,6 +55,7 @@ export default class CSSSettingsPlugin extends Plugin {
         }
 
         this.settingsTab.setSettings(settingsList);
+        this.settingsManager.initClasses();
       })
     );
 

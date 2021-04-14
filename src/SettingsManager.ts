@@ -239,6 +239,7 @@ export class CSSSettingsManager {
 
   cleanup() {
     this.styleTag.remove();
+    this.removeClasses();
   }
 
   async save() {
@@ -248,6 +249,38 @@ export class CSSSettingsManager {
 
   async load() {
     this.settings = Object.assign({}, await this.plugin.loadData());
+  }
+
+  initClasses() {
+    Object.keys(this.config).forEach(section => {
+      const config = this.config[section];
+
+      Object.keys(config).forEach(settingId => {
+        const setting = config[settingId];
+
+        if (setting.type === 'class-toggle') {
+          if (this.getSetting(section, settingId)) {
+            document.body.classList.add(setting.id);
+          }
+        }
+      })
+    })
+  }
+
+  removeClasses() {
+    Object.keys(this.config).forEach(section => {
+      const config = this.config[section];
+
+      Object.keys(config).forEach(settingId => {
+        const setting = config[settingId];
+
+        if (setting.type === 'class-toggle') {
+          if (this.getSetting(section, settingId)) {
+            document.body.classList.remove(setting.id);
+          }
+        }
+      })
+    })
   }
 
   setCSSVariables() {
