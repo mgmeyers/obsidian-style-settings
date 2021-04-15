@@ -44,16 +44,26 @@ export default class CSSSettingsPlugin extends Plugin {
           let match = settingRegExp.exec(text);
 
           if (match && match.length) {
-            const nameMatch = text.match(nameRegExp);
-            const name: string | null = nameMatch ? nameMatch[1] : null;
+            do {
+              const nameMatch = text.match(nameRegExp);
+              const name: string | undefined = nameMatch
+                ? nameMatch[1]
+                : undefined;
 
-            try {
-              do {
+              try {
                 const str = match[1].trim();
+
                 const indent = detectIndent(str);
-                const settings = yaml.load(str.replace(/\t/g, indent.indent), {
-                  filename: name,
-                }) as ParsedCSSSettings;
+
+                const settings = yaml.load(
+                  str.replace(
+                    /\t/g,
+                    indent.type === "space" ? indent.indent : "    "
+                  ),
+                  {
+                    filename: name,
+                  }
+                ) as ParsedCSSSettings;
 
                 if (
                   typeof settings === "object" &&
@@ -63,10 +73,10 @@ export default class CSSSettingsPlugin extends Plugin {
                 ) {
                   settingsList.push(settings);
                 }
-              } while ((match = settingRegExp.exec(text)) !== null);
-            } catch (e) {
-              errorList.push({ name, error: `${e}` });
-            }
+              } catch (e) {
+                errorList.push({ name, error: `${e}` });
+              }
+            } while ((match = settingRegExp.exec(text)) !== null);
           }
         }
 
@@ -122,7 +132,10 @@ class CSSSettingsTab extends PluginSettingTab {
 
     errorList.forEach((err) => {
       containerEl.createDiv({ cls: "style-settings-error" }, (wrapper) => {
-        wrapper.createDiv({ cls: "style-settings-error-name", text: `Error: ${err.name}` });
+        wrapper.createDiv({
+          cls: "style-settings-error-name",
+          text: `Error: ${err.name}`,
+        });
         wrapper.createDiv({
           cls: "style-settings-error-desc",
           text: err.error,
