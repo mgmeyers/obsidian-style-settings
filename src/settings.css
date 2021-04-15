@@ -45,3 +45,32 @@
 .style-settings-heading.is-collapsed .style-settings-collapse-indicator > svg {
     transform: rotate(-90deg);
 }
+
+.style-settings-error {
+    font-size: 14px;
+    border-radius: 6px;
+    background: rgba(var(--background-modifier-error-rgb), 0.2);
+    color: var(--text-error);
+    padding: 10px;
+    margin-bottom: 1rem;
+}
+
+.style-settings-error-name {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.style-settings-error-desc {
+    white-space: pre;
+}
+
+.style-settings-empty {
+    font-size: 14px;
+    background: var(--background-secondary);
+    padding: 10px;
+}
+
+.style-settings-empty-name {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
