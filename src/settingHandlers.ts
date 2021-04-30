@@ -663,7 +663,7 @@ export function createSettings(opts: {
           // Step up to the appropriate level
           while (
             containerStack.length > 1 &&
-            parseInt(containerStack[containerStack.length - 1].dataset.level) >
+            parseInt(containerStack[containerStack.length - 1].dataset.level) >=
               config.level
           ) {
             containerStack.pop();
