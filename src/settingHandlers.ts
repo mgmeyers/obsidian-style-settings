@@ -258,6 +258,7 @@ export function createVariableNumberSlider(opts: {
       );
 
       slider
+        .setDynamicTooltip()
         .setLimits(config.min, config.max, config.step)
         .setValue(value !== undefined ? (value as number) : config.default)
         .onChange(onChange);
