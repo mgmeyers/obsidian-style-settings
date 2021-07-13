@@ -69,6 +69,7 @@ export function createHeading(opts: {
     .then((setting) => {
       if (opts.config.collapsed) setting.settingEl.addClass("is-collapsed");
       setting.settingEl.dataset.level = opts.config.level.toString();
+      setting.settingEl.dataset.id = opts.config.id;
 
       const iconContainer = createSpan({
         cls: "style-settings-collapse-indicator",
@@ -120,6 +121,9 @@ export function createClassToggle(opts: {
           document.body.classList.remove(config.id);
         }
       });
+    })
+    .then((setting) => {
+      setting.settingEl.dataset.id = opts.config.id;
     });
 }
 
@@ -166,6 +170,9 @@ export function createVariableText(opts: {
         settingsManager.clearSetting(sectionId, config.id);
       });
       b.setTooltip(resetTooltip);
+    })
+    .then((setting) => {
+      setting.settingEl.dataset.id = opts.config.id;
     });
 }
 
@@ -220,6 +227,9 @@ export function createVariableNumber(opts: {
         settingsManager.clearSetting(sectionId, config.id);
       });
       b.setTooltip(resetTooltip);
+    })
+    .then((setting) => {
+      setting.settingEl.dataset.id = opts.config.id;
     });
 }
 
@@ -272,6 +282,9 @@ export function createVariableNumberSlider(opts: {
         settingsManager.clearSetting(sectionId, config.id);
       });
       b.setTooltip(resetTooltip);
+    })
+    .then((setting) => {
+      setting.settingEl.dataset.id = opts.config.id;
     });
 }
 
@@ -316,6 +329,9 @@ export function createVariableSelect(opts: {
         settingsManager.clearSetting(sectionId, config.id);
       });
       b.setTooltip(resetTooltip);
+    })
+    .then((setting) => {
+      setting.settingEl.dataset.id = opts.config.id;
     });
 }
 
@@ -409,6 +425,8 @@ export function createVariableColor(opts: {
     .setName(config.title)
     .setDesc(createDescription(config.description, config.default))
     .then((setting) => {
+      setting.settingEl.dataset.id = opts.config.id;
+
       pickr = Pickr.create(
         getPickrSettings({
           el: setting.controlEl.createDiv({ cls: "picker" }),
@@ -519,6 +537,8 @@ export function createVariableThemedColor(opts: {
   new Setting(containerEl)
     .setName(config.title)
     .then((setting) => {
+      setting.settingEl.dataset.id = opts.config.id;
+
       // Construct description
       setting.descEl.createSpan({}, (span) => {
         if (config.description) {
