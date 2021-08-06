@@ -1,76 +1,166 @@
 .style-settings-heading {
-    cursor: pointer;
-    margin-bottom: 18px;
-    padding-bottom: 6px;
-    border-bottom: 1px solid var(--background-modifier-border);
+  cursor: pointer;
+  margin-bottom: 18px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--background-modifier-border);
 }
 
 .style-settings-heading[data-level="0"] {
-    margin-bottom: 26px;
+  margin-bottom: 26px;
 }
 
 .style-settings-container {
-    padding-bottom: 16px;
+  padding-bottom: 16px;
 }
 
 .style-settings-heading[data-level="0"] + .style-settings-container {
-    padding-left: 34px;
+  padding-left: 34px;
 }
 
 .style-settings-heading.is-collapsed {
-    margin-bottom: 0;
+  margin-bottom: 0;
 }
 
 .style-settings-heading.is-collapsed + .style-settings-container {
-    display: none;
+  display: none;
 }
 
 .style-settings-collapse-indicator {
-    color: var(--text-faint);
-    display: inline-block;
-    margin-right: 8px;
-    position: relative;
-    top: -1px;
+  color: var(--text-faint);
+  display: inline-block;
+  margin-right: 8px;
+  position: relative;
+  top: -1px;
 }
 
-.style-settings-heading[data-level="0"] + .style-settings-container .style-settings-collapse-indicator {
-    margin-left: -17px;
+.style-settings-heading[data-level="0"]
+  + .style-settings-container
+  .style-settings-collapse-indicator {
+  margin-left: -17px;
 }
 
 .style-settings-collapse-indicator > svg {
-    height: 9px;
-    width: 9px;
+  height: 9px;
+  width: 9px;
 }
 
 .style-settings-heading.is-collapsed .style-settings-collapse-indicator > svg {
-    transform: rotate(-90deg);
+  transform: rotate(-90deg);
 }
 
 .style-settings-error {
-    font-size: 14px;
-    border-radius: 6px;
-    background: rgba(var(--background-modifier-error-rgb), 0.2);
-    color: var(--text-error);
-    padding: 10px;
-    margin-bottom: 1rem;
+  font-size: 14px;
+  border-radius: 6px;
+  background: rgba(var(--background-modifier-error-rgb), 0.2);
+  color: var(--text-error);
+  padding: 10px;
+  margin-bottom: 1rem;
 }
 
 .style-settings-error-name {
-    font-weight: bold;
-    margin-bottom: 5px;
+  font-weight: bold;
+  margin-bottom: 5px;
 }
 
 .style-settings-error-desc {
-    white-space: pre;
+  white-space: pre;
 }
 
 .style-settings-empty {
-    font-size: 14px;
-    background: var(--background-secondary);
-    padding: 10px;
+  font-size: 14px;
+  background: var(--background-secondary);
+  padding: 10px;
 }
 
 .style-settings-empty-name {
-    font-weight: bold;
-    margin-bottom: 5px;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.style-settings-import-input {
+  width: 0.1px;
+  height: 0.1px;
+  opacity: 0;
+  overflow: hidden;
+  position: absolute;
+  z-index: -1;
+}
+
+.style-settings-import-label {
+  cursor: pointer;
+  color: var(--text-accent);
+  text-decoration: underline;
+}
+
+.style-settings-import-label:hover {
+  color: var(--text-accent-hover);
+}
+
+.style-settings-export,
+.style-settings-import {
+  display: inline-block;
+  margin-right: 10px;
+}
+
+.style-settings-copy,
+.style-settings-download {
+  position: relative;
+  display: inline-block;
+  margin-left: 10px;
+}
+
+.style-settings-copy:before {
+  color: var(--interactive-success);
+  content: "✓";
+  position: absolute;
+  left: -18px;
+  font-weight: bold;
+  opacity: 0;
+  transition: 150ms opacity ease-in-out;
+}
+
+.style-settings-copy.success:before {
+  opacity: 1;
+}
+
+.modal-style-settings {
+  height: 70vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-style-settings .modal-content {
+  flex-grow: 1;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-style-settings textarea {
+  display: block;
+  width: 100%;
+  height: 100%;
+  font-family: var(--font-monospace) !important;
+  font-size: 12px;
+  white-space: pre;
+  overflow-wrap: normal;
+  overflow-x: scroll;
+  margin-bottom: 5px;
+}
+
+.modal-style-settings .setting-item {
+  align-items: flex-start;
+}
+
+.modal-style-settings button {
+  margin: 10px 0 0;
+}
+
+.style-settings-import-error {
+  display: none;
+  color: var(--text-error);
+}
+
+.style-settings-import-error.active {
+  display: block;
 }

@@ -1,4 +1,4 @@
-import { App, Plugin, PluginSettingTab } from "obsidian";
+import { App, Plugin, PluginSettingTab, Setting } from "obsidian";
 import { CSSSettingsManager } from "./SettingsManager";
 import {
   CleanupFunction,
@@ -159,8 +159,7 @@ class CSSSettingsTab extends PluginSettingTab {
           );
           frag.createEl("a", {
             text: "Click here for details and examples.",
-            href:
-              "https://github.com/mgmeyers/obsidian-style-settings#obsidian-style-settings-plugin",
+            href: "https://github.com/mgmeyers/obsidian-style-settings#obsidian-style-settings-plugin",
           });
         })
       );
@@ -178,6 +177,41 @@ class CSSSettingsTab extends PluginSettingTab {
     if (settings.length === 0) {
       return this.displayEmpty();
     }
+
+    new Setting(containerEl)
+      .then((setting) => {
+        // Build and import link to open the import modal
+        setting.controlEl.createEl(
+          "a",
+          {
+            cls: "icon-swapper-import",
+            text: "Import",
+            href: "#",
+          },
+          (el) => {
+            el.addEventListener("click", (e) => {
+              e.preventDefault();
+              this.plugin.settingsManager.import();
+            });
+          }
+        );
+
+        // Build and export link to open the export modal
+        setting.controlEl.createEl(
+          "a",
+          {
+            cls: "icon-swapper-export",
+            text: "Export",
+            href: "#",
+          },
+          (el) => {
+            el.addEventListener("click", (e) => {
+              e.preventDefault();
+              this.plugin.settingsManager.export("All settings", this.plugin.settingsManager.settings);
+            });
+          }
+        );
+      })
 
     const cleanupFns: CleanupFunction[] = [];
 
@@ -200,6 +234,7 @@ class CSSSettingsTab extends PluginSettingTab {
       const cleanup = createSettings({
         containerEl,
         sectionId: s.id,
+        sectionName: s.name,
         settings: options,
         settingsManager: plugin.settingsManager,
       });

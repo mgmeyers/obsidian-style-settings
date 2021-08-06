@@ -60,6 +60,10 @@ export interface Heading extends Meta {
 export function createHeading(opts: {
   config: Heading;
   containerEl: HTMLElement;
+  children: string[];
+  sectionId: string;
+  sectionName: string;
+  settingsManager: CSSSettingsManager;
 }) {
   new Setting(opts.containerEl)
     .setHeading()
@@ -93,6 +97,21 @@ export function createHeading(opts: {
             .onClick(opts.config.resetFn);
         });
       }
+
+      setting.addExtraButton((b) => {
+        b.setIcon("install")
+          .setTooltip("Export settings")
+          .then((b) => {
+            b.extraSettingsEl.onClickEvent((e) => {
+              e.stopPropagation();
+              const title = opts.sectionName === opts.config.title ? opts.config.title : `${opts.sectionName} > ${opts.config.title}`;
+              opts.settingsManager.export(
+                title,
+                opts.settingsManager.getSettings(opts.sectionId, opts.children)
+              );
+            });
+          });
+      });
     });
 }
 
@@ -643,13 +662,20 @@ export interface ParsedCSSSettings {
 export function createSettings(opts: {
   containerEl: HTMLElement;
   sectionId: string;
+  sectionName: string;
   settings: CSSSetting[];
   settingsManager: CSSSettingsManager;
 }): CleanupFunction[] {
-  const { containerEl, sectionId, settings, settingsManager } = opts;
+  const { containerEl, sectionId, settings, settingsManager, sectionName } =
+    opts;
 
   const containerStack: HTMLElement[] = [containerEl];
+  const idStack: string[] = [sectionId];
   const cleanup: CleanupFunction[] = [];
+
+  const settingGroups: Record<string, Array<string>> = {
+    [sectionId]: [],
+  };
 
   let containerLevel = 0;
 
@@ -658,10 +684,22 @@ export function createSettings(opts: {
     return stack[stack.length - 1];
   }
 
+  function pushId(id: string) {
+    idStack.forEach((containerId) => {
+      if (settingGroups[containerId]) {
+        settingGroups[containerId].push(id);
+      } else {
+        settingGroups[containerId] = [id];
+      }
+    });
+  }
+
   settings.forEach((setting) => {
     switch (setting.type) {
       case "heading": {
         const config = setting as Heading;
+
+        settingGroups[config.id] = [];
 
         let targetContainer = getTargetContainer(containerStack);
 
@@ -670,15 +708,24 @@ export function createSettings(opts: {
           createHeading({
             config,
             containerEl: targetContainer,
+            children: settingGroups[config.id],
+            settingsManager,
+            sectionName,
+            sectionId,
           });
         } else if (config.level === containerLevel) {
           // Same level
           containerStack.pop();
+          idStack.pop();
           targetContainer = getTargetContainer(containerStack);
 
           createHeading({
             config,
             containerEl: targetContainer,
+            children: settingGroups[config.id],
+            settingsManager,
+            sectionName,
+            sectionId,
           });
         } else {
           // Step up to the appropriate level
@@ -688,6 +735,7 @@ export function createSettings(opts: {
               config.level
           ) {
             containerStack.pop();
+            idStack.pop();
           }
 
           targetContainer = getTargetContainer(containerStack);
@@ -695,6 +743,10 @@ export function createSettings(opts: {
           createHeading({
             config,
             containerEl: targetContainer,
+            children: settingGroups[config.id],
+            settingsManager,
+            sectionName,
+            sectionId,
           });
         }
 
@@ -703,6 +755,7 @@ export function createSettings(opts: {
           (container) => {
             container.dataset.level = config.level.toString();
             containerStack.push(container);
+            idStack.push(config.id);
           }
         );
         containerLevel = config.level;
@@ -710,6 +763,7 @@ export function createSettings(opts: {
         break;
       }
       case "class-toggle": {
+        pushId(setting.id);
         createClassToggle({
           sectionId,
           config: setting as ClassToggle,
@@ -719,6 +773,7 @@ export function createSettings(opts: {
         break;
       }
       case "variable-text": {
+        pushId(setting.id);
         createVariableText({
           sectionId,
           config: setting as VariableText,
@@ -728,6 +783,7 @@ export function createSettings(opts: {
         break;
       }
       case "variable-number": {
+        pushId(setting.id);
         createVariableNumber({
           sectionId,
           config: setting as VariableNumber,
@@ -737,6 +793,7 @@ export function createSettings(opts: {
         break;
       }
       case "variable-number-slider": {
+        pushId(setting.id);
         createVariableNumberSlider({
           sectionId,
           config: setting as VariableNumberSlider,
@@ -746,6 +803,7 @@ export function createSettings(opts: {
         break;
       }
       case "variable-select": {
+        pushId(setting.id);
         createVariableSelect({
           sectionId,
           config: setting as VariableSelect,
@@ -755,6 +813,7 @@ export function createSettings(opts: {
         break;
       }
       case "variable-color": {
+        pushId(setting.id);
         cleanup.push(
           createVariableColor({
             sectionId,
@@ -766,6 +825,8 @@ export function createSettings(opts: {
         break;
       }
       case "variable-themed-color": {
+        // TODO: multiple ids?
+        pushId(setting.id);
         cleanup.push(
           createVariableThemedColor({
             sectionId,

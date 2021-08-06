@@ -12,6 +12,13 @@ import {
   AltFormatList,
 } from "./settingHandlers";
 import chroma from "chroma-js";
+import {
+  App,
+  ButtonComponent,
+  Modal,
+  Setting,
+  TextAreaComponent,
+} from "obsidian";
 
 type VariableKV = Array<{ key: string; value: string }>;
 
@@ -252,35 +259,35 @@ export class CSSSettingsManager {
   }
 
   initClasses() {
-    Object.keys(this.config).forEach(section => {
+    Object.keys(this.config).forEach((section) => {
       const config = this.config[section];
 
-      Object.keys(config).forEach(settingId => {
+      Object.keys(config).forEach((settingId) => {
         const setting = config[settingId];
 
-        if (setting.type === 'class-toggle') {
+        if (setting.type === "class-toggle") {
           if (this.getSetting(section, settingId)) {
             document.body.classList.add(setting.id);
           }
         }
-      })
-    })
+      });
+    });
   }
 
   removeClasses() {
-    Object.keys(this.config).forEach(section => {
+    Object.keys(this.config).forEach((section) => {
       const config = this.config[section];
 
-      Object.keys(config).forEach(settingId => {
+      Object.keys(config).forEach((settingId) => {
         const setting = config[settingId];
 
-        if (setting.type === 'class-toggle') {
+        if (setting.type === "class-toggle") {
           if (this.getSetting(section, settingId)) {
             document.body.classList.remove(setting.id);
           }
         }
-      })
-    })
+      });
+    });
   }
 
   setCSSVariables() {
@@ -344,15 +351,32 @@ export class CSSSettingsManager {
     return this.settings[`${sectionId}@@${settingId}`];
   }
 
+  getSettings(sectionId: string, ids: string[]) {
+    return ids.reduce<Record<string, SettingValue>>((settings, id) => {
+      const fullId = `${sectionId}@@${id}`;
+
+      if (this.settings[fullId]) {
+        settings[fullId] = this.settings[fullId];
+      }
+
+      return settings;
+    }, {});
+  }
+
   setSetting(sectionId: string, settingId: string, value: SettingValue) {
     this.settings[`${sectionId}@@${settingId}`] = value;
     this.save();
   }
 
-  clearSetting(
-    sectionId: string,
-    settingId: string
-  ) {
+  setSettings(settings: Record<string, SettingValue>) {
+    Object.keys(settings).forEach((id) => {
+      this.settings[id] = settings[id];
+    });
+
+    return this.save();
+  }
+
+  clearSetting(sectionId: string, settingId: string) {
     delete this.settings[`${sectionId}@@${settingId}`];
     this.save();
   }
@@ -361,9 +385,199 @@ export class CSSSettingsManager {
     Object.keys(this.settings).forEach((key) => {
       const [section] = key.split("@@");
       if (section === sectionId) {
-        delete this.settings[key]
+        delete this.settings[key];
       }
     });
     this.save();
+  }
+
+  export(section: string, config: Record<string, SettingValue>) {
+    new ExportModal(this.plugin.app, this.plugin, section, config).open();
+  }
+
+  import() {
+    new ImportModal(this.plugin.app, this.plugin).open();
+  }
+}
+
+export class ExportModal extends Modal {
+  plugin: CSSSettingsPlugin;
+  section: string;
+  config: Record<string, SettingValue>;
+
+  constructor(
+    app: App,
+    plugin: CSSSettingsPlugin,
+    section: string,
+    config: Record<string, SettingValue>
+  ) {
+    super(app);
+    this.plugin = plugin;
+    this.config = config;
+    this.section = section;
+  }
+
+  onOpen() {
+    let { contentEl, modalEl } = this;
+
+    modalEl.addClass("modal-style-settings");
+
+    new Setting(contentEl)
+      .setName(`Export settings for: ${this.section}`)
+      .then((setting) => {
+        const output = JSON.stringify(this.config, null, 2);
+
+        // Build a copy to clipboard link
+        setting.controlEl.createEl(
+          "a",
+          {
+            cls: "style-settings-copy",
+            text: "Copy to clipboard",
+            href: "#",
+          },
+          (copyButton) => {
+            new TextAreaComponent(contentEl)
+              .setValue(output)
+              .then((textarea) => {
+                copyButton.addEventListener("click", (e) => {
+                  e.preventDefault();
+
+                  // Select the textarea contents and copy them to the clipboard
+                  textarea.inputEl.select();
+                  textarea.inputEl.setSelectionRange(0, 99999);
+                  document.execCommand("copy");
+
+                  copyButton.addClass("success");
+
+                  setTimeout(() => {
+                    // If the button is still in the dom, remove the success class
+                    if (copyButton.parentNode) {
+                      copyButton.removeClass("success");
+                    }
+                  }, 2000);
+                });
+              });
+          }
+        );
+
+        // Build a download link
+        setting.controlEl.createEl("a", {
+          cls: "style-settings-download",
+          text: "Download",
+          attr: {
+            download: "style-settings.json",
+            href: `data:application/json;charset=utf-8,${encodeURIComponent(
+              output
+            )}`,
+          },
+        });
+      });
+  }
+
+  onClose() {
+    let { contentEl } = this;
+    contentEl.empty();
+  }
+}
+
+export class ImportModal extends Modal {
+  plugin: CSSSettingsPlugin;
+
+  constructor(app: App, plugin: CSSSettingsPlugin) {
+    super(app);
+    this.plugin = plugin;
+  }
+
+  onOpen() {
+    let { contentEl, modalEl } = this;
+
+    modalEl.addClass("modal-style-settings");
+
+    new Setting(contentEl)
+      .setName("Import style setting")
+      .setDesc("Import an entire or partial configuration. Warning: this may override existing settings");
+
+    new Setting(contentEl).then((setting) => {
+      // Build an error message container
+      const errorSpan = createSpan({
+        cls: "style-settings-import-error",
+        text: "Error importing config",
+      });
+
+      setting.nameEl.appendChild(errorSpan);
+
+      // Attempt to parse the imported data and close if successful
+      const importAndClose = async (str: string) => {
+        if (str) {
+          try {
+            const importedSettings = JSON.parse(str) as Record<
+              string,
+              SettingValue
+            >;
+
+            await this.plugin.settingsManager.setSettings(importedSettings);
+
+            this.plugin.settingsTab.display();
+            this.close();
+          } catch (e) {
+            errorSpan.addClass("active");
+            errorSpan.setText(`Error importing style settings: ${e}`);
+          }
+        } else {
+          errorSpan.addClass("active");
+          errorSpan.setText(`Error importing style settings: config is empty`);
+        }
+      };
+
+      // Build a file input
+      setting.controlEl.createEl(
+        "input",
+        {
+          cls: "style-settings-import-input",
+          attr: {
+            id: "style-settings-import-input",
+            name: "style-settings-import-input",
+            type: "file",
+            accept: ".json",
+          },
+        },
+        (importInput) => {
+          // Set up a FileReader so we can parse the file contents
+          importInput.addEventListener("change", (e) => {
+            const reader = new FileReader();
+
+            reader.onload = async (e: ProgressEvent<FileReader>) => {
+              await importAndClose(e.target.result.toString().trim());
+            };
+
+            reader.readAsText((e.target as HTMLInputElement).files[0]);
+          });
+        }
+      );
+
+      // Build a label we will style as a link
+      setting.controlEl.createEl("label", {
+        cls: "style-settings-import-label",
+        text: "Import from file",
+        attr: {
+          for: "style-settings-import-input",
+        },
+      });
+
+      new TextAreaComponent(contentEl)
+        .setPlaceholder("Paste config here...")
+        .then((ta) => {
+          new ButtonComponent(contentEl)
+            .setButtonText("Save")
+            .onClick(async () => {
+              await importAndClose(ta.getValue().trim());
+            });
+        });
+    });
+  }
+
+  onClose() {
+    let { contentEl } = this;
+    contentEl.empty();
   }
 }
