@@ -94,6 +94,59 @@ settings:
 */
 ```
 
+## `class-multi-toggle`
+
+`class-multi-toggle` creates a dropdown of predefined options for a CSS variable. The `id` of the setting will be used as the variable name.
+
+- When `allowEmpty` is `false`, a `default` option **must** be specified.
+- When `allowEmpty` is `true`, the `default` attribute is optional, and may be set to `none`.
+
+```css
+/* @settings
+
+name: Your Section Name Here
+id: a-unique-id
+settings:
+    - 
+        id: theme-variant
+        title: Theme variant
+        description: Variations on a theme
+        type: class-multi-toggle
+        allowEmpty: false
+        default: my-class
+        options:
+            - my-class
+            - my-other-class
+            - and-yet-another
+
+*/
+```
+
+Options may also be given a label:
+
+```css
+/* @settings
+
+name: Your Section Name Here
+id: a-unique-id
+settings:
+    - 
+        id: theme-variant
+        title: Theme variant
+        description: Variations on a theme
+        type: class-multi-toggle
+        allowEmpty: false
+        default: my-class
+        options:
+            - 
+                label: My Class
+                value: my-class
+            - 
+                label: My Other Class
+                value: my-other-class
+*/
+```
+
 ## `variable-text`
 
 `variable-text` represents any text based CSS value. The `id` of the setting will be used as the variable name. `variable-text` settings require a `default` attribute.
@@ -204,6 +257,30 @@ settings:
             - sans-serif
             - Segoe UI
 
+*/
+```
+
+Options can optionally be given a label:
+
+```css
+/* @settings
+
+name: Your Section Name Here
+id: a-unique-id
+settings:
+    - 
+        id: text
+        title: UI font
+        description: Font used for the user interface
+        type: variable-select
+        default: Roboto
+        options:
+            - 
+                label: The best font
+                value: Roboto
+            - 
+                label: The next best font
+                value: Helvetica Neue
 */
 ```
 

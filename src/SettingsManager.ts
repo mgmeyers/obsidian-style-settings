@@ -10,6 +10,7 @@ import {
   VariableText,
   ColorFormat,
   AltFormatList,
+  ClassMultiToggle,
 } from "./settingHandlers";
 import chroma from "chroma-js";
 import {
@@ -269,6 +270,19 @@ export class CSSSettingsManager {
           if (this.getSetting(section, settingId)) {
             document.body.classList.add(setting.id);
           }
+        } else if (setting.type === "class-multi-toggle") {
+          const multiToggle = setting as ClassMultiToggle;
+          let value = this.getSetting(section, settingId) as string | undefined;
+
+          if (value === undefined && !!multiToggle.default) {
+            value = multiToggle.default;
+          } else if (value === undefined) {
+            value = "none";
+          }
+
+          if (value !== "none") {
+            document.body.classList.add(value);
+          }
         }
       });
     });
@@ -495,7 +509,9 @@ export class ImportModal extends Modal {
 
     new Setting(contentEl)
       .setName("Import style setting")
-      .setDesc("Import an entire or partial configuration. Warning: this may override existing settings");
+      .setDesc(
+        "Import an entire or partial configuration. Warning: this may override existing settings"
+      );
 
     new Setting(contentEl).then((setting) => {
       // Build an error message container

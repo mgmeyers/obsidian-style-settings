@@ -149,6 +149,97 @@ export function createClassToggle(opts: {
     });
 }
 
+interface SelectOption {
+  label: string;
+  value: string;
+}
+
+export interface ClassMultiToggle extends Meta {
+  default?: string;
+  allowEmpty: boolean;
+  options: Array<string | SelectOption>;
+}
+
+export function createClassMultiToggle(opts: {
+  sectionId: string;
+  config: ClassMultiToggle;
+  containerEl: HTMLElement;
+  settingsManager: CSSSettingsManager;
+}): CleanupFunction {
+  const { sectionId, config, containerEl, settingsManager } = opts;
+
+  let dropdownComponent: DropdownComponent;
+
+  if (typeof config.default !== "string") {
+    return console.error(`Error: ${config.title} missing default value`);
+  }
+
+  let prevValue = settingsManager.getSetting(sectionId, config.id) as
+    | string
+    | undefined;
+
+  if (prevValue === undefined && !!config.default) {
+    prevValue = config.default;
+  } else if (prevValue === undefined) {
+    prevValue = "none";
+  }
+
+  new Setting(containerEl)
+    .setName(config.title)
+    .setDesc(createDescription(config.description, config.default))
+    .addDropdown((dropdown) => {
+      if (config.allowEmpty) {
+        dropdown.addOption("none", "");
+      }
+
+      config.options.forEach((o) => {
+        if (typeof o === "string") {
+          dropdown.addOption(o, o);
+        } else {
+          dropdown.addOption(o.value, o.label);
+        }
+      });
+
+      dropdown.setValue(prevValue).onChange((value) => {
+        settingsManager.setSetting(sectionId, config.id, value);
+
+        if (value !== "none") {
+          document.body.classList.add(value);
+        }
+
+        if (prevValue) {
+          document.body.classList.remove(prevValue);
+        }
+
+        prevValue = value;
+      });
+
+      dropdownComponent = dropdown;
+    })
+    .addExtraButton((b) => {
+      b.setIcon("reset");
+      b.onClick(() => {
+        const value = config.default || "none";
+
+        dropdownComponent.setValue(config.default || "none");
+
+        if (value !== "none") {
+          document.body.classList.add(value);
+        }
+
+        if (prevValue) {
+          document.body.classList.remove(prevValue);
+        }
+
+        settingsManager.clearSetting(sectionId, config.id);
+      });
+      b.setTooltip(resetTooltip);
+    })
+    .then((setting) => {
+      setting.settingEl.dataset.id = opts.config.id;
+    });
+}
+
 export interface VariableText extends Meta {
   default: string;
 }
@@ -312,7 +403,7 @@ export function createVariableNumberSlider(opts: {
 
 export interface VariableSelect extends Meta {
   default: string;
-  options: string[];
+  options: Array<string | SelectOption>;
 }
 
 export function createVariableSelect(opts: {
@@ -334,7 +425,13 @@ export function createVariableSelect(opts: {
     .addDropdown((dropdown) => {
       const value = settingsManager.getSetting(sectionId, config.id);
 
-      config.options.forEach((o) => dropdown.addOption(o, o));
+      config.options.forEach((o) => {
+        if (typeof o === "string") {
+          dropdown.addOption(o, o);
+        } else {
+          dropdown.addOption(o.value, o.label);
+        }
+      });
 
       dropdown
         .setValue(value !== undefined ? (value as string) : config.default)
@@ -791,6 +888,16 @@ export function createSettings(opts: {
         createClassToggle({
           sectionId,
           config: setting as ClassToggle,
+          containerEl: getTargetContainer(containerStack),
+          settingsManager,
+        });
+        break;
+      }
+      case "class-multi-toggle": {
+        pushId(setting.id);
+        createClassMultiToggle({
+          sectionId,
+          config: setting as ClassMultiToggle,
           containerEl: getTargetContainer(containerStack),
           settingsManager,
         });
