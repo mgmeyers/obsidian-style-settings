@@ -104,7 +104,10 @@ export function createHeading(opts: {
           .then((b) => {
             b.extraSettingsEl.onClickEvent((e) => {
               e.stopPropagation();
-              const title = opts.sectionName === opts.config.title ? opts.config.title : `${opts.sectionName} > ${opts.config.title}`;
+              const title =
+                opts.sectionName === opts.config.title
+                  ? opts.config.title
+                  : `${opts.sectionName} > ${opts.config.title}`;
               opts.settingsManager.export(
                 title,
                 opts.settingsManager.getSettings(opts.sectionId, opts.children)
@@ -468,6 +471,13 @@ export function createVariableColor(opts: {
           instance.hide();
           instance.addSwatch(color.toHEXA().toString());
         })
+        .on("show", () => {
+          const { result } = (pickr.getRoot() as any).interaction;
+
+          requestAnimationFrame(() =>
+            requestAnimationFrame(() => result.select())
+          );
+        })
         .on("cancel", onPickrCancel);
     })
     .addExtraButton((b) => {
@@ -596,6 +606,13 @@ export function createVariableThemedColor(opts: {
                     : config["default-light"],
               })
             )
+              .on("show", () => {
+                const { result } = (pickrLight.getRoot() as any).interaction;
+
+                requestAnimationFrame(() =>
+                  requestAnimationFrame(() => result.select())
+                );
+              })
               .on("save", onSave(idLight))
               .on("cancel", onPickrCancel);
 
@@ -622,6 +639,13 @@ export function createVariableThemedColor(opts: {
                     : config["default-dark"],
               })
             )
+              .on("show", () => {
+                const { result } = (pickrDark.getRoot() as any).interaction;
+
+                requestAnimationFrame(() =>
+                  requestAnimationFrame(() => result.select())
+                );
+              })
               .on("save", onSave(idDark))
               .on("cancel", onPickrCancel);
 
