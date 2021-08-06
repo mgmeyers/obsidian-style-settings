@@ -893,7 +893,7 @@ export function createSettings(opts: {
         });
         break;
       }
-      case "class-multi-toggle": {
+      case "class-select": {
         pushId(setting.id);
         createClassMultiToggle({
           sectionId,

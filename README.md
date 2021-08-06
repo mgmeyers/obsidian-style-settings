@@ -94,9 +94,9 @@ settings:
 */
 ```
 
-## `class-multi-toggle`
+## `class-select`
 
-`class-multi-toggle` creates a dropdown of predefined options for a CSS variable. The `id` of the setting will be used as the variable name.
+`class-select` creates a dropdown of predefined options for a CSS variable. The `id` of the setting will be used as the variable name.
 
 - When `allowEmpty` is `false`, a `default` option **must** be specified.
 - When `allowEmpty` is `true`, the `default` attribute is optional, and may be set to `none`.
@@ -111,7 +111,7 @@ settings:
         id: theme-variant
         title: Theme variant
         description: Variations on a theme
-        type: class-multi-toggle
+        type: class-select
         allowEmpty: false
         default: my-class
         options:
@@ -134,7 +134,7 @@ settings:
         id: theme-variant
         title: Theme variant
         description: Variations on a theme
-        type: class-multi-toggle
+        type: class-select
         allowEmpty: false
         default: my-class
         options:

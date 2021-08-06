@@ -270,7 +270,7 @@ export class CSSSettingsManager {
           if (this.getSetting(section, settingId)) {
             document.body.classList.add(setting.id);
           }
-        } else if (setting.type === "class-multi-toggle") {
+        } else if (setting.type === "class-select") {
           const multiToggle = setting as ClassMultiToggle;
           let value = this.getSetting(section, settingId) as string | undefined;
 
