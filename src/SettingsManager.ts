@@ -11,6 +11,7 @@ import {
   ColorFormat,
   AltFormatList,
   ClassMultiToggle,
+  ClassToggle,
 } from "./settingHandlers";
 import chroma from "chroma-js";
 import {
@@ -267,7 +268,9 @@ export class CSSSettingsManager {
         const setting = config[settingId];
 
         if (setting.type === "class-toggle") {
-          if (this.getSetting(section, settingId)) {
+          const classToggle = setting as ClassToggle;
+          let value = this.getSetting(section, settingId) as boolean | undefined;
+          if (value === true || (value === undefined && classToggle.default === true)) {
             document.body.classList.add(setting.id);
           }
         } else if (setting.type === "class-select") {

@@ -6,6 +6,7 @@ import {
   debounce,
   ButtonComponent,
   setIcon,
+  ToggleComponent,
 } from "obsidian";
 import { CSSSettingsManager } from "./SettingsManager";
 import Pickr from "@simonwep/pickr";
@@ -122,7 +123,9 @@ export function createHeading(opts: {
     });
 }
 
-export interface ClassToggle extends Meta {}
+export interface ClassToggle extends Meta {
+  default?: boolean;
+}
 
 export function createClassToggle(opts: {
   sectionId: string;
@@ -131,6 +134,7 @@ export function createClassToggle(opts: {
   settingsManager: CSSSettingsManager;
 }): CleanupFunction {
   const { sectionId, config, containerEl, settingsManager } = opts;
+  let toggleComponent: ToggleComponent;
 
   new Setting(containerEl)
     .setName(config.title)
@@ -138,15 +142,36 @@ export function createClassToggle(opts: {
     .addToggle((toggle) => {
       const value = settingsManager.getSetting(sectionId, config.id);
 
-      toggle.setValue((value as boolean) || false).onChange((value) => {
-        settingsManager.setSetting(sectionId, config.id, value);
+      toggle
+        .setValue((value as boolean) || !!config.default)
+        .onChange((value) => {
+          settingsManager.setSetting(sectionId, config.id, value);
+
+          if (value) {
+            document.body.classList.add(config.id);
+          } else {
+            document.body.classList.remove(config.id);
+          }
+        });
+
+        toggleComponent = toggle;
+    })
+    .addExtraButton((b) => {
+      b.setIcon("reset");
+      b.onClick(() => {
+        const value = !!config.default;
+        
+        toggleComponent.setValue(value);
 
         if (value) {
           document.body.classList.add(config.id);
         } else {
           document.body.classList.remove(config.id);
         }
+
+        settingsManager.clearSetting(sectionId, config.id);
       });
+      b.setTooltip(resetTooltip);
     })
     .then((setting) => {
       setting.settingEl.dataset.id = opts.config.id;
@@ -463,7 +488,9 @@ export function createVariableSelect(opts: {
 
   new Setting(containerEl)
     .setName(config.title)
-    .setDesc(createDescription(config.description, config.default, defaultLabel))
+    .setDesc(
+      createDescription(config.description, config.default, defaultLabel)
+    )
     .addDropdown((dropdown) => {
       const value = settingsManager.getSetting(sectionId, config.id);
 

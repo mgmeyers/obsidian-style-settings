@@ -184,7 +184,7 @@ class CSSSettingsTab extends PluginSettingTab {
         setting.controlEl.createEl(
           "a",
           {
-            cls: "icon-swapper-import",
+            cls: "style-settings-import",
             text: "Import",
             href: "#",
           },
@@ -200,7 +200,7 @@ class CSSSettingsTab extends PluginSettingTab {
         setting.controlEl.createEl(
           "a",
           {
-            cls: "icon-swapper-export",
+            cls: "style-settings-export",
             text: "Export",
             href: "#",
           },
