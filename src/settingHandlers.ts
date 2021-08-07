@@ -20,7 +20,11 @@ function sanitizeText(str: string): string {
   return str.replace(/[;<>]/g, "");
 }
 
-function createDescription(description: string | undefined, def: string) {
+function createDescription(
+  description: string | undefined,
+  def: string,
+  defLabel?: string
+) {
   const fragment = createFragment();
 
   if (description) {
@@ -30,7 +34,7 @@ function createDescription(description: string | undefined, def: string) {
   if (def) {
     const small = createEl("small");
     small.appendChild(createEl("strong", { text: "Default: " }));
-    small.appendChild(document.createTextNode(def));
+    small.appendChild(document.createTextNode(defLabel || def));
 
     const div = createEl("div");
 
@@ -184,9 +188,29 @@ export function createClassMultiToggle(opts: {
     prevValue = "none";
   }
 
+  const defaultOption = config.default
+    ? config.options.find((o) => {
+        if (typeof o === "string") {
+          return o === config.default;
+        }
+
+        return o.value === config.default;
+      })
+    : undefined;
+
+  let defaultLabel = undefined;
+
+  if (defaultOption && typeof defaultOption === "string") {
+    defaultLabel = defaultOption;
+  } else if (defaultOption && typeof defaultOption === "object") {
+    defaultLabel = defaultOption.label;
+  }
+
   new Setting(containerEl)
     .setName(config.title)
-    .setDesc(createDescription(config.description, config.default))
+    .setDesc(
+      createDescription(config.description, config.default, defaultLabel)
+    )
     .addDropdown((dropdown) => {
       if (config.allowEmpty) {
         dropdown.addOption("none", "");
@@ -419,9 +443,27 @@ export function createVariableSelect(opts: {
     return console.error(`Error: ${config.title} missing default value`);
   }
 
+  const defaultOption = config.default
+    ? config.options.find((o) => {
+        if (typeof o === "string") {
+          return o === config.default;
+        }
+
+        return o.value === config.default;
+      })
+    : undefined;
+
+  let defaultLabel = undefined;
+
+  if (defaultOption && typeof defaultOption === "string") {
+    defaultLabel = defaultOption;
+  } else if (defaultOption && typeof defaultOption === "object") {
+    defaultLabel = defaultOption.label;
+  }
+
   new Setting(containerEl)
     .setName(config.title)
-    .setDesc(createDescription(config.description, config.default))
+    .setDesc(createDescription(config.description, config.default, defaultLabel))
     .addDropdown((dropdown) => {
       const value = settingsManager.getSetting(sectionId, config.id);
 
