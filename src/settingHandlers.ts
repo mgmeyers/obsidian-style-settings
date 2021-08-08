@@ -143,7 +143,7 @@ export function createClassToggle(opts: {
       const value = settingsManager.getSetting(sectionId, config.id);
 
       toggle
-        .setValue((value as boolean) || !!config.default)
+        .setValue(value !== undefined ? !!value : !!config.default)
         .onChange((value) => {
           settingsManager.setSetting(sectionId, config.id, value);
 
