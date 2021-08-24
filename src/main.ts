@@ -85,9 +85,12 @@ export default class CSSSettingsPlugin extends Plugin {
       })
     );
 
-    this.app.workspace.trigger("css-change");
-
     document.body.classList.add("css-settings-manager");
+
+    // Let other plugins register before calling this to pick up on plugin style settings
+    setTimeout(() => {
+      this.app.workspace.trigger("css-change");
+    });
   }
 
   onunload() {
@@ -178,40 +181,42 @@ class CSSSettingsTab extends PluginSettingTab {
       return this.displayEmpty();
     }
 
-    new Setting(containerEl)
-      .then((setting) => {
-        // Build and import link to open the import modal
-        setting.controlEl.createEl(
-          "a",
-          {
-            cls: "style-settings-import",
-            text: "Import",
-            href: "#",
-          },
-          (el) => {
-            el.addEventListener("click", (e) => {
-              e.preventDefault();
-              this.plugin.settingsManager.import();
-            });
-          }
-        );
+    new Setting(containerEl).then((setting) => {
+      // Build and import link to open the import modal
+      setting.controlEl.createEl(
+        "a",
+        {
+          cls: "style-settings-import",
+          text: "Import",
+          href: "#",
+        },
+        (el) => {
+          el.addEventListener("click", (e) => {
+            e.preventDefault();
+            this.plugin.settingsManager.import();
+          });
+        }
+      );
 
-        // Build and export link to open the export modal
-        setting.controlEl.createEl(
-          "a",
-          {
-            cls: "style-settings-export",
-            text: "Export",
-            href: "#",
-          },
-          (el) => {
-            el.addEventListener("click", (e) => {
-              e.preventDefault();
-              this.plugin.settingsManager.export("All settings", this.plugin.settingsManager.settings);
-            });
-          }
-        );
-      })
+      // Build and export link to open the export modal
+      setting.controlEl.createEl(
+        "a",
+        {
+          cls: "style-settings-export",
+          text: "Export",
+          href: "#",
+        },
+        (el) => {
+          el.addEventListener("click", (e) => {
+            e.preventDefault();
+            this.plugin.settingsManager.export(
+              "All settings",
+              this.plugin.settingsManager.settings
+            );
+          });
+        }
+      );
+    });
 
     const cleanupFns: CleanupFunction[] = [];
 
