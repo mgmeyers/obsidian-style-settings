@@ -1,0 +1,373 @@
+
+.test-theme-dark-background-primary {
+  color: #202020;
+}
+.test-theme-dark-background-primary-bg {
+  background-color: #202020;
+}
+.test-theme-dark-background-primary-alt {
+  color: #1a1a1a;
+}
+.test-theme-dark-background-primary-alt-bg {
+  background-color: #1a1a1a;
+}
+.test-theme-dark-background-secondary {
+  color: #161616;
+}
+.test-theme-dark-background-secondary-bg {
+  background-color: #161616;
+}
+.test-theme-dark-background-secondary-alt {
+  color: #000000;
+}
+.test-theme-dark-background-secondary-alt-bg {
+  background-color: #000000;
+}
+.test-theme-dark-background-modifier-border {
+  color: #333;
+}
+.test-theme-dark-background-modifier-border-bg {
+  background-color: #333;
+}
+.test-theme-dark-background-modifier-form-field {
+  color: rgba(0, 0, 0, 0.3);
+}
+.test-theme-dark-background-modifier-form-field-bg {
+  background-color: rgba(0, 0, 0, 0.3);
+}
+.test-theme-dark-background-modifier-form-field-highlighted {
+  color: rgba(0, 0, 0, 0.22);
+}
+.test-theme-dark-background-modifier-form-field-highlighted-bg {
+  background-color: rgba(0, 0, 0, 0.22);
+}
+.test-theme-dark-background-modifier-box-shadow {
+  color: rgba(0, 0, 0, 0.3);
+}
+.test-theme-dark-background-modifier-box-shadow-bg {
+  background-color: rgba(0, 0, 0, 0.3);
+}
+.test-theme-dark-background-modifier-success {
+  color: #197300;
+}
+.test-theme-dark-background-modifier-success-bg {
+  background-color: #197300;
+}
+.test-theme-dark-background-modifier-error {
+  color: #3d0000;
+}
+.test-theme-dark-background-modifier-error-bg {
+  background-color: #3d0000;
+}
+.test-theme-dark-background-modifier-error-hover {
+  color: #470000;
+}
+.test-theme-dark-background-modifier-error-hover-bg {
+  background-color: #470000;
+}
+.test-theme-dark-background-modifier-cover {
+  color: rgba(0, 0, 0, 0.8);
+}
+.test-theme-dark-background-modifier-cover-bg {
+  background-color: rgba(0, 0, 0, 0.8);
+}
+.test-theme-dark-text-accent {
+  color: #7f6df2;
+}
+.test-theme-dark-text-accent-bg {
+  background-color: #7f6df2;
+}
+.test-theme-dark-text-accent-hover {
+  color: #8875ff;
+}
+.test-theme-dark-text-accent-hover-bg {
+  background-color: #8875ff;
+}
+.test-theme-dark-text-normal {
+  color: #dcddde;
+}
+.test-theme-dark-text-normal-bg {
+  background-color: #dcddde;
+}
+.test-theme-dark-text-muted {
+  color: #999;
+}
+.test-theme-dark-text-muted-bg {
+  background-color: #999;
+}
+.test-theme-dark-text-faint {
+  color: #666;
+}
+.test-theme-dark-text-faint-bg {
+  background-color: #666;
+}
+.test-theme-dark-text-error {
+  color: #ff3333;
+}
+.test-theme-dark-text-error-bg {
+  background-color: #ff3333;
+}
+.test-theme-dark-text-error-hover {
+  color: #990000;
+}
+.test-theme-dark-text-error-hover-bg {
+  background-color: #990000;
+}
+.test-theme-dark-text-highlight-bg {
+  color: rgba(255, 255, 0, 0.4);
+}
+.test-theme-dark-text-highlight-bg-bg {
+  background-color: rgba(255, 255, 0, 0.4);
+}
+.test-theme-dark-text-highlight-bg-active {
+  color: rgba(255, 128, 0, 0.4);
+}
+.test-theme-dark-text-highlight-bg-active-bg {
+  background-color: rgba(255, 128, 0, 0.4);
+}
+.test-theme-dark-text-selection {
+  color: rgba(23, 48, 77, 0.99);
+}
+.test-theme-dark-text-selection-bg {
+  background-color: rgba(23, 48, 77, 0.99);
+}
+.test-theme-dark-text-on-accent {
+  color: #dcddde;
+}
+.test-theme-dark-text-on-accent-bg {
+  background-color: #dcddde;
+}
+.test-theme-dark-interactive-normal {
+  color: #2a2a2a;
+}
+.test-theme-dark-interactive-normal-bg {
+  background-color: #2a2a2a;
+}
+.test-theme-dark-interactive-hover {
+  color: #303030;
+}
+.test-theme-dark-interactive-hover-bg {
+  background-color: #303030;
+}
+.test-theme-dark-interactive-accent {
+  color: #483699;
+}
+.test-theme-dark-interactive-accent-bg {
+  background-color: #483699;
+}
+.test-theme-dark-interactive-accent-hover {
+  color: #4d3ca6;
+}
+.test-theme-dark-interactive-accent-hover-bg {
+  background-color: #4d3ca6;
+}
+.test-theme-dark-interactive-success {
+  color: #197300;
+}
+.test-theme-dark-interactive-success-bg {
+  background-color: #197300;
+}
+.test-theme-dark-scrollbar-active-thumb-bg {
+  color: rgba(255, 255, 255, 0.2);
+}
+.test-theme-dark-scrollbar-active-thumb-bg-bg {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+.test-theme-dark-scrollbar-bg {
+  color: rgba(255, 255, 255, 0.05);
+}
+.test-theme-dark-scrollbar-bg-bg {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+.test-theme-dark-scrollbar-thumb-bg {
+  color: rgba(255, 255, 255, 0.1);
+}
+.test-theme-dark-scrollbar-thumb-bg-bg {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+.test-theme-light-background-primary {
+  color: #ffffff;
+}
+.test-theme-light-background-primary-bg {
+  background-color: #ffffff;
+}
+.test-theme-light-background-primary-alt {
+  color: #f5f6f8;
+}
+.test-theme-light-background-primary-alt-bg {
+  background-color: #f5f6f8;
+}
+.test-theme-light-background-secondary {
+  color: #f2f3f5;
+}
+.test-theme-light-background-secondary-bg {
+  background-color: #f2f3f5;
+}
+.test-theme-light-background-secondary-alt {
+  color: #e3e5e8;
+}
+.test-theme-light-background-secondary-alt-bg {
+  background-color: #e3e5e8;
+}
+.test-theme-light-background-modifier-border {
+  color: #ddd;
+}
+.test-theme-light-background-modifier-border-bg {
+  background-color: #ddd;
+}
+.test-theme-light-background-modifier-form-field {
+  color: #fff;
+}
+.test-theme-light-background-modifier-form-field-bg {
+  background-color: #fff;
+}
+.test-theme-light-background-modifier-form-field-highlighted {
+  color: #fff;
+}
+.test-theme-light-background-modifier-form-field-highlighted-bg {
+  background-color: #fff;
+}
+.test-theme-light-background-modifier-box-shadow {
+  color: rgba(0, 0, 0, 0.1);
+}
+.test-theme-light-background-modifier-box-shadow-bg {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+.test-theme-light-background-modifier-success {
+  color: #A4E7C3;
+}
+.test-theme-light-background-modifier-success-bg {
+  background-color: #A4E7C3;
+}
+.test-theme-light-background-modifier-error {
+  color: #990000;
+}
+.test-theme-light-background-modifier-error-bg {
+  background-color: #990000;
+}
+.test-theme-light-background-modifier-error-hover {
+  color: #bb0000;
+}
+.test-theme-light-background-modifier-error-hover-bg {
+  background-color: #bb0000;
+}
+.test-theme-light-background-modifier-cover {
+  color: rgba(0, 0, 0, 0.8);
+}
+.test-theme-light-background-modifier-cover-bg {
+  background-color: rgba(0, 0, 0, 0.8);
+}
+.test-theme-light-text-accent {
+  color: #705dcf;
+}
+.test-theme-light-text-accent-bg {
+  background-color: #705dcf;
+}
+.test-theme-light-text-accent-hover {
+  color: #7a6ae6;
+}
+.test-theme-light-text-accent-hover-bg {
+  background-color: #7a6ae6;
+}
+.test-theme-light-text-normal {
+  color: #2e3338;
+}
+.test-theme-light-text-normal-bg {
+  background-color: #2e3338;
+}
+.test-theme-light-text-muted {
+  color: #888888;
+}
+.test-theme-light-text-muted-bg {
+  background-color: #888888;
+}
+.test-theme-light-text-faint {
+  color: #999999;
+}
+.test-theme-light-text-faint-bg {
+  background-color: #999999;
+}
+.test-theme-light-text-error {
+  color: #800000;
+}
+.test-theme-light-text-error-bg {
+  background-color: #800000;
+}
+.test-theme-light-text-error-hover {
+  color: #990000;
+}
+.test-theme-light-text-error-hover-bg {
+  background-color: #990000;
+}
+.test-theme-light-text-highlight-bg {
+  color: rgba(255, 255, 0, 0.4);
+}
+.test-theme-light-text-highlight-bg-bg {
+  background-color: rgba(255, 255, 0, 0.4);
+}
+.test-theme-light-text-highlight-bg-active {
+  color: rgba(255, 128, 0, 0.4);
+}
+.test-theme-light-text-highlight-bg-active-bg {
+  background-color: rgba(255, 128, 0, 0.4);
+}
+.test-theme-light-text-selection {
+  color: rgba(204, 230, 255, 0.99);
+}
+.test-theme-light-text-selection-bg {
+  background-color: rgba(204, 230, 255, 0.99);
+}
+.test-theme-light-text-on-accent {
+  color: #f2f2f2;
+}
+.test-theme-light-text-on-accent-bg {
+  background-color: #f2f2f2;
+}
+.test-theme-light-interactive-normal {
+  color: #f2f3f5;
+}
+.test-theme-light-interactive-normal-bg {
+  background-color: #f2f3f5;
+}
+.test-theme-light-interactive-hover {
+  color: #e9e9e9;
+}
+.test-theme-light-interactive-hover-bg {
+  background-color: #e9e9e9;
+}
+.test-theme-light-interactive-accent {
+  color: #7b6cd9;
+}
+.test-theme-light-interactive-accent-bg {
+  background-color: #7b6cd9;
+}
+.test-theme-light-interactive-accent-hover {
+  color: #8273e6;
+}
+.test-theme-light-interactive-accent-hover-bg {
+  background-color: #8273e6;
+}
+.test-theme-light-interactive-success {
+  color: #197300;
+}
+.test-theme-light-interactive-success-bg {
+  background-color: #197300;
+}
+.test-theme-light-scrollbar-active-thumb-bg {
+  color: rgba(0, 0, 0, 0.2);
+}
+.test-theme-light-scrollbar-active-thumb-bg-bg {
+  background-color: rgba(0, 0, 0, 0.2);
+}
+.test-theme-light-scrollbar-bg {
+  color: rgba(0, 0, 0, 0.05);
+}
+.test-theme-light-scrollbar-bg-bg {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+.test-theme-light-scrollbar-thumb-bg {
+  color: rgba(0, 0, 0, 0.1);
+}
+.test-theme-light-scrollbar-thumb-bg-bg {
+  background-color: rgba(0, 0, 0, 0.1);
+}
