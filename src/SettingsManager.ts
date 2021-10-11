@@ -1,19 +1,17 @@
-import CSSSettingsPlugin from "./main";
 import {
+  AltFormatList,
   CSSSetting,
+  ClassMultiToggle,
+  ClassToggle,
+  ColorFormat,
   ParsedCSSSettings,
   VariableColor,
-  VariableThemedColor,
   VariableNumber,
   VariableNumberSlider,
   VariableSelect,
   VariableText,
-  ColorFormat,
-  AltFormatList,
-  ClassMultiToggle,
-  ClassToggle,
+  VariableThemedColor,
 } from "./settingHandlers";
-import chroma from "chroma-js";
 import {
   App,
   ButtonComponent,
@@ -21,6 +19,9 @@ import {
   Setting,
   TextAreaComponent,
 } from "obsidian";
+
+import CSSSettingsPlugin from "./main";
+import chroma from "chroma-js";
 
 type VariableKV = Array<{ key: string; value: string }>;
 
@@ -73,10 +74,11 @@ function generateColorVariables(
     }
     case "hsl-split": {
       const hsl = parsedColor.hsl();
+      const h = isNaN(hsl[0]) ? 0 : hsl[0];
       const out = [
         {
           key: `${key}-h`,
-          value: hsl[0].toString(),
+          value: h.toString(),
         },
         {
           key: `${key}-s`,
