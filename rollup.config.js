@@ -3,7 +3,6 @@ import typescript from "@rollup/plugin-typescript";
 import { nodeResolve } from "@rollup/plugin-node-resolve";
 import commonjs from "@rollup/plugin-commonjs";
 import css from "rollup-plugin-css-only";
-import copy from "rollup-plugin-copy";
 
 dotenv.config();
 
@@ -31,31 +30,5 @@ const output = [
     ],
   },
 ];
-
-if (process.env.PLUGIN_DEST) {
-  output.push({
-    input: "./src/main.ts",
-    output: {
-      dir: process.env.PLUGIN_DEST,
-      sourcemap: "inline",
-      format: "cjs",
-      exports: "default",
-      banner,
-    },
-    external: ["obsidian"],
-    plugins: [
-      css({ output: "styles.css" }),
-      typescript(),
-      nodeResolve({ browser: true }),
-      commonjs(),
-      copy({
-        targets: [
-          { src: "./manifest.json", dest: process.env.PLUGIN_DEST },
-          { src: "./styles.css", dest: process.env.PLUGIN_DEST },
-        ],
-      }),
-    ],
-  });
-}
 
 export default output;

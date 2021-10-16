@@ -11,3 +11,5 @@ data.json
 .DS_Store
 *.js.map
 .env
+
+.hotreload

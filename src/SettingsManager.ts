@@ -271,8 +271,13 @@ export class CSSSettingsManager {
 
         if (setting.type === "class-toggle") {
           const classToggle = setting as ClassToggle;
-          let value = this.getSetting(section, settingId) as boolean | undefined;
-          if (value === true || (value === undefined && classToggle.default === true)) {
+          let value = this.getSetting(section, settingId) as
+            | boolean
+            | undefined;
+          if (
+            value === true ||
+            (value === undefined && classToggle.default === true)
+          ) {
             document.body.classList.add(setting.id);
           }
         } else if (setting.type === "class-select") {
@@ -373,10 +378,19 @@ export class CSSSettingsManager {
   getSettings(sectionId: string, ids: string[]) {
     return ids.reduce<Record<string, SettingValue>>((settings, id) => {
       const fullId = `${sectionId}@@${id}`;
+      const alts = ["dark", "light"];
 
       if (this.settings[fullId]) {
         settings[fullId] = this.settings[fullId];
       }
+
+      alts.forEach((alt) => {
+        const id = `${fullId}@@${alt}`;
+
+        if (this.settings[id]) {
+          settings[id] = this.settings[id];
+        }
+      });
 
       return settings;
     }, {});
