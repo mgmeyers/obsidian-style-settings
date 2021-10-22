@@ -33,64 +33,77 @@ export default class CSSSettingsPlugin extends Plugin {
 
     this.registerEvent(
       this.app.workspace.on("css-change", () => {
-        const styleSheets = document.styleSheets;
-        const settingsList: ParsedCSSSettings[] = [];
-        const errorList: ErrorList = [];
+        this.parseCSS();
+      })
+    );
 
-        for (let i = 0, len = styleSheets.length; i < len; i++) {
-          const sheet = styleSheets.item(i);
-          const text = sheet.ownerNode.textContent.trim();
-
-          let match = settingRegExp.exec(text);
-
-          if (match && match.length) {
-            do {
-              const nameMatch = text.match(nameRegExp);
-              const name: string | undefined = nameMatch
-                ? nameMatch[1]
-                : undefined;
-
-              try {
-                const str = match[1].trim();
-
-                const indent = detectIndent(str);
-
-                const settings = yaml.load(
-                  str.replace(
-                    /\t/g,
-                    indent.type === "space" ? indent.indent : "    "
-                  ),
-                  {
-                    filename: name,
-                  }
-                ) as ParsedCSSSettings;
-
-                if (
-                  typeof settings === "object" &&
-                  settings.name &&
-                  settings.id &&
-                  settings.settings
-                ) {
-                  settingsList.push(settings);
-                }
-              } catch (e) {
-                errorList.push({ name, error: `${e}` });
-              }
-            } while ((match = settingRegExp.exec(text)) !== null);
-          }
-        }
-
-        this.settingsTab.setSettings(settingsList, errorList);
-        this.settingsManager.initClasses();
+    this.registerEvent(
+      (this.app.workspace as any).on("parse-style-settings", () => {
+        this.parseCSS();
       })
     );
 
     document.body.classList.add("css-settings-manager");
 
-    // Let other plugins register before calling this to pick up on plugin style settings
-    setTimeout(() => {
-      this.app.workspace.trigger("css-change");
-    });
+    this.parseCSS();
+  }
+
+  debounceTimer = 0;
+
+  parseCSS() {
+    clearTimeout(this.debounceTimer);
+
+    this.debounceTimer = window.setTimeout(() => {
+      const styleSheets = document.styleSheets;
+      const settingsList: ParsedCSSSettings[] = [];
+      const errorList: ErrorList = [];
+
+      for (let i = 0, len = styleSheets.length; i < len; i++) {
+        const sheet = styleSheets.item(i);
+        const text = sheet.ownerNode.textContent.trim();
+
+        let match = settingRegExp.exec(text);
+
+        if (match && match.length) {
+          do {
+            const nameMatch = text.match(nameRegExp);
+            const name: string | undefined = nameMatch
+              ? nameMatch[1]
+              : undefined;
+
+            try {
+              const str = match[1].trim();
+
+              const indent = detectIndent(str);
+
+              const settings = yaml.load(
+                str.replace(
+                  /\t/g,
+                  indent.type === "space" ? indent.indent : "    "
+                ),
+                {
+                  filename: name,
+                }
+              ) as ParsedCSSSettings;
+
+              if (
+                typeof settings === "object" &&
+                settings.name &&
+                settings.id &&
+                settings.settings
+              ) {
+                settingsList.push(settings);
+              }
+            } catch (e) {
+              errorList.push({ name, error: `${e}` });
+            }
+          } while ((match = settingRegExp.exec(text)) !== null);
+        }
+      }
+
+      this.settingsTab.setSettings(settingsList, errorList);
+      this.settingsManager.initClasses();
+    }, 100);
   }
 
   onunload() {
