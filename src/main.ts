@@ -86,11 +86,14 @@ export default class CSSSettingsPlugin extends Plugin {
                 }
               ) as ParsedCSSSettings;
 
+              settings.settings = settings.settings.filter(setting => setting);
+
               if (
                 typeof settings === "object" &&
                 settings.name &&
                 settings.id &&
-                settings.settings
+                settings.settings && 
+                settings.settings.length
               ) {
                 settingsList.push(settings);
               }
