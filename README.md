@@ -55,6 +55,7 @@ All settings definitions must have these parameters:
   - `variable-select`: a text-based CSS variable displayed as a dropdown menu of predefined options
   - `variable-color`: a color CSS variable with corresponding color picker
 
+
 ## `heading`
 
 `heading`s can be used to organize and group settings into collapsable nested sections. Along with the required attributes, `heading`s must contain a `level` attribute between `1` and `6`, and can optionally contain a `collapsed` attribute:
@@ -451,4 +452,58 @@ When `opacity` is set to `true`:
 --accent-s: 100%;
 --accent-l: 50%;
 --accent-a: 1;
+```
+
+## Localization Support
+
+Translations for titles and descriptions can be supplied for each language Obsidian supports by using one of the following postfixes:
+
+```
+en: English
+zh: 简体中文
+zh-TW: 繁體中文
+ru: Pусский
+ko: 한국어
+it: Italiano
+id: Bahasa Indonesia
+ro: Română
+pt-BR: Portugues do Brasil
+cz: čeština
+de: Deutsch
+es: Español
+fr: Français
+no: Norsk
+pl: język polski
+pt: Português
+ja: 日本語
+da: Dansk
+uk: Український
+sq: Shqip
+tr: Türkçe (kısmi)
+hi: हिन्दी (आंशिक)
+nl: Nederlands (gedeeltelijk)
+ar: العربية (جزئي)
+```
+
+For example:
+
+```
+```css
+/* @settings
+
+name: Your Section Name Here
+id: a-unique-id
+settings:
+    - 
+        id: my-css-class
+        title: My Toggle
+        title.de: Mein Toggle
+        title.ko: 내 토글
+        description: Adds my-css-class to the body element
+        description.de: Fügt my-css-class zum body-Element hinzu
+        description.ko: my-css-class를 body 요소에 추가합니다.
+        type: class-toggle
+
+*/
+```
 ```
