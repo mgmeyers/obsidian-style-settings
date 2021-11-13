@@ -10,6 +10,7 @@ import {
 } from "obsidian";
 import { CSSSettingsManager } from "./SettingsManager";
 import Pickr from "@simonwep/pickr";
+import { lang, t } from "./lang/helpers";
 
 const resetTooltip = "Restore default";
 
@@ -34,7 +35,7 @@ function createDescription(
 
   if (def) {
     const small = createEl("small");
-    small.appendChild(createEl("strong", { text: "Default: " }));
+    small.appendChild(createEl("strong", { text: `${t('Default:')} ` }));
     small.appendChild(document.createTextNode(defLabel || def));
 
     const div = createEl("div");
@@ -49,17 +50,85 @@ function createDescription(
 
 export type CleanupFunction = void | (() => void);
 
-interface Meta {
+interface WithTitle {
+  title: string;
+  "title.ar"?: string;
+  "title.cz"?: string;
+  "title.da"?: string;
+  "title.de"?: string;
+  "title.es"?: string;
+  "title.fr"?: string;
+  "title.hi"?: string;
+  "title.id"?: string;
+  "title.it"?: string;
+  "title.ja"?: string;
+  "title.ko"?: string;
+  "title.nl"?: string;
+  "title.no"?: string;
+  "title.pl"?: string;
+  "title.pt-BR"?: string;
+  "title.pt"?: string;
+  "title.ro"?: string;
+  "title.ru"?: string;
+  "title.sq"?: string;
+  "title.tr"?: string;
+  "title.uk"?: string;
+  "title.zh-TW"?: string;
+  "title.zh"?: string;
+}
+
+interface WithDescription {
+  description?: string;
+  "description.ar"?: string;
+  "description.cz"?: string;
+  "description.da"?: string;
+  "description.de"?: string;
+  "description.es"?: string;
+  "description.fr"?: string;
+  "description.hi"?: string;
+  "description.id"?: string;
+  "description.it"?: string;
+  "description.ja"?: string;
+  "description.ko"?: string;
+  "description.nl"?: string;
+  "description.no"?: string;
+  "description.pl"?: string;
+  "description.pt-BR"?: string;
+  "description.pt"?: string;
+  "description.ro"?: string;
+  "description.ru"?: string;
+  "description.sq"?: string;
+  "description.tr"?: string;
+  "description.uk"?: string;
+  "description.zh-TW"?: string;
+  "description.zh"?: string;
+}
+
+interface Meta extends WithTitle, WithDescription {
   id: string;
   type: string;
-  title: string;
-  description?: string;
 }
 
 export interface Heading extends Meta {
   level: 0 | 1 | 2 | 3 | 4 | 5 | 6;
   collapsed?: boolean;
   resetFn?: () => void;
+}
+
+function getTitle<T extends Meta>(config: T): string {
+  if (lang) {
+    return config[`title.${lang}` as keyof WithTitle] || config.title;
+  }
+
+  return config.title;
+}
+
+function getDescription<T extends Meta>(config: T): string {
+  if (lang) {
+    return config[`description.${lang}` as keyof WithDescription] || config.description;
+  }
+
+  return config.description;
 }
 
 export function createHeading(opts: {
@@ -73,8 +142,8 @@ export function createHeading(opts: {
   new Setting(opts.containerEl)
     .setHeading()
     .setClass("style-settings-heading")
-    .setName(opts.config.title)
-    .setDesc(opts.config.description ? opts.config.description : "")
+    .setName(getTitle(opts.config))
+    .setDesc(getDescription(opts.config) ? getDescription(opts.config) : "")
     .then((setting) => {
       if (opts.config.collapsed) setting.settingEl.addClass("is-collapsed");
       setting.settingEl.dataset.level = opts.config.level.toString();
@@ -110,9 +179,9 @@ export function createHeading(opts: {
             b.extraSettingsEl.onClickEvent((e) => {
               e.stopPropagation();
               const title =
-                opts.sectionName === opts.config.title
-                  ? opts.config.title
-                  : `${opts.sectionName} > ${opts.config.title}`;
+                opts.sectionName === getTitle(opts.config)
+                  ? getTitle(opts.config)
+                  : `${opts.sectionName} > ${getTitle(opts.config)}`;
               opts.settingsManager.export(
                 title,
                 opts.settingsManager.getSettings(opts.sectionId, opts.children)
@@ -137,8 +206,8 @@ export function createClassToggle(opts: {
   let toggleComponent: ToggleComponent;
 
   new Setting(containerEl)
-    .setName(config.title)
-    .setDesc(config.description || "")
+    .setName(getTitle(config))
+    .setDesc(getDescription(config) || "")
     .addToggle((toggle) => {
       const value = settingsManager.getSetting(sectionId, config.id);
 
@@ -200,7 +269,7 @@ export function createClassMultiToggle(opts: {
   let dropdownComponent: DropdownComponent;
 
   if (typeof config.default !== "string") {
-    return console.error(`Error: ${config.title} missing default value`);
+    return console.error(`${t('Error:')} ${getTitle(config)} ${t('missing default value')}`);
   }
 
   let prevValue = settingsManager.getSetting(sectionId, config.id) as
@@ -232,9 +301,9 @@ export function createClassMultiToggle(opts: {
   }
 
   new Setting(containerEl)
-    .setName(config.title)
+    .setName(getTitle(config))
     .setDesc(
-      createDescription(config.description, config.default, defaultLabel)
+      createDescription(getDescription(config), config.default, defaultLabel)
     )
     .addDropdown((dropdown) => {
       if (config.allowEmpty) {
@@ -303,12 +372,12 @@ export function createVariableText(opts: {
   let textComponent: TextComponent;
 
   if (typeof config.default !== "string") {
-    return console.error(`Error: ${config.title} missing default value`);
+    return console.error(`${t('Error:')} ${getTitle(config)} ${t('missing default value')}`);
   }
 
   new Setting(containerEl)
-    .setName(config.title)
-    .setDesc(createDescription(config.description, config.default))
+    .setName(getTitle(config))
+    .setDesc(createDescription(getDescription(config), config.default))
     .addText((text) => {
       const value = settingsManager.getSetting(sectionId, config.id);
       const onChange = debounce(
@@ -353,12 +422,12 @@ export function createVariableNumber(opts: {
   let textComponent: TextComponent;
 
   if (typeof config.default !== "number") {
-    return console.error(`Error: ${config.title} missing default value`);
+    return console.error(`${t('Error:')} ${getTitle(config)} ${t('missing default value')}`);
   }
 
   new Setting(containerEl)
-    .setName(config.title)
-    .setDesc(createDescription(config.description, config.default.toString(10)))
+    .setName(getTitle(config))
+    .setDesc(createDescription(getDescription(config), config.default.toString(10)))
     .addText((text) => {
       const value = settingsManager.getSetting(sectionId, config.id);
       const onChange = debounce(
@@ -413,12 +482,12 @@ export function createVariableNumberSlider(opts: {
   let sliderComponent: SliderComponent;
 
   if (typeof config.default !== "number") {
-    return console.error(`Error: ${config.title} missing default value`);
+    return console.error(`${t('Error:')} ${getTitle(config)} ${t('missing default value')}`);
   }
 
   new Setting(containerEl)
-    .setName(config.title)
-    .setDesc(createDescription(config.description, config.default.toString(10)))
+    .setName(getTitle(config))
+    .setDesc(createDescription(getDescription(config), config.default.toString(10)))
     .addSlider((slider) => {
       const value = settingsManager.getSetting(sectionId, config.id);
       const onChange = debounce(
@@ -465,7 +534,7 @@ export function createVariableSelect(opts: {
   let dropdownComponent: DropdownComponent;
 
   if (typeof config.default !== "string") {
-    return console.error(`Error: ${config.title} missing default value`);
+    return console.error(`${t('Error:')} ${getTitle(config)} ${t('missing default value')}`);
   }
 
   const defaultOption = config.default
@@ -487,9 +556,9 @@ export function createVariableSelect(opts: {
   }
 
   new Setting(containerEl)
-    .setName(config.title)
+    .setName(getTitle(config))
     .setDesc(
-      createDescription(config.description, config.default, defaultLabel)
+      createDescription(getDescription(config), config.default, defaultLabel)
     )
     .addDropdown((dropdown) => {
       const value = settingsManager.getSetting(sectionId, config.id);
@@ -592,7 +661,7 @@ export function createVariableColor(opts: {
     !isValidDefaultColor(config.default)
   ) {
     return console.error(
-      `Error: ${config.title} missing default value, or value is not in a valid color format`
+      `${t('Error:')} ${getTitle(config)} ${t('missing default value, or value is not in a valid color format')}`
     );
   }
 
@@ -610,8 +679,8 @@ export function createVariableColor(opts: {
   }
 
   new Setting(containerEl)
-    .setName(config.title)
-    .setDesc(createDescription(config.description, config.default))
+    .setName(getTitle(config))
+    .setDesc(createDescription(getDescription(config), config.default))
     .then((setting) => {
       setting.settingEl.dataset.id = opts.config.id;
 
@@ -681,7 +750,7 @@ export function createVariableThemedColor(opts: {
     !isValidDefaultColor(config["default-light"])
   ) {
     return console.error(
-      `Error: ${config.title} missing default light value, or value is not in a valid color format`
+      `${t('Error:')} ${getTitle(config)} ${t('missing default light value, or value is not in a valid color format')}`
     );
   }
 
@@ -690,7 +759,7 @@ export function createVariableThemedColor(opts: {
     !isValidDefaultColor(config["default-dark"])
   ) {
     return console.error(
-      `Error: ${config.title} missing default dark value, or value is not in a valid color format`
+      `${t('Error:')} ${getTitle(config)} ${t('missing default dark value, or value is not in a valid color format')}`
     );
   }
 
@@ -730,14 +799,14 @@ export function createVariableThemedColor(opts: {
   };
 
   new Setting(containerEl)
-    .setName(config.title)
+    .setName(getTitle(config))
     .then((setting) => {
       setting.settingEl.dataset.id = opts.config.id;
 
       // Construct description
       setting.descEl.createSpan({}, (span) => {
-        if (config.description) {
-          span.appendChild(document.createTextNode(config.description));
+        if (getDescription(config)) {
+          span.appendChild(document.createTextNode(getDescription(config)));
         }
       });
 
