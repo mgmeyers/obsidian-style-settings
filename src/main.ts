@@ -72,6 +72,9 @@ export default class CSSSettingsPlugin extends Plugin {
   parseCSS() {
     clearTimeout(this.debounceTimer);
 
+    this.settingsList = [];
+    this.errorList = [];
+
     this.debounceTimer = window.setTimeout(() => {
       const styleSheets = document.styleSheets;
 
