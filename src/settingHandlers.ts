@@ -35,7 +35,7 @@ function createDescription(
 
   if (def) {
     const small = createEl("small");
-    small.appendChild(createEl("strong", { text: `${t('Default:')} ` }));
+    small.appendChild(createEl("strong", { text: `${t("Default:")} ` }));
     small.appendChild(document.createTextNode(defLabel || def));
 
     const div = createEl("div");
@@ -125,7 +125,10 @@ function getTitle<T extends Meta>(config: T): string {
 
 function getDescription<T extends Meta>(config: T): string {
   if (lang) {
-    return config[`description.${lang}` as keyof WithDescription] || config.description;
+    return (
+      config[`description.${lang}` as keyof WithDescription] ||
+      config.description
+    );
   }
 
   return config.description;
@@ -223,13 +226,13 @@ export function createClassToggle(opts: {
           }
         });
 
-        toggleComponent = toggle;
+      toggleComponent = toggle;
     })
     .addExtraButton((b) => {
       b.setIcon("reset");
       b.onClick(() => {
         const value = !!config.default;
-        
+
         toggleComponent.setValue(value);
 
         if (value) {
@@ -269,7 +272,9 @@ export function createClassMultiToggle(opts: {
   let dropdownComponent: DropdownComponent;
 
   if (typeof config.default !== "string") {
-    return console.error(`${t('Error:')} ${getTitle(config)} ${t('missing default value')}`);
+    return console.error(
+      `${t("Error:")} ${getTitle(config)} ${t("missing default value")}`
+    );
   }
 
   let prevValue = settingsManager.getSetting(sectionId, config.id) as
@@ -372,7 +377,9 @@ export function createVariableText(opts: {
   let textComponent: TextComponent;
 
   if (typeof config.default !== "string") {
-    return console.error(`${t('Error:')} ${getTitle(config)} ${t('missing default value')}`);
+    return console.error(
+      `${t("Error:")} ${getTitle(config)} ${t("missing default value")}`
+    );
   }
 
   new Setting(containerEl)
@@ -422,12 +429,16 @@ export function createVariableNumber(opts: {
   let textComponent: TextComponent;
 
   if (typeof config.default !== "number") {
-    return console.error(`${t('Error:')} ${getTitle(config)} ${t('missing default value')}`);
+    return console.error(
+      `${t("Error:")} ${getTitle(config)} ${t("missing default value")}`
+    );
   }
 
   new Setting(containerEl)
     .setName(getTitle(config))
-    .setDesc(createDescription(getDescription(config), config.default.toString(10)))
+    .setDesc(
+      createDescription(getDescription(config), config.default.toString(10))
+    )
     .addText((text) => {
       const value = settingsManager.getSetting(sectionId, config.id);
       const onChange = debounce(
@@ -482,12 +493,16 @@ export function createVariableNumberSlider(opts: {
   let sliderComponent: SliderComponent;
 
   if (typeof config.default !== "number") {
-    return console.error(`${t('Error:')} ${getTitle(config)} ${t('missing default value')}`);
+    return console.error(
+      `${t("Error:")} ${getTitle(config)} ${t("missing default value")}`
+    );
   }
 
   new Setting(containerEl)
     .setName(getTitle(config))
-    .setDesc(createDescription(getDescription(config), config.default.toString(10)))
+    .setDesc(
+      createDescription(getDescription(config), config.default.toString(10))
+    )
     .addSlider((slider) => {
       const value = settingsManager.getSetting(sectionId, config.id);
       const onChange = debounce(
@@ -534,7 +549,9 @@ export function createVariableSelect(opts: {
   let dropdownComponent: DropdownComponent;
 
   if (typeof config.default !== "string") {
-    return console.error(`${t('Error:')} ${getTitle(config)} ${t('missing default value')}`);
+    return console.error(
+      `${t("Error:")} ${getTitle(config)} ${t("missing default value")}`
+    );
   }
 
   const defaultOption = config.default
@@ -609,17 +626,18 @@ export interface VariableColor extends Meta {
 }
 
 function getPickrSettings(opts: {
+  isView: boolean;
   el: HTMLElement;
   containerEl: HTMLElement;
   swatches: string[];
   opacity: boolean | undefined;
   defaultColor: string;
 }): Pickr.Options {
-  const { el, containerEl, swatches, opacity, defaultColor } = opts;
+  const { el, isView, containerEl, swatches, opacity, defaultColor } = opts;
 
   return {
     el,
-    container: containerEl,
+    container: isView ? document.body : containerEl,
     theme: "nano",
     swatches,
     lockOpacity: !opacity,
@@ -653,15 +671,18 @@ export function createVariableColor(opts: {
   config: VariableColor;
   containerEl: HTMLElement;
   settingsManager: CSSSettingsManager;
+  isView: boolean;
 }): CleanupFunction {
-  const { sectionId, config, containerEl, settingsManager } = opts;
+  const { isView, sectionId, config, containerEl, settingsManager } = opts;
 
   if (
     typeof config.default !== "string" ||
     !isValidDefaultColor(config.default)
   ) {
     return console.error(
-      `${t('Error:')} ${getTitle(config)} ${t('missing default value, or value is not in a valid color format')}`
+      `${t("Error:")} ${getTitle(config)} ${t(
+        "missing default value, or value is not in a valid color format"
+      )}`
     );
   }
 
@@ -686,6 +707,7 @@ export function createVariableColor(opts: {
 
       pickr = Pickr.create(
         getPickrSettings({
+          isView,
           el: setting.controlEl.createDiv({ cls: "picker" }),
           containerEl,
           swatches,
@@ -742,15 +764,18 @@ export function createVariableThemedColor(opts: {
   config: VariableThemedColor;
   containerEl: HTMLElement;
   settingsManager: CSSSettingsManager;
+  isView: boolean;
 }): CleanupFunction {
-  const { sectionId, config, containerEl, settingsManager } = opts;
+  const { sectionId, isView, config, containerEl, settingsManager } = opts;
 
   if (
     typeof config["default-light"] !== "string" ||
     !isValidDefaultColor(config["default-light"])
   ) {
     return console.error(
-      `${t('Error:')} ${getTitle(config)} ${t('missing default light value, or value is not in a valid color format')}`
+      `${t("Error:")} ${getTitle(config)} ${t(
+        "missing default light value, or value is not in a valid color format"
+      )}`
     );
   }
 
@@ -759,7 +784,9 @@ export function createVariableThemedColor(opts: {
     !isValidDefaultColor(config["default-dark"])
   ) {
     return console.error(
-      `${t('Error:')} ${getTitle(config)} ${t('missing default dark value, or value is not in a valid color format')}`
+      `${t("Error:")} ${getTitle(config)} ${t(
+        "missing default dark value, or value is not in a valid color format"
+      )}`
     );
   }
 
@@ -831,6 +858,7 @@ export function createVariableThemedColor(opts: {
           wrapper.createDiv({ cls: "theme-light" }, (themeWrapper) => {
             pickrLight = Pickr.create(
               getPickrSettings({
+                isView,
                 el: themeWrapper.createDiv({ cls: "picker" }),
                 containerEl,
                 swatches: swatchesLight,
@@ -864,6 +892,7 @@ export function createVariableThemedColor(opts: {
           wrapper.createDiv({ cls: "theme-dark" }, (themeWrapper) => {
             pickrDark = Pickr.create(
               getPickrSettings({
+                isView,
                 el: themeWrapper.createDiv({ cls: "picker" }),
                 containerEl,
                 swatches: swatchesDark,
@@ -920,13 +949,20 @@ export interface ParsedCSSSettings {
 
 export function createSettings(opts: {
   containerEl: HTMLElement;
+  isView: boolean;
   sectionId: string;
   sectionName: string;
   settings: CSSSetting[];
   settingsManager: CSSSettingsManager;
 }): CleanupFunction[] {
-  const { containerEl, sectionId, settings, settingsManager, sectionName } =
-    opts;
+  const {
+    isView,
+    containerEl,
+    sectionId,
+    settings,
+    settingsManager,
+    sectionName,
+  } = opts;
 
   const containerStack: HTMLElement[] = [containerEl];
   const idStack: string[] = [sectionId];
@@ -1089,6 +1125,7 @@ export function createSettings(opts: {
             config: setting as VariableColor,
             containerEl: getTargetContainer(containerStack),
             settingsManager,
+            isView,
           })
         );
         break;
@@ -1102,6 +1139,7 @@ export function createSettings(opts: {
             config: setting as VariableThemedColor,
             containerEl: getTargetContainer(containerStack),
             settingsManager,
+            isView,
           })
         );
         break;

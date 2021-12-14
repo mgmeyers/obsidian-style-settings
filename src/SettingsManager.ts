@@ -64,10 +64,12 @@ function generateColorVariables(
     case "hsl-values": {
       const hsl = parsedColor.hsl();
       const alpha = opacity ? `,${parsedColor.alpha()}` : "";
+      const h = isNaN(hsl[0]) ? 0 : hsl[0];
+
       return [
         {
           key,
-          value: `${hsl[0]},${hsl[1] * 100}%,${hsl[2] * 100}%${alpha}`,
+          value: `${h},${hsl[1] * 100}%,${hsl[2] * 100}%${alpha}`,
         },
         ...alts,
       ];

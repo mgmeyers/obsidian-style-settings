@@ -1,4 +1,11 @@
-import { App, Plugin, PluginSettingTab, Setting } from "obsidian";
+import {
+  App,
+  ItemView,
+  Plugin,
+  PluginSettingTab,
+  Setting,
+  WorkspaceLeaf,
+} from "obsidian";
 import { CSSSettingsManager } from "./SettingsManager";
 import {
   CleanupFunction,
@@ -21,6 +28,8 @@ type ErrorList = Array<{ name: string; error: string }>;
 export default class CSSSettingsPlugin extends Plugin {
   settingsManager: CSSSettingsManager;
   settingsTab: CSSSettingsTab;
+  settingsList: ParsedCSSSettings[] = [];
+  errorList: ErrorList = [];
 
   async onload() {
     this.settingsManager = new CSSSettingsManager(this);
@@ -30,6 +39,16 @@ export default class CSSSettingsPlugin extends Plugin {
     this.settingsTab = new CSSSettingsTab(this.app, this);
 
     this.addSettingTab(this.settingsTab);
+
+    this.registerView(viewType, (leaf) => new SettingsView(this, leaf));
+
+    this.addCommand({
+      id: "show-style-settings-leaf",
+      name: "Show style settings view",
+      callback: () => {
+        this.activateView();
+      },
+    });
 
     this.registerEvent(
       this.app.workspace.on("css-change", () => {
@@ -55,8 +74,6 @@ export default class CSSSettingsPlugin extends Plugin {
 
     this.debounceTimer = window.setTimeout(() => {
       const styleSheets = document.styleSheets;
-      const settingsList: ParsedCSSSettings[] = [];
-      const errorList: ErrorList = [];
 
       for (let i = 0, len = styleSheets.length; i < len; i++) {
         const sheet = styleSheets.item(i);
@@ -86,45 +103,88 @@ export default class CSSSettingsPlugin extends Plugin {
                 }
               ) as ParsedCSSSettings;
 
-              settings.settings = settings.settings.filter(setting => setting);
+              settings.settings = settings.settings.filter(
+                (setting) => setting
+              );
 
               if (
                 typeof settings === "object" &&
                 settings.name &&
                 settings.id &&
-                settings.settings && 
+                settings.settings &&
                 settings.settings.length
               ) {
-                settingsList.push(settings);
+                this.settingsList.push(settings);
               }
             } catch (e) {
-              errorList.push({ name, error: `${e}` });
+              this.errorList.push({ name, error: `${e}` });
             }
           } while ((match = settingRegExp.exec(text)) !== null);
         }
       }
 
-      this.settingsTab.setSettings(settingsList, errorList);
+      this.settingsTab.settingsMarkup.setSettings(
+        this.settingsList,
+        this.errorList
+      );
+      this.app.workspace.getLeavesOfType(viewType).forEach((leaf) => {
+        (leaf.view as SettingsView).settingsMarkup.setSettings(
+          this.settingsList,
+          this.errorList
+        );
+      });
       this.settingsManager.initClasses();
     }, 100);
   }
 
   onunload() {
-    this.settingsManager.cleanup();
-    this.settingsTab.cleanup();
     document.body.classList.remove("css-settings-manager");
+    this.settingsManager.cleanup();
+    this.settingsTab.settingsMarkup.cleanup();
+    this.deactivateView();
+  }
+
+  deactivateView() {
+    this.app.workspace.detachLeavesOfType(viewType);
+  }
+
+  async activateView() {
+    this.deactivateView();
+    const leaf = this.app.workspace.createLeafBySplit(
+      this.app.workspace.activeLeaf,
+      "vertical"
+    );
+
+    await leaf.setViewState({
+      type: viewType,
+    });
+
+    (leaf.view as SettingsView).settingsMarkup.setSettings(
+      this.settingsList,
+      this.errorList
+    );
   }
 }
 
-class CSSSettingsTab extends PluginSettingTab {
+class SettingsMarkup {
+  app: App;
   plugin: CSSSettingsPlugin;
   cleanupFns: CleanupFunction[] = [];
   settings: ParsedCSSSettings[] = [];
   errorList: ErrorList = [];
+  containerEl: HTMLElement;
+  isView: boolean;
 
-  constructor(app: App, plugin: CSSSettingsPlugin) {
-    super(app, plugin);
+  constructor(
+    app: App,
+    plugin: CSSSettingsPlugin,
+    containerEl: HTMLElement,
+    isView?: boolean
+  ) {
+    this.app = app;
     this.plugin = plugin;
+    this.containerEl = containerEl;
+    this.isView = !!isView;
   }
 
   display(): void {
@@ -254,6 +314,7 @@ class CSSSettingsTab extends PluginSettingTab {
 
       const cleanup = createSettings({
         containerEl,
+        isView: this.isView,
         sectionId: s.id,
         sectionName: s.name,
         settings: options,
@@ -264,5 +325,56 @@ class CSSSettingsTab extends PluginSettingTab {
     });
 
     this.cleanupFns = cleanupFns;
+  }
+}
+
+class CSSSettingsTab extends PluginSettingTab {
+  settingsMarkup: SettingsMarkup;
+
+  constructor(app: App, plugin: CSSSettingsPlugin) {
+    super(app, plugin);
+    this.settingsMarkup = new SettingsMarkup(app, plugin, this.containerEl);
+  }
+
+  display(): void {
+    this.settingsMarkup.display();
+  }
+}
+
+const viewType = "style-settings";
+
+class SettingsView extends ItemView {
+  settingsMarkup: SettingsMarkup;
+  plugin: CSSSettingsPlugin;
+
+  constructor(plugin: CSSSettingsPlugin, leaf: WorkspaceLeaf) {
+    super(leaf);
+    this.plugin = plugin;
+    this.settingsMarkup = new SettingsMarkup(
+      plugin.app,
+      plugin,
+      this.contentEl,
+      true
+    );
+  }
+
+  getViewType() {
+    return viewType;
+  }
+
+  getIcon() {
+    return "gear";
+  }
+
+  getDisplayText() {
+    return "Style Settings";
+  }
+
+  async onOpen() {
+    return this.settingsMarkup.display();
+  }
+
+  async onClose() {
+    return this.settingsMarkup.cleanup();
   }
 }

@@ -164,3 +164,16 @@
 .style-settings-import-error.active {
   display: block;
 }
+
+.view-content .style-settings-container .setting-item:not(.setting-item-heading) {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.view-content .style-settings-container .setting-item:not(.setting-item-heading) .setting-item-control {
+  padding-top: 0.5em;
+}
+
+.view-content .style-settings-container .setting-item:not(.setting-item-heading) .themed-color-wrapper {
+  display: flex;
+}
