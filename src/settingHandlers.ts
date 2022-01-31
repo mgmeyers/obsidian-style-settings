@@ -365,6 +365,7 @@ export function createClassMultiToggle(opts: {
 
 export interface VariableText extends Meta {
   default: string;
+  quotes?: boolean;
 }
 
 export function createVariableText(opts: {
@@ -537,6 +538,7 @@ export function createVariableNumberSlider(opts: {
 export interface VariableSelect extends Meta {
   default: string;
   options: Array<string | SelectOption>;
+  quotes?: boolean;
 }
 
 export function createVariableSelect(opts: {

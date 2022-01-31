@@ -185,12 +185,16 @@ function getCSSVariables(
         continue;
       case "variable-text":
       case "variable-select":
+        const format_text = setting as VariableText | VariableSelect;
+        let text = value !== undefined
+                ? value.toString()
+                : format_text.default.toString();
+        if (format_text.quotes) {
+          text = `'${text}'`;
+        }
         vars.push({
           key: setting.id,
-          value:
-            value !== undefined
-              ? value.toString()
-              : (setting as VariableText | VariableSelect).default.toString(),
+          value: text
         });
         continue;
       case "variable-color": {
