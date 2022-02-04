@@ -655,6 +655,7 @@ function getPickrSettings(opts: {
       interaction: {
         hex: true,
         rgba: true,
+        hsla: true,
         input: true,
         cancel: true,
         save: true,
