@@ -190,7 +190,12 @@ function getCSSVariables(
                 ? value.toString()
                 : format_text.default.toString();
         if (format_text.quotes) {
-          text = `'${text}'`;
+          if (text !== `""`) {
+            text = `'${text}'`;
+          }
+          else {
+            text = ``;
+          }
         }
         vars.push({
           key: setting.id,

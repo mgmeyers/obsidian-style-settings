@@ -387,7 +387,7 @@ export function createVariableText(opts: {
     .setName(getTitle(config))
     .setDesc(createDescription(getDescription(config), config.default))
     .addText((text) => {
-      const value = settingsManager.getSetting(sectionId, config.id);
+      let value = settingsManager.getSetting(sectionId, config.id);
       const onChange = debounce(
         (value: string) => {
           settingsManager.setSetting(sectionId, config.id, sanitizeText(value));
@@ -396,6 +396,9 @@ export function createVariableText(opts: {
         true
       );
 
+      if (config.quotes && value === `""`) {
+          value = ``;
+      }
       text
         .setValue(value ? value.toString() : config.default)
         .onChange(onChange);
