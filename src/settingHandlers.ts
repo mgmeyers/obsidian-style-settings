@@ -669,7 +669,7 @@ function onPickrCancel(instance: Pickr) {
 }
 
 function isValidDefaultColor(color: string) {
-  return /^(#|rgb)/.test(color);
+  return /^(#|rgb|hsl)/.test(color);
 }
 
 export function createVariableColor(opts: {
