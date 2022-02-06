@@ -106,6 +106,8 @@ export default class CSSSettingsPlugin extends Plugin {
                 }
               ) as ParsedCSSSettings;
 
+              if (!settings.settings) continue;
+
               settings.settings = settings.settings.filter(
                 (setting) => setting
               );
