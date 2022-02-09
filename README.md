@@ -49,6 +49,7 @@ All settings definitions must have these parameters:
 - `type`: The type of setting. Can be one of:
   - `heading`: a heading element for organizing settings
   - `class-toggle`: a switch to toggle classes on the `body` element
+  - `class-select`: a dropdown menu of predefined options to add classes on the `body` element
   - `variable-text`: a text-based CSS variable
   - `variable-number`: a numeric CSS variable
   - `variable-number-slider`: a numeric CSS variable represented by a slider
