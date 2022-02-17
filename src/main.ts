@@ -197,7 +197,10 @@ class SettingsMarkup {
   }
 
   cleanup() {
-    this.cleanupFns.forEach((fn) => fn && fn());
+    Array.from(this.cleanupFns).forEach((fn) => {
+      fn && fn();
+      this.cleanupFns.remove(fn);
+    });
   }
 
   setSettings(settings: ParsedCSSSettings[], errorList: ErrorList) {
@@ -343,6 +346,10 @@ class CSSSettingsTab extends PluginSettingTab {
 
   display(): void {
     this.settingsMarkup.display();
+  }
+
+  hide(): void {
+    this.settingsMarkup.cleanup();
   }
 }
 
