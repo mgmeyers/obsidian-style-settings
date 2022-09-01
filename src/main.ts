@@ -30,6 +30,8 @@ export default class CSSSettingsPlugin extends Plugin {
   settingsTab: CSSSettingsTab;
   settingsList: ParsedCSSSettings[] = [];
   errorList: ErrorList = [];
+  lightEl: HTMLElement;
+  darkEl: HTMLElement;
 
   async onload() {
     this.settingsManager = new CSSSettingsManager(this);
@@ -62,9 +64,22 @@ export default class CSSSettingsPlugin extends Plugin {
       })
     );
 
+    this.lightEl = document.body.createDiv("theme-light style-settings-ref");
+    this.darkEl = document.body.createDiv("theme-dark style-settings-ref");
+
     document.body.classList.add("css-settings-manager");
 
     this.parseCSS();
+  }
+
+  getCSSVar(id: string) {
+    const light = getComputedStyle(this.lightEl).getPropertyValue(`--${id}`);
+    const dark = getComputedStyle(this.darkEl).getPropertyValue(`--${id}`);
+    const current = getComputedStyle(document.body).getPropertyValue(`--${id}`);
+
+    console.log(id, light, dark, current)
+
+    return { light, dark, current }
   }
 
   debounceTimer = 0;
@@ -143,7 +158,14 @@ export default class CSSSettingsPlugin extends Plugin {
   }
 
   onunload() {
+    this.lightEl.remove();
+    this.darkEl.remove();
+
+    this.lightEl = null;
+    this.darkEl = null;
+
     document.body.classList.remove("css-settings-manager");
+    
     this.settingsManager.cleanup();
     this.settingsTab.settingsMarkup.cleanup();
     this.deactivateView();

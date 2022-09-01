@@ -11,14 +11,9 @@ import {
   VariableSelect,
   VariableText,
   VariableThemedColor,
+  ColorGradient,
 } from "./settingHandlers";
-import {
-  App,
-  ButtonComponent,
-  Modal,
-  Setting,
-  TextAreaComponent,
-} from "obsidian";
+import { App, ButtonComponent, Modal, Setting, TextAreaComponent } from "obsidian";
 
 import CSSSettingsPlugin from "./main";
 import chroma from "chroma-js";
@@ -149,13 +144,39 @@ function generateColorVariables(
   }
 }
 
+function pushColors(
+  arr: VariableKV,
+  id: string,
+  from: string,
+  to: string,
+  format: "hsl" | "rgb" | "hex",
+  step: number,
+  pad: number
+) {
+  const scale = chroma.scale([from.trim(), to.trim()]).domain([0, 100]);
+  for (let i = 0; i <= 100; i++) {
+    if (i % step === 0) {
+      const c = scale(i);
+      arr.push(...generateColorVariables(`${id}-${i.toString().padStart(pad, "0")}`, format, c.css(), c.alpha() !== 1));
+    }
+  }
+}
+
 function getCSSVariables(
   settings: CSSSettings,
-  config: MappedSettings
+  config: MappedSettings,
+  gradients: Record<string, ColorGradient[]>,
+  settingsManager: CSSSettingsManager
 ): [VariableKV, VariableKV, VariableKV] {
   const vars: VariableKV = [];
   const themedLight: VariableKV = [];
   const themedDark: VariableKV = [];
+
+  const gradientCandidates: Record<string, string> = {};
+  const gradientCandidatesLight: Record<string, string> = {};
+  const gradientCandidatesDark: Record<string, string> = {};
+
+  const seenGradientSections: Set<string> = new Set();
 
   for (const key in settings) {
     const [sectionId, settingId, modifier] = key.split("@@");
@@ -172,12 +193,8 @@ function getCSSVariables(
     switch (setting.type) {
       case "variable-number":
       case "variable-number-slider":
-        const format = (setting as VariableNumber | VariableNumberSlider)
-          .format;
-        const val =
-          value !== undefined
-            ? value
-            : (setting as VariableNumber | VariableNumberSlider).default;
+        const format = (setting as VariableNumber | VariableNumberSlider).format;
+        const val = value !== undefined ? value : (setting as VariableNumber | VariableNumberSlider).default;
         vars.push({
           key: setting.id,
           value: `${val}${format || ""}`,
@@ -186,26 +203,24 @@ function getCSSVariables(
       case "variable-text":
       case "variable-select":
         const format_text = setting as VariableText | VariableSelect;
-        let text = value !== undefined
-                ? value.toString()
-                : format_text.default.toString();
+        let text = value !== undefined ? value.toString() : format_text.default.toString();
         if (format_text.quotes) {
           if (text !== `""`) {
             text = `'${text}'`;
-          }
-          else {
+          } else {
             text = ``;
           }
         }
         vars.push({
           key: setting.id,
-          value: text
+          value: text,
         });
         continue;
       case "variable-color": {
+        if (!seenGradientSections.has(sectionId)) seenGradientSections.add(sectionId);
+
         const colorSetting = setting as VariableColor;
-        const color =
-          value !== undefined ? value.toString() : colorSetting.default;
+        const color = value !== undefined ? value.toString() : colorSetting.default;
 
         vars.push(
           ...generateColorVariables(
@@ -217,16 +232,20 @@ function getCSSVariables(
           )
         );
 
+        generateColorVariables(setting.id, "rgb", color, colorSetting.opacity).forEach((kv) => {
+          gradientCandidates[kv.key] = kv.value;
+        });
+
         continue;
       }
       case "variable-themed-color": {
+        if (!seenGradientSections.has(sectionId)) seenGradientSections.add(sectionId);
+
         const colorSetting = setting as VariableThemedColor;
         const color =
           value !== undefined
             ? value.toString()
-            : colorSetting[
-                modifier === "light" ? "default-light" : "default-dark"
-              ];
+            : colorSetting[modifier === "light" ? "default-light" : "default-dark"];
 
         (modifier === "light" ? themedLight : themedDark).push(
           ...generateColorVariables(
@@ -237,9 +256,54 @@ function getCSSVariables(
             colorSetting["alt-format"]
           )
         );
+
+        generateColorVariables(setting.id, "rgb", color, colorSetting.opacity).forEach((kv) => {
+          if (modifier === "light") {
+            gradientCandidatesLight[kv.key] = kv.value;
+          } else {
+            gradientCandidatesDark[kv.key] = kv.value;
+          }
+        });
+        continue;
       }
     }
   }
+
+  seenGradientSections.forEach((sectionId) => {
+    const g = gradients[sectionId];
+    if (!g) return;
+
+    g.forEach((def) => {
+      const { from, to, format, step, id, pad = 0 } = def;
+
+      if (gradientCandidatesLight[from]) {
+        const fromColor = gradientCandidatesLight[from];
+        const toColor = gradientCandidatesLight[to] || settingsManager.plugin.getCSSVar(to).light?.trim();
+
+        if (toColor) {
+          pushColors(themedLight, id, fromColor, toColor, format, step, pad);
+        }
+      }
+
+      if (gradientCandidatesDark[from]) {
+        const fromColor = gradientCandidatesDark[from];
+        const toColor = gradientCandidatesDark[to] || settingsManager.plugin.getCSSVar(to).dark?.trim();
+
+        if (toColor) {
+          pushColors(themedDark, id, fromColor, toColor, format, step, pad);
+        }
+      }
+
+      if (gradientCandidates[from]) {
+        const fromColor = gradientCandidates[from];
+        const toColor = gradientCandidates[to] || settingsManager.plugin.getCSSVar(to).current?.trim();
+
+        if (toColor) {
+          pushColors(vars, id, fromColor, toColor, format, step, pad);
+        }
+      }
+    });
+  });
 
   return [vars, themedLight, themedDark];
 }
@@ -249,6 +313,7 @@ export class CSSSettingsManager {
   plugin: CSSSettingsPlugin;
   styleTag: HTMLStyleElement;
   config: MappedSettings = {};
+  gradients: Record<string, ColorGradient[]> = {};
 
   constructor(plugin: CSSSettingsPlugin) {
     this.plugin = plugin;
@@ -282,13 +347,8 @@ export class CSSSettingsManager {
 
         if (setting.type === "class-toggle") {
           const classToggle = setting as ClassToggle;
-          let value = this.getSetting(section, settingId) as
-            | boolean
-            | undefined;
-          if (
-            value === true ||
-            (value === undefined && classToggle.default === true)
-          ) {
+          let value = this.getSetting(section, settingId) as boolean | undefined;
+          if (value === true || (value === undefined && classToggle.default === true)) {
             document.body.classList.add(setting.id);
           }
         } else if (setting.type === "class-select") {
@@ -326,10 +386,7 @@ export class CSSSettingsManager {
   }
 
   setCSSVariables() {
-    const [vars, themedLight, themedDark] = getCSSVariables(
-      this.settings,
-      this.config
-    );
+    const [vars, themedLight, themedDark] = getCSSVariables(this.settings, this.config, this.gradients, this);
 
     this.styleTag.innerText = `
       body.css-settings-manager {
@@ -356,11 +413,17 @@ export class CSSSettingsManager {
 
   setConfig(settings: ParsedCSSSettings[]) {
     this.config = {};
+    this.gradients = {};
 
     settings.forEach((s) => {
       this.config[s.id] = {};
       s.settings.forEach((setting) => {
         this.config[s.id][setting.id] = setting;
+
+        if (setting.type === "color-gradient") {
+          if (!this.gradients[s.id]) this.gradients[s.id] = [];
+          this.gradients[s.id].push(setting as ColorGradient);
+        }
       });
     });
 
@@ -449,12 +512,7 @@ export class ExportModal extends Modal {
   section: string;
   config: Record<string, SettingValue>;
 
-  constructor(
-    app: App,
-    plugin: CSSSettingsPlugin,
-    section: string,
-    config: Record<string, SettingValue>
-  ) {
+  constructor(app: App, plugin: CSSSettingsPlugin, section: string, config: Record<string, SettingValue>) {
     super(app);
     this.plugin = plugin;
     this.config = config;
@@ -466,56 +524,50 @@ export class ExportModal extends Modal {
 
     modalEl.addClass("modal-style-settings");
 
-    new Setting(contentEl)
-      .setName(`Export settings for: ${this.section}`)
-      .then((setting) => {
-        const output = JSON.stringify(this.config, null, 2);
+    new Setting(contentEl).setName(`Export settings for: ${this.section}`).then((setting) => {
+      const output = JSON.stringify(this.config, null, 2);
 
-        // Build a copy to clipboard link
-        setting.controlEl.createEl(
-          "a",
-          {
-            cls: "style-settings-copy",
-            text: "Copy to clipboard",
-            href: "#",
-          },
-          (copyButton) => {
-            new TextAreaComponent(contentEl)
-              .setValue(output)
-              .then((textarea) => {
-                copyButton.addEventListener("click", (e) => {
-                  e.preventDefault();
+      // Build a copy to clipboard link
+      setting.controlEl.createEl(
+        "a",
+        {
+          cls: "style-settings-copy",
+          text: "Copy to clipboard",
+          href: "#",
+        },
+        (copyButton) => {
+          new TextAreaComponent(contentEl).setValue(output).then((textarea) => {
+            copyButton.addEventListener("click", (e) => {
+              e.preventDefault();
 
-                  // Select the textarea contents and copy them to the clipboard
-                  textarea.inputEl.select();
-                  textarea.inputEl.setSelectionRange(0, 99999);
-                  document.execCommand("copy");
+              // Select the textarea contents and copy them to the clipboard
+              textarea.inputEl.select();
+              textarea.inputEl.setSelectionRange(0, 99999);
+              document.execCommand("copy");
 
-                  copyButton.addClass("success");
+              copyButton.addClass("success");
 
-                  setTimeout(() => {
-                    // If the button is still in the dom, remove the success class
-                    if (copyButton.parentNode) {
-                      copyButton.removeClass("success");
-                    }
-                  }, 2000);
-                });
-              });
-          }
-        );
+              setTimeout(() => {
+                // If the button is still in the dom, remove the success class
+                if (copyButton.parentNode) {
+                  copyButton.removeClass("success");
+                }
+              }, 2000);
+            });
+          });
+        }
+      );
 
-        // Build a download link
-        setting.controlEl.createEl("a", {
-          cls: "style-settings-download",
-          text: "Download",
-          attr: {
-            download: "style-settings.json",
-            href: `data:application/json;charset=utf-8,${encodeURIComponent(
-              output
-            )}`,
-          },
-        });
+      // Build a download link
+      setting.controlEl.createEl("a", {
+        cls: "style-settings-download",
+        text: "Download",
+        attr: {
+          download: "style-settings.json",
+          href: `data:application/json;charset=utf-8,${encodeURIComponent(output)}`,
+        },
       });
+    });
   }
 
   onClose() {
@@ -539,9 +591,7 @@ export class ImportModal extends Modal {
 
     new Setting(contentEl)
       .setName("Import style setting")
-      .setDesc(
-        "Import an entire or partial configuration. Warning: this may override existing settings"
-      );
+      .setDesc("Import an entire or partial configuration. Warning: this may override existing settings");
 
     new Setting(contentEl).then((setting) => {
       // Build an error message container
@@ -556,10 +606,7 @@ export class ImportModal extends Modal {
       const importAndClose = async (str: string) => {
         if (str) {
           try {
-            const importedSettings = JSON.parse(str) as Record<
-              string,
-              SettingValue
-            >;
+            const importedSettings = JSON.parse(str) as Record<string, SettingValue>;
 
             await this.plugin.settingsManager.setSettings(importedSettings);
 
@@ -610,15 +657,11 @@ export class ImportModal extends Modal {
         },
       });
 
-      new TextAreaComponent(contentEl)
-        .setPlaceholder("Paste config here...")
-        .then((ta) => {
-          new ButtonComponent(contentEl)
-            .setButtonText("Save")
-            .onClick(async () => {
-              await importAndClose(ta.getValue().trim());
-            });
+      new TextAreaComponent(contentEl).setPlaceholder("Paste config here...").then((ta) => {
+        new ButtonComponent(contentEl).setButtonText("Save").onClick(async () => {
+          await importAndClose(ta.getValue().trim());
         });
+      });
     });
   }
 

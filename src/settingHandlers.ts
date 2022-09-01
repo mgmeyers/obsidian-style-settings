@@ -624,10 +624,18 @@ export type ColorFormat =
   | "hex";
 
 export interface VariableColor extends Meta {
-  default: string;
+  default?: string;
   format: ColorFormat;
   "alt-format"?: Array<{ id: string; format: ColorFormat }>;
   opacity?: boolean;
+}
+
+export interface ColorGradient extends Meta {
+  from: string;
+  to: string;
+  format: 'hsl' | 'rgb' | 'hex';
+  pad?: number;
+  step: number;
 }
 
 function getPickrSettings(opts: {
@@ -680,6 +688,13 @@ export function createVariableColor(opts: {
   isView: boolean;
 }): CleanupFunction {
   const { isView, sectionId, config, containerEl, settingsManager } = opts;
+
+  if (
+    typeof config.default !== "string" ||
+    !isValidDefaultColor(config.default)
+  ) {
+    config.default = settingsManager.plugin.getCSSVar(config.id).current?.trim()
+  }
 
   if (
     typeof config.default !== "string" ||

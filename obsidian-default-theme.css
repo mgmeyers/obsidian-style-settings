@@ -6,7 +6,6 @@ settings:
   - 
     id: heading-fonts
     title: Fonts
-    title.de: FONTIESSSS
     type: heading
     level: 1
     collapsed: true
@@ -28,9 +27,7 @@ settings:
   - 
     id: font-monospace
     title: Monospace Font
-    title.de: MONOSPACIE FONTIEEE
     description: Used for codeblocks, tables, etc.
-    description.de: CODIE BLOCKIES
     type: variable-text
     default: '"Source Code Pro", monospace'
   

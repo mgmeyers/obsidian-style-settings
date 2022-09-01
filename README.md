@@ -455,6 +455,35 @@ When `opacity` is set to `true`:
 --accent-a: 1;
 ```
 
+## `color-gradient`
+
+`color-gradient` outputs a fixed number of colors along a gradient between two existing color variables. A `format` attribute is also required. *Note: The `to` variable must be set in style settings for the gradient to be generated. Also, gradients will only be generated using colors defined under the current style settings `id`.*
+
+Parameters:
+- `from`: The starting color, or color that will be at step 0
+- `to`: The ending color, or color that will be at step 100
+- `step`: The increment at which to output a CSS variable. For example, setting `step` to `10` will output `--var-0`, `--var-10`, `--var-20`, etc...
+- `format`: Can be one of: `hsl`, `rgb`, or `hex`;
+- `pad`?: When set, the number section of the variable will be padded with `0`'s until it contains this number of digits. For example, setting `pad` to `3` and `step` to `10` will output `--var-000`, `--var-010`, `--var-020`
+
+```css
+/* @settings
+
+name: Your Section Name Here
+id: a-unique-id
+settings:
+    -
+        id: color-base
+        type: color-gradient
+        from: color-base-00
+        to: color-base-100
+        step: 5
+        pad: 2
+        format: hex
+
+*/
+```
+
 ## Localization Support
 
 Translations for titles and descriptions can be supplied for each language Obsidian supports by using one of the following postfixes:

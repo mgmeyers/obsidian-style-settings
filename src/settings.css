@@ -177,3 +177,10 @@
 .view-content .style-settings-container .setting-item:not(.setting-item-heading) .themed-color-wrapper {
   display: flex;
 }
+
+.style-settings-ref {
+  position: absolute;
+  width: 0 !important;
+  height: 0 !important;
+  pointer-events: none;
+}
