@@ -455,6 +455,23 @@ When `opacity` is set to `true`:
 --accent-a: 1;
 ```
 
+- `hsl-split-decimal`
+
+```
+--accent-h: 211;
+--accent-s: 1;
+--accent-l: 0.5;
+```
+
+When `opacity` is set to `true`:
+
+```
+--accent-h: 211;
+--accent-s: 1;
+--accent-l: 0.5;
+--accent-a: 1;
+```
+
 ## `color-gradient`
 
 `color-gradient` outputs a fixed number of colors along a gradient between two existing color variables. A `format` attribute is also required. *Note: The `to` variable must be set in style settings for the gradient to be generated. Also, gradients will only be generated using colors defined under the current style settings `id`.*
