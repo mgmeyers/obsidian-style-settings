@@ -618,6 +618,7 @@ export type ColorFormat =
   | "hsl"
   | "hsl-values"
   | "hsl-split"
+  | "hsl-split-decimal"
   | "rgb"
   | "rgb-values"
   | "rgb-split"
