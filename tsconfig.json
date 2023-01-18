@@ -18,9 +18,6 @@
       "ES6",
       "ES7"
     ],
-    "types": [
-      "svelte"
-    ]
   },
   "include": [
     "**/*.ts"

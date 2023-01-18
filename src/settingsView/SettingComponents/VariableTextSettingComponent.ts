@@ -59,6 +59,6 @@ export class VariableTextSettingComponent extends AbstractSettingComponent {
 	}
 
 	destroy(): void {
-		this.settingEl.settingEl.remove();
+		this.settingEl?.settingEl.remove();
 	}
 }

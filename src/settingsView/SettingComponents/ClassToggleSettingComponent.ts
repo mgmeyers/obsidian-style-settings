@@ -57,6 +57,6 @@ export class ClassToggleSettingComponent extends AbstractSettingComponent {
 	}
 
 	destroy(): void {
-		this.settingEl.settingEl.remove();
+		this.settingEl?.settingEl.remove();
 	}
 }

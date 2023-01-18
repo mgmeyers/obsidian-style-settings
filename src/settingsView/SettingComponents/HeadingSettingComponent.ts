@@ -50,11 +50,17 @@ export class HeadingSettingComponent extends AbstractSettingComponent {
 	}
 
 	destroy(): void {
+		if (!this.setting.collapsed) {
+			this.destroyChildren();
+		}
+		this.settingEl?.settingEl.remove();
+	}
+
+	private destroyChildren() {
 		for (const child of this.children) {
 			child.destroy();
 		}
-		this.childEl.empty();
-		this.settingEl.settingEl.remove();
+		this.childEl?.empty();
 	}
 
 	private toggleVisible() {
@@ -67,7 +73,7 @@ export class HeadingSettingComponent extends AbstractSettingComponent {
 		this.settingEl.settingEl.toggleClass("is-collapsed", collapsed);
 
 		if (collapsed) {
-			this.childEl?.empty();
+			this.destroyChildren();
 		} else {
 			for (const child of this.children) {
 				child.render(this.childEl);

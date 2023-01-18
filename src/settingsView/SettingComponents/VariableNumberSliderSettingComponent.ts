@@ -56,6 +56,6 @@ export class VariableNumberSliderSettingComponent extends AbstractSettingCompone
 	}
 
 	destroy(): void {
-		this.settingEl.settingEl.remove();
+		this.settingEl?.settingEl.remove();
 	}
 }

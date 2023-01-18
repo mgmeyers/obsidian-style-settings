@@ -59,7 +59,7 @@ export class VariableSelectSettingComponent extends AbstractSettingComponent {
 	}
 
 	destroy(): void {
-		this.settingEl.settingEl.remove();
+		this.settingEl?.settingEl.remove();
 	}
 
 	private getDefaultOption(): string | SelectOption | undefined {

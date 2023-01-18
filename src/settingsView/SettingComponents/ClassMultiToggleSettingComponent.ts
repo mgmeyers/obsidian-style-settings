@@ -86,6 +86,7 @@ export class ClassMultiToggleSettingComponent extends AbstractSettingComponent {
 	}
 
 	destroy(): void {
+		this.settingEl?.settingEl.remove();
 	}
 
 	private getDefaultOption(): string | SelectOption | undefined {

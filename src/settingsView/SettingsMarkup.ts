@@ -1,13 +1,14 @@
 import {App, Setting} from "obsidian";
-import {CleanupFunction, CSSSetting, ParsedCSSSettings} from "../settingHandlers";
+import {CSSSetting, ParsedCSSSettings} from "../settingHandlers";
 import CSSSettingsPlugin from "../main";
 import {parseSettings} from "../settingParser";
 import {ErrorList} from "../Utils";
+import {HeadingSettingComponent} from "./SettingComponents/HeadingSettingComponent";
 
 export class SettingsMarkup {
 	app: App;
 	plugin: CSSSettingsPlugin;
-	cleanupFns: CleanupFunction[] = [];
+	settingsComponentTree: HeadingSettingComponent;
 	settings: ParsedCSSSettings[] = [];
 	errorList: ErrorList = [];
 	containerEl: HTMLElement;
@@ -30,10 +31,7 @@ export class SettingsMarkup {
 	}
 
 	cleanup() {
-		Array.from(this.cleanupFns).forEach((fn) => {
-			fn && fn();
-			this.cleanupFns.remove(fn);
-		});
+		this.settingsComponentTree?.destroy();
 	}
 
 	setSettings(settings: ParsedCSSSettings[], errorList: ErrorList) {
@@ -135,9 +133,9 @@ export class SettingsMarkup {
 			);
 		});
 
-		const cleanupFns: CleanupFunction[] = [];
+		console.log(this.settings);
 
-		settings.forEach((s) => {
+		for (const s of settings) {
 			const options: CSSSetting[] = [
 				{
 					id: s.id,
@@ -153,16 +151,7 @@ export class SettingsMarkup {
 				...s.settings,
 			];
 
-			// const cleanup = createSettings({
-			// 	containerEl,
-			// 	isView: this.isView,
-			// 	sectionId: s.id,
-			// 	sectionName: s.name,
-			// 	settings: options,
-			// 	settingsManager: plugin.settingsManager,
-			// });
-
-			const tree = parseSettings({
+			this.settingsComponentTree = parseSettings({
 				isView: this.isView,
 				sectionId: s.id,
 				sectionName: s.name,
@@ -170,16 +159,9 @@ export class SettingsMarkup {
 				settingsManager: plugin.settingsManager,
 			});
 
-			tree.render(containerEl);
+			this.settingsComponentTree.render(containerEl);
 
-			console.log(tree);
-
-
-			const cleanup: CleanupFunction[] = [];
-
-			if (cleanup.length) cleanupFns.push(...cleanup);
-		});
-
-		this.cleanupFns = cleanupFns;
+			console.log(this.settingsComponentTree);
+		}
 	}
 }

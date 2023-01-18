@@ -2,8 +2,6 @@ import typescript from "@rollup/plugin-typescript";
 import { nodeResolve } from "@rollup/plugin-node-resolve";
 import commonjs from "@rollup/plugin-commonjs";
 import css from "rollup-plugin-css-only";
-import svelte from "rollup-plugin-svelte";
-import {sveltePreprocess} from "svelte-preprocess/dist/autoProcess";
 
 const isProd = process.env.BUILD === "production";
 
@@ -25,9 +23,6 @@ const output = [
     },
     external: ["obsidian"],
     plugins: [
-      svelte({
-        preprocess: sveltePreprocess(),
-      }),
       css({ output: "styles.css" }),
       typescript(),
       nodeResolve({ browser: true }),

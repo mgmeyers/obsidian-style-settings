@@ -88,9 +88,11 @@ export class VariableThemedColorSettingComponent extends AbstractSettingComponen
 	}
 
 	destroy(): void {
-		this.pickrLight.destroyAndRemove();
-		this.pickrDark.destroyAndRemove();
-		this.settingEl.settingEl.remove();
+		this.pickrLight?.destroyAndRemove();
+		this.pickrDark?.destroyAndRemove();
+		this.pickrLight = undefined;
+		this.pickrDark = undefined;
+		this.settingEl?.settingEl.remove();
 	}
 
 	private createColorPickerLight(wrapper: HTMLDivElement, containerEl: HTMLElement, swatchesLight: string[], valueLight: number | string | boolean, idLight: string) {

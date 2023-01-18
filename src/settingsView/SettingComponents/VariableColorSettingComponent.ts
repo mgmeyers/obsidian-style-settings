@@ -86,7 +86,8 @@ export class VariableColorSettingComponent extends AbstractSettingComponent {
 	}
 
 	destroy(): void {
-		this.pickr.destroyAndRemove();
-		this.settingEl.settingEl.remove();
+		this.pickr?.destroyAndRemove();
+		this.pickr = undefined;
+		this.settingEl?.settingEl.remove();
 	}
 }
