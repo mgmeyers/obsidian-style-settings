@@ -1,3 +1,1 @@
-export const ptBr = {
-    
-}
+export const ptBr = {};

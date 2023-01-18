@@ -1,3 +1,1 @@
-export const uk = {
-    
-}
+export const uk = {};

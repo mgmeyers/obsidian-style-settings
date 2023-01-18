@@ -1,3 +1,1 @@
-export const sq = {
-    
-}
+export const sq = {};

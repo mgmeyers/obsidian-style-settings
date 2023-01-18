@@ -1,3 +1,1 @@
-export const zhTw = {
-    
-}
+export const zhTw = {};

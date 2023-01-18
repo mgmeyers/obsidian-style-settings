@@ -1,3 +1,1 @@
-export const cz = {
-    
-}
+export const cz = {};

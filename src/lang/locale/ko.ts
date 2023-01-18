@@ -1,3 +1,1 @@
-export const ko = {
-    
-}
+export const ko = {};

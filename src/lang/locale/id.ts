@@ -1,3 +1,1 @@
-export const id = {
-    
-}
+export const id = {};

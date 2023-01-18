@@ -1,3 +1,1 @@
-export const ja = {
-    
-}
+export const ja = {};

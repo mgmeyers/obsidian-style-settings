@@ -14,7 +14,12 @@
       "dom",
       "es5",
       "scripthost",
-      "es2015"
+      "es2017",
+      "ES6",
+      "ES7"
+    ],
+    "types": [
+      "svelte"
     ]
   },
   "include": [
