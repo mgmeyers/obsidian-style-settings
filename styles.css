@@ -1,3 +1,11 @@
+.style-settings-container .pcr-app {
+    display: none;
+}
+
+.style-settings-container .pcr-app.visible {
+    display: flex;
+}
+
 .pcr-app .pcr-swatches > button {
     padding: 0;
 }

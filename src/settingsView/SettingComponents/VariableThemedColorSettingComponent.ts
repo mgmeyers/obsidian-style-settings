@@ -97,6 +97,11 @@ export class VariableThemedColorSettingComponent extends AbstractSettingComponen
 
 	private createColorPickerLight(wrapper: HTMLDivElement, containerEl: HTMLElement, swatchesLight: string[], valueLight: number | string | boolean, idLight: string) {
 		const themeLightWrapper = wrapper.createDiv({cls: "theme-light"});
+
+		// fix, so that the color is correctly shown before the color picker has been opened
+		const defaultColor = valueLight !== undefined ? (valueLight as string) : this.setting["default-light"];
+		themeLightWrapper.style.setProperty("--pcr-color", defaultColor);
+
 		this.pickrLight = Pickr.create(
 			getPickrSettings({
 				isView: this.isView,
@@ -104,7 +109,7 @@ export class VariableThemedColorSettingComponent extends AbstractSettingComponen
 				containerEl,
 				swatches: swatchesLight,
 				opacity: this.setting.opacity,
-				defaultColor: valueLight !== undefined ? (valueLight as string) : this.setting["default-light"],
+				defaultColor: defaultColor,
 			}),
 		);
 
@@ -131,6 +136,11 @@ export class VariableThemedColorSettingComponent extends AbstractSettingComponen
 
 	private createColorPickerDark(wrapper: HTMLDivElement, containerEl: HTMLElement, swatchesDark: string[], valueDark: number | string | boolean, idDark: string) {
 		const themeDarkWrapper = wrapper.createDiv({cls: "theme-dark"});
+
+		// fix, so that the color is correctly shown before the color picker has been opened
+		const defaultColor = valueDark !== undefined ? (valueDark as string) : this.setting["default-dark"];
+		themeDarkWrapper.style.setProperty("--pcr-color", defaultColor);
+
 		this.pickrDark = Pickr.create(
 			getPickrSettings({
 				isView: this.isView,
@@ -138,7 +148,7 @@ export class VariableThemedColorSettingComponent extends AbstractSettingComponen
 				containerEl,
 				swatches: swatchesDark,
 				opacity: this.setting.opacity,
-				defaultColor: valueDark !== undefined ? (valueDark as string) : this.setting["default-dark"],
+				defaultColor: defaultColor,
 			}),
 		);
 

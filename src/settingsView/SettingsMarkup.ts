@@ -1,7 +1,7 @@
-import {App, ButtonComponent, Setting, TextComponent} from "obsidian";
+import {App, SearchComponent, Setting} from "obsidian";
 import {buildSettingComponentTree, CSSSetting, Meta, ParsedCSSSettings} from "../SettingHandlers";
 import CSSSettingsPlugin from "../main";
-import {ErrorList, getTitle} from "../Utils";
+import {customDebounce, ErrorList, getTitle} from "../Utils";
 import {HeadingSettingComponent} from "./SettingComponents/HeadingSettingComponent";
 import * as fuzzysort from "fuzzysort";
 
@@ -137,23 +137,30 @@ export class SettingsMarkup {
 				},
 			);
 
-			const searchComponent = new TextComponent(setting.nameEl);
+			let searchComponent: SearchComponent;
+
+			setting.addSearch((s) => {
+				searchComponent = s;
+			});
+
+			// move the search component from the back to the front
+			setting.nameEl.appendChild(setting.controlEl.lastChild);
+
 			searchComponent.setValue(this.filterString);
 			searchComponent.onChange((value: string) => {
-				this.filterString = value;
+				customDebounce(
+					() => {
+						this.filterString = value;
+						if (value) {
+							this.filter();
+						} else {
+							this.clearFilter();
+						}
+					},
+					250,
+				);
 			});
-
-			const searchButton = new ButtonComponent(setting.nameEl);
-			searchButton.setButtonText("Search");
-			searchButton.onClick(() => {
-				this.filter();
-			});
-
-			const clearFilterButton = new ButtonComponent(setting.nameEl);
-			clearFilterButton.setButtonText("Clear");
-			clearFilterButton.onClick(() => {
-				this.clearFilter();
-			});
+			searchComponent.setPlaceholder("Search Style Settings...");
 		});
 
 		console.log(this.settings);

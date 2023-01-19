@@ -48,6 +48,10 @@ export class VariableColorSettingComponent extends AbstractSettingComponent {
 		this.settingEl.setName(title);
 		this.settingEl.setDesc(createDescription(description, this.setting.default));
 
+		// fix, so that the color is correctly shown before the color picker has been opened
+		const defaultColor = value !== undefined ? (value as string) : this.setting.default;
+		containerEl.style.setProperty("--pcr-color", defaultColor);
+
 		this.pickr = Pickr.create(
 			getPickrSettings({
 				isView: this.isView,
@@ -55,7 +59,7 @@ export class VariableColorSettingComponent extends AbstractSettingComponent {
 				containerEl: containerEl,
 				swatches: swatches,
 				opacity: this.setting.opacity,
-				defaultColor: value !== undefined ? (value as string) : this.setting.default,
+				defaultColor: defaultColor,
 			}),
 		);
 
