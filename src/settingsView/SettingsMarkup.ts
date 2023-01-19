@@ -1,16 +1,19 @@
-import {App, Setting} from "obsidian";
-import {buildSettingComponentTree, CSSSetting, ParsedCSSSettings} from "../SettingHandlers";
+import {App, ButtonComponent, Setting, TextComponent} from "obsidian";
+import {buildSettingComponentTree, CSSSetting, Meta, ParsedCSSSettings} from "../SettingHandlers";
 import CSSSettingsPlugin from "../main";
-import {ErrorList} from "../Utils";
+import {ErrorList, getTitle} from "../Utils";
 import {HeadingSettingComponent} from "./SettingComponents/HeadingSettingComponent";
+import * as fuzzysort from "fuzzysort";
 
 export class SettingsMarkup {
 	app: App;
 	plugin: CSSSettingsPlugin;
-	settingsComponentTrees: HeadingSettingComponent[];
+	settingsComponentTrees: HeadingSettingComponent[] = [];
+	filterString: string = "";
 	settings: ParsedCSSSettings[] = [];
 	errorList: ErrorList = [];
 	containerEl: HTMLElement;
+	settingsContainerEl: HTMLElement;
 	isView: boolean;
 
 	constructor(
@@ -33,6 +36,7 @@ export class SettingsMarkup {
 		for (const settingsComponentTree of this.settingsComponentTrees) {
 			settingsComponentTree.destroy();
 		}
+		this.settingsContainerEl?.empty();
 	}
 
 	setSettings(settings: ParsedCSSSettings[], errorList: ErrorList) {
@@ -132,9 +136,29 @@ export class SettingsMarkup {
 					});
 				},
 			);
+
+			const searchComponent = new TextComponent(setting.nameEl);
+			searchComponent.setValue(this.filterString);
+			searchComponent.onChange((value: string) => {
+				this.filterString = value;
+			});
+
+			const searchButton = new ButtonComponent(setting.nameEl);
+			searchButton.setButtonText("Search");
+			searchButton.onClick(() => {
+				this.filter();
+			});
+
+			const clearFilterButton = new ButtonComponent(setting.nameEl);
+			clearFilterButton.setButtonText("Clear");
+			clearFilterButton.onClick(() => {
+				this.clearFilter();
+			});
 		});
 
 		console.log(this.settings);
+
+		this.settingsContainerEl = containerEl.createDiv();
 
 		this.settingsComponentTrees = [];
 
@@ -162,11 +186,36 @@ export class SettingsMarkup {
 				settingsManager: plugin.settingsManager,
 			});
 
-			settingsComponentTree.render(containerEl);
+			settingsComponentTree.render(this.settingsContainerEl);
 
 			console.log(settingsComponentTree);
 
 			this.settingsComponentTrees.push(settingsComponentTree);
 		}
+	}
+
+	filter() {
+		this.cleanup();
+
+		for (const settingsComponentTree of this.settingsComponentTrees) {
+			settingsComponentTree.filter((setting: Meta) => this.filterFunction(setting));
+			settingsComponentTree.render(this.settingsContainerEl);
+		}
+	}
+
+	clearFilter() {
+		this.cleanup();
+
+		for (const settingsComponentTree of this.settingsComponentTrees) {
+			settingsComponentTree.clearFilter();
+			settingsComponentTree.render(this.settingsContainerEl);
+		}
+	}
+
+	filterFunction(setting: Meta): boolean {
+		if (!this.filterString) {
+			return true;
+		}
+		return fuzzysort.single(this.filterString, getTitle(setting))?.score > -10000;
 	}
 }

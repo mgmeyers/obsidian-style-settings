@@ -1,7 +1,7 @@
 import {AbstractSettingComponent} from "./AbstractSettingComponent";
 import {setIcon, Setting} from "obsidian";
 import {getDescription, getTitle} from "../../Utils";
-import {CSSSetting, Heading} from "../../SettingHandlers";
+import {CSSSetting, Heading, Meta} from "../../SettingHandlers";
 import {SettingComponentFactory, SettingType} from "./SettingComponentFactory";
 
 export class HeadingSettingComponent extends AbstractSettingComponent {
@@ -10,9 +10,15 @@ export class HeadingSettingComponent extends AbstractSettingComponent {
 	settingEl: Setting;
 	parent: HeadingSettingComponent;
 	children: AbstractSettingComponent[];
+	filteredChildren: AbstractSettingComponent[];
+	filterMode: boolean;
+	filterResultCount: number;
 
 	onInit() {
 		this.children = [];
+		this.filteredChildren = [];
+		this.filterMode = false;
+		this.filterResultCount = 0;
 	}
 
 	render(containerEl: HTMLElement): void {
@@ -36,6 +42,13 @@ export class HeadingSettingComponent extends AbstractSettingComponent {
 
 		this.settingEl.nameEl.prepend(iconContainer);
 
+		if (this.filterMode) {
+			this.settingEl.nameEl.createSpan({
+				cls: "style-settings-filter-result-count",
+				text: `${this.filterResultCount} Results`,
+			});
+		}
+
 		this.settingEl.settingEl.addEventListener("click", (e) => {
 			this.toggleVisible();
 		});
@@ -54,6 +67,52 @@ export class HeadingSettingComponent extends AbstractSettingComponent {
 			this.destroyChildren();
 		}
 		this.settingEl?.settingEl.remove();
+	}
+
+	filter(filter: (setting: Meta) => boolean): number {
+		this.filteredChildren = [];
+		this.filterResultCount = 0;
+		for (const child of this.children) {
+			if (child.setting.type === SettingType.HEADING) {
+				let childResultCount = (child as HeadingSettingComponent).filter(filter);
+				if (childResultCount > 0) {
+					this.filterResultCount += childResultCount;
+					this.filteredChildren.push(child);
+				}
+			} else {
+				if (filter(child.setting)) {
+					this.filteredChildren.push(child);
+					this.filterResultCount += 1;
+				}
+			}
+		}
+		this.filterMode = true;
+		this.setting.collapsed = false;
+		return this.filterResultCount;
+	}
+
+	clearFilter(): void {
+		this.filteredChildren = [];
+		for (const child of this.children) {
+			if (child.setting.type === SettingType.HEADING) {
+				(child as HeadingSettingComponent).clearFilter();
+			}
+		}
+		this.filterMode = false;
+		this.setting.collapsed = true;
+	}
+
+	private renderChildren() {
+		this.destroyChildren();
+		if (this.filterMode) {
+			for (const child of this.filteredChildren) {
+				child.render(this.childEl);
+			}
+		} else {
+			for (const child of this.children) {
+				child.render(this.childEl);
+			}
+		}
 	}
 
 	private destroyChildren() {
@@ -75,9 +134,7 @@ export class HeadingSettingComponent extends AbstractSettingComponent {
 		if (collapsed) {
 			this.destroyChildren();
 		} else {
-			for (const child of this.children) {
-				child.render(this.childEl);
-			}
+			this.renderChildren();
 		}
 	}
 

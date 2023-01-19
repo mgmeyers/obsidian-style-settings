@@ -27,6 +27,7 @@
     "chroma-js": "^2.1.2",
     "detect-indent": "^7.0.0",
     "dotenv": "^10.0.0",
+    "fuzzysort": "^2.0.4",
     "js-yaml": "^4.1.0",
     "rollup-plugin-copy": "^3.4.0",
     "rollup-plugin-css-only": "^3.1.0"

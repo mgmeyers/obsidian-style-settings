@@ -81,6 +81,12 @@
     transform: rotate(-90deg);
 }
 
+.style-settings-filter-result-count {
+    color: var(--text-faint);
+    line-height: var(--line-height-tight);
+    margin-inline: var(--size-4-2);
+}
+
 .style-settings-error {
     font-size: 14px;
     border-radius: 6px;
