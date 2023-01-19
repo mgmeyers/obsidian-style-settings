@@ -1,14 +1,13 @@
 import {App, Setting} from "obsidian";
-import {CSSSetting, ParsedCSSSettings} from "../settingHandlers";
+import {buildSettingComponentTree, CSSSetting, ParsedCSSSettings} from "../SettingHandlers";
 import CSSSettingsPlugin from "../main";
-import {parseSettings} from "../settingParser";
 import {ErrorList} from "../Utils";
 import {HeadingSettingComponent} from "./SettingComponents/HeadingSettingComponent";
 
 export class SettingsMarkup {
 	app: App;
 	plugin: CSSSettingsPlugin;
-	settingsComponentTree: HeadingSettingComponent;
+	settingsComponentTrees: HeadingSettingComponent[];
 	settings: ParsedCSSSettings[] = [];
 	errorList: ErrorList = [];
 	containerEl: HTMLElement;
@@ -31,7 +30,9 @@ export class SettingsMarkup {
 	}
 
 	cleanup() {
-		this.settingsComponentTree?.destroy();
+		for (const settingsComponentTree of this.settingsComponentTrees) {
+			settingsComponentTree.destroy();
+		}
 	}
 
 	setSettings(settings: ParsedCSSSettings[], errorList: ErrorList) {
@@ -135,6 +136,8 @@ export class SettingsMarkup {
 
 		console.log(this.settings);
 
+		this.settingsComponentTrees = [];
+
 		for (const s of settings) {
 			const options: CSSSetting[] = [
 				{
@@ -151,7 +154,7 @@ export class SettingsMarkup {
 				...s.settings,
 			];
 
-			this.settingsComponentTree = parseSettings({
+			const settingsComponentTree = buildSettingComponentTree({
 				isView: this.isView,
 				sectionId: s.id,
 				sectionName: s.name,
@@ -159,9 +162,11 @@ export class SettingsMarkup {
 				settingsManager: plugin.settingsManager,
 			});
 
-			this.settingsComponentTree.render(containerEl);
+			settingsComponentTree.render(containerEl);
 
-			console.log(this.settingsComponentTree);
+			console.log(settingsComponentTree);
+
+			this.settingsComponentTrees.push(settingsComponentTree);
 		}
 	}
 }

@@ -1,7 +1,14 @@
 import {AbstractSettingComponent} from "./AbstractSettingComponent";
 import {Setting} from "obsidian";
-import {createDescription, resetTooltip, VariableColor} from "../../settingHandlers";
-import {getDescription, getPickrSettings, getTitle, isValidDefaultColor, onPickrCancel} from "../../Utils";
+import {resetTooltip, VariableColor} from "../../SettingHandlers";
+import {
+	createDescription,
+	getDescription,
+	getPickrSettings,
+	getTitle,
+	isValidDefaultColor,
+	onPickrCancel,
+} from "../../Utils";
 import {t} from "../../lang/helpers";
 import Pickr from "@simonwep/pickr";
 

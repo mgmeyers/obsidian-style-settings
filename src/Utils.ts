@@ -1,5 +1,5 @@
-import {lang} from "./lang/helpers";
-import {Meta, WithDescription, WithTitle} from "./settingHandlers";
+import {lang, t} from "./lang/helpers";
+import {Meta, WithDescription, WithTitle} from "./SettingHandlers";
 import Pickr from "@simonwep/pickr";
 
 export const settingRegExp = /\/\*\s*@settings[\r\n]+?([\s\S]+?)\*\//g;
@@ -65,4 +65,38 @@ export function getPickrSettings(opts: {
 
 export function onPickrCancel(instance: Pickr) {
 	instance.hide();
+}
+
+export function sanitizeText(str: string): string {
+	if (str === "") {
+		return `""`;
+	}
+
+	return str.replace(/[;<>]/g, "");
+}
+
+export function createDescription(
+	description: string | undefined,
+	def: string,
+	defLabel?: string,
+) {
+	const fragment = createFragment();
+
+	if (description) {
+		fragment.appendChild(document.createTextNode(description));
+	}
+
+	if (def) {
+		const small = createEl("small");
+		small.appendChild(createEl("strong", {text: `${t("Default:")} `}));
+		small.appendChild(document.createTextNode(defLabel || def));
+
+		const div = createEl("div");
+
+		div.appendChild(small);
+
+		fragment.appendChild(div);
+	}
+
+	return fragment;
 }

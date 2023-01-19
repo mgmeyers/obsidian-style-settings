@@ -1,5 +1,5 @@
 import {CSSSettingsManager} from "../../SettingsManager";
-import {CSSSetting} from "../../settingHandlers";
+import {CSSSetting} from "../../SettingHandlers";
 
 export abstract class AbstractSettingComponent {
 	sectionId: string;

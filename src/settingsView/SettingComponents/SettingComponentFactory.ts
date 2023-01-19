@@ -1,5 +1,5 @@
 import {AbstractSettingComponent} from "./AbstractSettingComponent";
-import {CSSSetting} from "../../settingHandlers";
+import {CSSSetting} from "../../SettingHandlers";
 import {CSSSettingsManager} from "../../SettingsManager";
 import {HeadingSettingComponent} from "./HeadingSettingComponent";
 import {ClassToggleSettingComponent} from "./ClassToggleSettingComponent";

@@ -1,6 +1,6 @@
 import {AbstractSettingComponent} from "./AbstractSettingComponent";
 import {ButtonComponent, Setting} from "obsidian";
-import {resetTooltip, VariableThemedColor} from "../../settingHandlers";
+import {resetTooltip, VariableThemedColor} from "../../SettingHandlers";
 import {getDescription, getPickrSettings, getTitle, isValidDefaultColor, onPickrCancel} from "../../Utils";
 import {t} from "../../lang/helpers";
 import Pickr from "@simonwep/pickr";

@@ -1,7 +1,7 @@
 import {AbstractSettingComponent} from "./AbstractSettingComponent";
 import {debounce, Setting, TextComponent} from "obsidian";
-import {createDescription, resetTooltip, VariableNumber} from "../../settingHandlers";
-import {getDescription, getTitle} from "../../Utils";
+import {resetTooltip, VariableNumber} from "../../SettingHandlers";
+import {createDescription, getDescription, getTitle} from "../../Utils";
 import {t} from "../../lang/helpers";
 
 export class VariableNumberSettingComponent extends AbstractSettingComponent {

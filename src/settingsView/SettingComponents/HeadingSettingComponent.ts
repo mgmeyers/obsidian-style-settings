@@ -1,7 +1,7 @@
 import {AbstractSettingComponent} from "./AbstractSettingComponent";
 import {setIcon, Setting} from "obsidian";
 import {getDescription, getTitle} from "../../Utils";
-import {CSSSetting, Heading} from "../../settingHandlers";
+import {CSSSetting, Heading} from "../../SettingHandlers";
 import {SettingComponentFactory, SettingType} from "./SettingComponentFactory";
 
 export class HeadingSettingComponent extends AbstractSettingComponent {

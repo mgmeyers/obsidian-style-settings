@@ -1,43 +1,8 @@
-import {t} from "./lang/helpers";
 import {SettingType} from "./settingsView/SettingComponents/SettingComponentFactory";
+import {CSSSettingsManager} from "./SettingsManager";
+import {HeadingSettingComponent} from "./settingsView/SettingComponents/HeadingSettingComponent";
 
 export const resetTooltip = "Restore default";
-
-export function sanitizeText(str: string): string {
-	if (str === "") {
-		return `""`;
-	}
-
-	return str.replace(/[;<>]/g, "");
-}
-
-export function createDescription(
-	description: string | undefined,
-	def: string,
-	defLabel?: string,
-) {
-	const fragment = createFragment();
-
-	if (description) {
-		fragment.appendChild(document.createTextNode(description));
-	}
-
-	if (def) {
-		const small = createEl("small");
-		small.appendChild(createEl("strong", {text: `${t("Default:")} `}));
-		small.appendChild(document.createTextNode(defLabel || def));
-
-		const div = createEl("div");
-
-		div.appendChild(small);
-
-		fragment.appendChild(div);
-	}
-
-	return fragment;
-}
-
-export type CleanupFunction = void | (() => void);
 
 export interface WithTitle {
 	title: string;
@@ -192,4 +157,52 @@ export interface ParsedCSSSettings {
 	name: string;
 	id: string;
 	settings: Array<CSSSetting>;
+}
+
+export function buildSettingComponentTree(opts: {
+	isView: boolean;
+	sectionId: string;
+	sectionName: string;
+	settings: Meta[];
+	settingsManager: CSSSettingsManager;
+}): HeadingSettingComponent {
+	const {
+		isView,
+		sectionId,
+		settings,
+		settingsManager,
+		sectionName,
+	} = opts;
+
+	const root: HeadingSettingComponent = new HeadingSettingComponent(sectionId, sectionName, settings[0], settingsManager, isView);
+
+	console.log(settings);
+
+	let currentHeading: HeadingSettingComponent = root;
+
+	for (let setting of settings.splice(1)) {
+		if (setting.type === "heading") {
+			const newHeading: Heading = setting as Heading;
+
+			// console.log(newHeading);
+
+			if (newHeading.level < currentHeading.setting.level) {
+				while (newHeading.level < currentHeading.setting.level) {
+					currentHeading = currentHeading.parent;
+				}
+
+				currentHeading = currentHeading.parent.addChild(newHeading) as HeadingSettingComponent;
+			} else if (newHeading.level === currentHeading.setting.level) {
+				currentHeading = currentHeading.parent.addChild(newHeading) as HeadingSettingComponent;
+			} else {
+				currentHeading = currentHeading.addChild(newHeading) as HeadingSettingComponent;
+			}
+
+		} else {
+			currentHeading.addChild(setting);
+		}
+	}
+
+
+	return root;
 }

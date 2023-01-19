@@ -1,6 +1,6 @@
 import {AbstractSettingComponent} from "./AbstractSettingComponent";
 import {Setting, ToggleComponent} from "obsidian";
-import {ClassToggle, resetTooltip} from "../../settingHandlers";
+import {ClassToggle, resetTooltip} from "../../SettingHandlers";
 import {getDescription, getTitle} from "../../Utils";
 
 export class ClassToggleSettingComponent extends AbstractSettingComponent {

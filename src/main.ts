@@ -1,6 +1,6 @@
 import {Plugin} from "obsidian";
 import {CSSSettingsManager} from "./SettingsManager";
-import {ParsedCSSSettings} from "./settingHandlers";
+import {ParsedCSSSettings} from "./SettingHandlers";
 import yaml from "js-yaml";
 import detectIndent from "detect-indent";
 
