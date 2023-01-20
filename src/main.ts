@@ -85,25 +85,7 @@ export default class CSSSettingsPlugin extends Plugin {
 			}
 
 			// compatability with Settings Search Plugin
-			if ((window as any).SettingsSearch) {
-				const settingsSearch: any = (window as any).SettingsSearch;
-
-				settingsSearch.removeTabResources("obsidian-style-settings");
-
-				for (const parsedCSSSetting of this.settingsList) {
-					console.log("test");
-					settingsSearch.addResources(...parsedCSSSetting.settings.map(x => {
-						const settingsSearchResource: SettingsSeachResource = {
-							tab: "obsidian-style-settings",
-							name: "Style Settings",
-							text: getTitle(x) ?? "",
-							desc: getDescription(x) ?? "",
-						};
-						// console.log(settingsSearchResource);
-						return settingsSearchResource;
-					}));
-				}
-			}
+			this.registerSettingsToSettingsSearch();
 
 			this.settingsTab.settingsMarkup.setSettings(
 				this.settingsList,
@@ -117,6 +99,44 @@ export default class CSSSettingsPlugin extends Plugin {
 			});
 			this.settingsManager.initClasses();
 		}, 100);
+	}
+
+	private registerSettingsToSettingsSearch() {
+		const onSettingsSearchLoaded = () => {
+			// console.log("register callback called");
+			if ((window as any).SettingsSearch) {
+				// console.log("settings search found");
+				const settingsSearch: any = (window as any).SettingsSearch;
+
+				settingsSearch.removeTabResources("obsidian-style-settings");
+
+				for (const parsedCSSSetting of this.settingsList) {
+					// console.log("test");
+					settingsSearch.addResources(...parsedCSSSetting.settings.map(x => {
+						const settingsSearchResource: SettingsSeachResource = {
+							tab: "obsidian-style-settings",
+							name: "Style Settings",
+							text: getTitle(x) ?? "",
+							desc: getDescription(x) ?? "",
+						};
+						// console.log(settingsSearchResource);
+						return settingsSearchResource;
+					}));
+				}
+			}
+		};
+
+		// @ts-ignore TODO: expand obsidian types, so that the ts-ignore is not needed
+		if (this.app.plugins.plugins["settings-search"]?.loaded) {
+			// console.log("registered settings directly");
+			onSettingsSearchLoaded();
+		} else {
+			// console.log("registered settings via event");
+			// @ts-ignore
+			this.app.workspace.on("settings-search-loaded", () => {
+				onSettingsSearchLoaded();
+			});
+		}
 	}
 
 	private parseCSSStyleSheet(sheet: CSSStyleSheet): void {

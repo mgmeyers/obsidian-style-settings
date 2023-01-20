@@ -36,7 +36,7 @@ export abstract class AbstractSettingComponent {
 		);
 	}
 
-	decisiveMatch(str: string) {
+	decisiveMatch(str: string): boolean {
 		return this.match(str) > -100000;
 	}
 
