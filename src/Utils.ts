@@ -109,3 +109,18 @@ export function customDebounce(cb: () => void, timeout: number = 300): void {
 		cb();
 	}, timeout);
 }
+
+
+/*
+ * compatability with Settings Search Plugin
+ */
+export interface SettingsSeachResource {
+	//Id of your settings tab. This is usually the ID of your plugin as defined in the manifest.
+	tab: string;
+	//Name of your settings tab. This is usually the name of your plugin as defined in the manifest. This is used to organize the settings under headers when searching.
+	name: string;
+	//The name of the setting to add.
+	text: string;
+	//An optional description string to add to the setting.
+	desc: string;
+}

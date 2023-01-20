@@ -9,7 +9,7 @@ import "./css/pickerOverrides.css";
 import "./css/settings.css";
 import {CSSSettingsTab} from "./settingsView/CSSSettingsTab";
 import {SettingsView, viewType} from "./settingsView/SettingsView";
-import {ErrorList, nameRegExp, settingRegExp} from "./Utils";
+import {ErrorList, getDescription, getTitle, nameRegExp, settingRegExp, SettingsSeachResource} from "./Utils";
 
 export default class CSSSettingsPlugin extends Plugin {
 	settingsManager: CSSSettingsManager;
@@ -81,51 +81,27 @@ export default class CSSSettingsPlugin extends Plugin {
 
 			for (let i = 0, len = styleSheets.length; i < len; i++) {
 				const sheet = styleSheets.item(i);
-				const text = sheet.ownerNode.textContent.trim();
+				this.parseCSSStyleSheet(sheet);
+			}
 
-				let match = settingRegExp.exec(text);
+			// compatability with Settings Search Plugin
+			if ((window as any).SettingsSearch) {
+				const settingsSearch: any = (window as any).SettingsSearch;
 
-				if (match && match.length) {
-					do {
-						const nameMatch = text.match(nameRegExp);
-						const name: string | undefined = nameMatch
-							? nameMatch[1]
-							: undefined;
+				settingsSearch.removeTabResources("obsidian-style-settings");
 
-						try {
-							const str = match[1].trim();
-
-							const indent = detectIndent(str);
-
-							const settings = yaml.load(
-								str.replace(
-									/\t/g,
-									indent.type === "space" ? indent.indent : "    ",
-								),
-								{
-									filename: name,
-								},
-							) as ParsedCSSSettings;
-
-							if (!settings.settings) continue;
-
-							settings.settings = settings.settings.filter(
-								(setting) => setting,
-							);
-
-							if (
-								typeof settings === "object" &&
-								settings.name &&
-								settings.id &&
-								settings.settings &&
-								settings.settings.length
-							) {
-								this.settingsList.push(settings);
-							}
-						} catch (e) {
-							this.errorList.push({name, error: `${e}`});
-						}
-					} while ((match = settingRegExp.exec(text)) !== null);
+				for (const parsedCSSSetting of this.settingsList) {
+					console.log("test");
+					settingsSearch.addResources(...parsedCSSSetting.settings.map(x => {
+						const settingsSearchResource: SettingsSeachResource = {
+							tab: "obsidian-style-settings",
+							name: "Style Settings",
+							text: getTitle(x) ?? "",
+							desc: getDescription(x) ?? "",
+						};
+						// console.log(settingsSearchResource);
+						return settingsSearchResource;
+					}));
 				}
 			}
 
@@ -141,6 +117,59 @@ export default class CSSSettingsPlugin extends Plugin {
 			});
 			this.settingsManager.initClasses();
 		}, 100);
+	}
+
+	private parseCSSStyleSheet(sheet: CSSStyleSheet): void {
+		const text: string = sheet.ownerNode.textContent.trim();
+
+		let match: RegExpExecArray = settingRegExp.exec(text);
+
+		if (match && match.length) {
+			do {
+				const nameMatch: RegExpMatchArray = text.match(nameRegExp);
+				const name: string | undefined = nameMatch ? nameMatch[1] : undefined;
+
+				try {
+					const settings = this.parseCSSSettings(match, name);
+
+					if (
+						settings &&
+						typeof settings === "object" &&
+						settings.name &&
+						settings.id &&
+						settings.settings &&
+						settings.settings.length
+					) {
+						this.settingsList.push(settings);
+					}
+				} catch (e) {
+					this.errorList.push({name, error: `${e}`});
+				}
+			} while ((match = settingRegExp.exec(text)) !== null);
+		}
+	}
+
+	private parseCSSSettings(match: RegExpExecArray, name: string): ParsedCSSSettings | undefined {
+		const str = match[1].trim();
+
+		const indent = detectIndent(str);
+
+		const settings: ParsedCSSSettings = yaml.load(
+			str.replace(
+				/\t/g,
+				indent.type === "space" ? indent.indent : "    ",
+			),
+			{
+				filename: name,
+			},
+		) as ParsedCSSSettings;
+
+		if (!settings.settings) return undefined;
+
+		settings.settings = settings.settings.filter(
+			(setting) => setting,
+		);
+		return settings;
 	}
 
 	onunload() {
