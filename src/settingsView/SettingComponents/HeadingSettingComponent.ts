@@ -1,7 +1,7 @@
 import {AbstractSettingComponent} from "./AbstractSettingComponent";
 import {setIcon, Setting} from "obsidian";
 import {getDescription, getTitle} from "../../Utils";
-import {CSSSetting, Heading, Meta} from "../../SettingHandlers";
+import {CSSSetting, Heading} from "../../SettingHandlers";
 import {SettingComponentFactory, SettingType} from "./SettingComponentFactory";
 
 export class HeadingSettingComponent extends AbstractSettingComponent {
@@ -69,35 +69,40 @@ export class HeadingSettingComponent extends AbstractSettingComponent {
 		this.settingEl?.settingEl.remove();
 	}
 
-	filter(filter: (setting: Meta) => boolean): number {
+	filter(filterString: string): number {
 		this.filteredChildren = [];
 		this.filterResultCount = 0;
+
 		for (const child of this.children) {
 			if (child.setting.type === SettingType.HEADING) {
-				let childResultCount = (child as HeadingSettingComponent).filter(filter);
+				let childResultCount = (child as HeadingSettingComponent).filter(filterString);
 				if (childResultCount > 0) {
 					this.filterResultCount += childResultCount;
 					this.filteredChildren.push(child);
 				}
 			} else {
-				if (filter(child.setting)) {
+				if (child.decisiveMatch(filterString)) {
 					this.filteredChildren.push(child);
 					this.filterResultCount += 1;
 				}
 			}
 		}
+
 		this.filterMode = true;
 		this.setting.collapsed = false;
+
 		return this.filterResultCount;
 	}
 
 	clearFilter(): void {
 		this.filteredChildren = [];
+
 		for (const child of this.children) {
 			if (child.setting.type === SettingType.HEADING) {
 				(child as HeadingSettingComponent).clearFilter();
 			}
 		}
+
 		this.filterMode = false;
 		this.setting.collapsed = true;
 	}

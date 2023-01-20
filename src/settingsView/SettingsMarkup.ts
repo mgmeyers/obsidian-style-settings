@@ -1,9 +1,8 @@
 import {App, SearchComponent, Setting} from "obsidian";
-import {buildSettingComponentTree, CSSSetting, Meta, ParsedCSSSettings} from "../SettingHandlers";
+import {buildSettingComponentTree, CSSSetting, ParsedCSSSettings} from "../SettingHandlers";
 import CSSSettingsPlugin from "../main";
-import {customDebounce, ErrorList, getTitle} from "../Utils";
+import {customDebounce, ErrorList} from "../Utils";
 import {HeadingSettingComponent} from "./SettingComponents/HeadingSettingComponent";
-import * as fuzzysort from "fuzzysort";
 
 export class SettingsMarkup {
 	app: App;
@@ -205,7 +204,7 @@ export class SettingsMarkup {
 		this.cleanup();
 
 		for (const settingsComponentTree of this.settingsComponentTrees) {
-			settingsComponentTree.filter((setting: Meta) => this.filterFunction(setting));
+			settingsComponentTree.filter(this.filterString);
 			settingsComponentTree.render(this.settingsContainerEl);
 		}
 	}
@@ -217,12 +216,5 @@ export class SettingsMarkup {
 			settingsComponentTree.clearFilter();
 			settingsComponentTree.render(this.settingsContainerEl);
 		}
-	}
-
-	filterFunction(setting: Meta): boolean {
-		if (!this.filterString) {
-			return true;
-		}
-		return fuzzysort.single(this.filterString, getTitle(setting))?.score > -10000;
 	}
 }

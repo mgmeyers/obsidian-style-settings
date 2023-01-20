@@ -79,7 +79,7 @@ export function createDescription(
 	description: string | undefined,
 	def: string,
 	defLabel?: string,
-) {
+): DocumentFragment {
 	const fragment = createFragment();
 
 	if (description) {
