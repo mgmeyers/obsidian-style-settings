@@ -101,17 +101,22 @@ export default class CSSSettingsPlugin extends Plugin {
 		}, 100);
 	}
 
+	/**
+	 * Registers the current settings to the settings search plugin.
+	 * It also unregisters the old settings.
+	 *
+	 * @private
+	 */
 	private registerSettingsToSettingsSearch() {
 		const onSettingsSearchLoaded = () => {
-			// console.log("register callback called");
+			console.log("style settings | registered settings to the settings search plugin");
+
 			if ((window as any).SettingsSearch) {
-				// console.log("settings search found");
 				const settingsSearch: any = (window as any).SettingsSearch;
 
 				settingsSearch.removeTabResources("obsidian-style-settings");
 
 				for (const parsedCSSSetting of this.settingsList) {
-					// console.log("test");
 					settingsSearch.addResources(...parsedCSSSetting.settings.map(x => {
 						const settingsSearchResource: SettingsSeachResource = {
 							tab: "obsidian-style-settings",
@@ -119,7 +124,6 @@ export default class CSSSettingsPlugin extends Plugin {
 							text: getTitle(x) ?? "",
 							desc: getDescription(x) ?? "",
 						};
-						// console.log(settingsSearchResource);
 						return settingsSearchResource;
 					}));
 				}
@@ -128,10 +132,8 @@ export default class CSSSettingsPlugin extends Plugin {
 
 		// @ts-ignore TODO: expand obsidian types, so that the ts-ignore is not needed
 		if (this.app.plugins.plugins["settings-search"]?.loaded) {
-			// console.log("registered settings directly");
 			onSettingsSearchLoaded();
 		} else {
-			// console.log("registered settings via event");
 			// @ts-ignore
 			this.app.workspace.on("settings-search-loaded", () => {
 				onSettingsSearchLoaded();
@@ -139,6 +141,26 @@ export default class CSSSettingsPlugin extends Plugin {
 		}
 	}
 
+	/**
+	 * Remove any settings from settings search if settings search is loaded.
+	 *
+	 * @private
+	 */
+	private unregisterSettingsFromSettingsSearch() {
+		// @ts-ignore TODO: expand obsidian types, so that the ts-ignore is not needed
+		if (this.app.plugins.plugins["settings-search"]?.loaded) {
+			// @ts-ignore
+			window.SettingsSearch.removeTabResources("obsidian-style-settings");
+		}
+	}
+
+	/**
+	 * Parses the settings from a css style sheet.
+	 * Adds the parsed settings to `settingsList` and any errors to `errorList`.
+	 *
+	 * @param sheet the stylesheet to parse
+	 * @private
+	 */
 	private parseCSSStyleSheet(sheet: CSSStyleSheet): void {
 		const text: string = sheet.ownerNode.textContent.trim();
 
@@ -150,7 +172,8 @@ export default class CSSSettingsPlugin extends Plugin {
 				const name: string | undefined = nameMatch ? nameMatch[1] : undefined;
 
 				try {
-					const settings = this.parseCSSSettings(match, name);
+					const str = match[1].trim();
+					const settings = this.parseCSSSettings(str, name);
 
 					if (
 						settings &&
@@ -169,9 +192,14 @@ export default class CSSSettingsPlugin extends Plugin {
 		}
 	}
 
-	private parseCSSSettings(match: RegExpExecArray, name: string): ParsedCSSSettings | undefined {
-		const str = match[1].trim();
-
+	/**
+	 * Parse css settings from a string.
+	 *
+	 * @param str the stringified settings to parse
+	 * @param name the name of the file
+	 * @private
+	 */
+	private parseCSSSettings(str: string, name: string): ParsedCSSSettings | undefined {
 		const indent = detectIndent(str);
 
 		const settings: ParsedCSSSettings = yaml.load(
@@ -204,6 +232,8 @@ export default class CSSSettingsPlugin extends Plugin {
 		this.settingsManager.cleanup();
 		this.settingsTab.settingsMarkup.cleanup();
 		this.deactivateView();
+
+		this.unregisterSettingsFromSettingsSearch();
 	}
 
 	deactivateView() {

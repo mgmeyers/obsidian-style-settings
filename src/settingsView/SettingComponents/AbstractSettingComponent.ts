@@ -25,6 +25,11 @@ export abstract class AbstractSettingComponent {
 
 	}
 
+	/**
+	 * Matches the Component against `str`. A perfect match returns 0, no match returns negative infinity.
+	 *
+	 * @param str the string to match this Component against.
+	 */
 	match(str: string): number {
 		if (!str) {
 			return Number.NEGATIVE_INFINITY;
@@ -36,11 +41,24 @@ export abstract class AbstractSettingComponent {
 		);
 	}
 
+	/**
+	 * Matches the Component against `str`. A match returns true, no match  or a bad match returns false.
+	 *
+	 * @param str the string to match this Component against.
+	 */
 	decisiveMatch(str: string): boolean {
 		return this.match(str) > -100000;
 	}
 
+	/**
+	 * Renders the Component and all it's children into `containerEl`.
+	 *
+	 * @param containerEl
+	 */
 	abstract render(containerEl: HTMLElement): void;
 
+	/**
+	 * Destroys the component and all it's children.
+	 */
 	abstract destroy(): void;
 }

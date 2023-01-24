@@ -31,6 +31,9 @@ export class SettingsMarkup {
 		this.generate(this.settings);
 	}
 
+	/**
+	 * Recursively destroys all setting elements.
+	 */
 	cleanup() {
 		for (const settingsComponentTree of this.settingsComponentTrees) {
 			settingsComponentTree.destroy();
@@ -136,12 +139,11 @@ export class SettingsMarkup {
 				},
 			);
 
+			// Searchbar
 			let searchComponent: SearchComponent;
-
 			setting.addSearch((s) => {
 				searchComponent = s;
 			});
-
 			// move the search component from the back to the front
 			setting.nameEl.appendChild(setting.controlEl.lastChild);
 
@@ -161,8 +163,6 @@ export class SettingsMarkup {
 			});
 			searchComponent.setPlaceholder("Search Style Settings...");
 		});
-
-		console.log(this.settings);
 
 		this.settingsContainerEl = containerEl.createDiv();
 
@@ -194,12 +194,13 @@ export class SettingsMarkup {
 
 			settingsComponentTree.render(this.settingsContainerEl);
 
-			console.log(settingsComponentTree);
-
 			this.settingsComponentTrees.push(settingsComponentTree);
 		}
 	}
 
+	/**
+	 * Recursively filter all setting elements based on `filterString` and then re-renders.
+	 */
 	filter() {
 		this.cleanup();
 
@@ -209,6 +210,9 @@ export class SettingsMarkup {
 		}
 	}
 
+	/**
+	 * Recursively clears the filter and then re-renders.
+	 */
 	clearFilter() {
 		this.cleanup();
 
