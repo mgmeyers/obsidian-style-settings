@@ -1,12 +1,13 @@
+import '@simonwep/pickr/dist/themes/nano.min.css';
+import './css/pickerOverrides.css';
+import './css/settings.css';
+
 import { Plugin } from 'obsidian';
 import { CSSSettingsManager } from './SettingsManager';
 import { ParsedCSSSettings } from './SettingHandlers';
 import yaml from 'js-yaml';
 import detectIndent from 'detect-indent';
 
-import '@simonwep/pickr/dist/themes/nano.min.css';
-import './css/pickerOverrides.css';
-import './css/settings.css';
 import { CSSSettingsTab } from './settingsView/CSSSettingsTab';
 import { SettingsView, viewType } from './settingsView/SettingsView';
 import {
