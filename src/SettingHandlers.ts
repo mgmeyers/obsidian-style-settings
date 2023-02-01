@@ -176,15 +176,11 @@ export function buildSettingComponentTree(opts: {
 
 	const root: HeadingSettingComponent = new HeadingSettingComponent(sectionId, sectionName, settings[0], settingsManager, isView);
 
-	console.log(settings);
-
 	let currentHeading: HeadingSettingComponent = root;
 
 	for (let setting of settings.splice(1)) {
 		if (setting.type === "heading") {
 			const newHeading: Heading = setting as Heading;
-
-			// console.log(newHeading);
 
 			if (newHeading.level < currentHeading.setting.level) {
 				while (newHeading.level < currentHeading.setting.level) {
@@ -202,7 +198,6 @@ export function buildSettingComponentTree(opts: {
 			currentHeading.addChild(setting);
 		}
 	}
-
 
 	return root;
 }

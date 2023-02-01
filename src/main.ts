@@ -63,8 +63,6 @@ export default class CSSSettingsPlugin extends Plugin {
 		const dark = getComputedStyle(this.darkEl).getPropertyValue(`--${id}`);
 		const current = getComputedStyle(document.body).getPropertyValue(`--${id}`);
 
-		console.log(id, light, dark, current);
-
 		return {light, dark, current};
 	}
 
