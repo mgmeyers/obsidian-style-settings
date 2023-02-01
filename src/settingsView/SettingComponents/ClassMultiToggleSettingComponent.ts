@@ -1,8 +1,12 @@
-import {AbstractSettingComponent} from "./AbstractSettingComponent";
-import {DropdownComponent, Setting} from "obsidian";
-import {ClassMultiToggle, resetTooltip, SelectOption} from "../../SettingHandlers";
-import {t} from "../../lang/helpers";
-import {createDescription, getDescription, getTitle} from "../../Utils";
+import { AbstractSettingComponent } from './AbstractSettingComponent';
+import { DropdownComponent, Setting } from 'obsidian';
+import {
+	ClassMultiToggle,
+	resetTooltip,
+	SelectOption,
+} from '../../SettingHandlers';
+import { t } from '../../lang/helpers';
+import { createDescription, getDescription, getTitle } from '../../Utils';
 
 export class ClassMultiToggleSettingComponent extends AbstractSettingComponent {
 	settingEl: Setting;
@@ -14,29 +18,29 @@ export class ClassMultiToggleSettingComponent extends AbstractSettingComponent {
 		const title = getTitle(this.setting);
 		const description = getDescription(this.setting);
 
-		if (typeof this.setting.default !== "string") {
+		if (typeof this.setting.default !== 'string') {
 			return console.error(
-				`${t("Error:")} ${title} ${t("missing default value")}`,
+				`${t('Error:')} ${title} ${t('missing default value')}`
 			);
 		}
 
 		let prevValue = this.getPreviousValue();
 
-		let defaultLabel = this.getDefaultOptionLabel();
+		const defaultLabel = this.getDefaultOptionLabel();
 
 		this.settingEl = new Setting(containerEl);
 		this.settingEl.setName(title);
 		this.settingEl.setDesc(
-			createDescription(description, this.setting.default, defaultLabel),
+			createDescription(description, this.setting.default, defaultLabel)
 		);
 
 		this.settingEl.addDropdown((dropdown) => {
 			if (this.setting.allowEmpty) {
-				dropdown.addOption("none", "");
+				dropdown.addOption('none', '');
 			}
 
 			for (const o of this.setting.options) {
-				if (typeof o === "string") {
+				if (typeof o === 'string') {
 					dropdown.addOption(o, o);
 				} else {
 					dropdown.addOption(o.value, o.label);
@@ -48,7 +52,7 @@ export class ClassMultiToggleSettingComponent extends AbstractSettingComponent {
 			dropdown.onChange((value) => {
 				this.settingsManager.setSetting(this.sectionId, this.setting.id, value);
 
-				if (value !== "none") {
+				if (value !== 'none') {
 					document.body.classList.add(value);
 				}
 
@@ -63,13 +67,13 @@ export class ClassMultiToggleSettingComponent extends AbstractSettingComponent {
 		});
 
 		this.settingEl.addExtraButton((b) => {
-			b.setIcon("reset");
+			b.setIcon('reset');
 			b.onClick(() => {
-				const value = this.setting.default || "none";
+				const value = this.setting.default || 'none';
 
-				this.dropdownComponent.setValue(this.setting.default || "none");
+				this.dropdownComponent.setValue(this.setting.default || 'none');
 
-				if (value !== "none") {
+				if (value !== 'none') {
 					document.body.classList.add(value);
 				}
 
@@ -91,8 +95,8 @@ export class ClassMultiToggleSettingComponent extends AbstractSettingComponent {
 
 	private getDefaultOption(): string | SelectOption | undefined {
 		if (this.setting.default) {
-			return this.setting.options.find(o => {
-				if (typeof o === "string") {
+			return this.setting.options.find((o) => {
+				if (typeof o === 'string') {
 					return o === this.setting.default;
 				}
 
@@ -107,7 +111,7 @@ export class ClassMultiToggleSettingComponent extends AbstractSettingComponent {
 		const defaultOption = this.getDefaultOption();
 
 		if (defaultOption) {
-			if (typeof defaultOption === "string") {
+			if (typeof defaultOption === 'string') {
 				return defaultOption;
 			}
 			return defaultOption.label;
@@ -117,22 +121,17 @@ export class ClassMultiToggleSettingComponent extends AbstractSettingComponent {
 	}
 
 	private getPreviousValue() {
-		let prevValue = this.settingsManager.getSetting(this.sectionId, this.setting.id) as string | undefined;
+		const prevValue = this.settingsManager.getSetting(
+			this.sectionId,
+			this.setting.id
+		) as string | undefined;
 
 		if (prevValue === undefined) {
 			if (this.setting.default) {
 				return this.setting.default;
 			}
-			return "none";
+			return 'none';
 		}
 		return prevValue;
-
-		// if (prevValue === undefined && !!this.setting.default) {
-		// 	prevValue = this.setting.default;
-		// } else if (prevValue === undefined) {
-		// 	prevValue = "none";
-		// }
-		//
-		// return prevValue;
 	}
 }

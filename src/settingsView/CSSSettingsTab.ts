@@ -1,6 +1,6 @@
-import {App, PluginSettingTab} from "obsidian";
-import {SettingsMarkup} from "./SettingsMarkup";
-import CSSSettingsPlugin from "../main";
+import { App, PluginSettingTab } from 'obsidian';
+import { SettingsMarkup } from './SettingsMarkup';
+import CSSSettingsPlugin from '../main';
 
 export class CSSSettingsTab extends PluginSettingTab {
 	settingsMarkup: SettingsMarkup;

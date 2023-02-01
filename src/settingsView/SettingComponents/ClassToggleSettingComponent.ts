@@ -1,7 +1,7 @@
-import {AbstractSettingComponent} from "./AbstractSettingComponent";
-import {Setting, ToggleComponent} from "obsidian";
-import {ClassToggle, resetTooltip} from "../../SettingHandlers";
-import {getDescription, getTitle} from "../../Utils";
+import { AbstractSettingComponent } from './AbstractSettingComponent';
+import { Setting, ToggleComponent } from 'obsidian';
+import { ClassToggle, resetTooltip } from '../../SettingHandlers';
+import { getDescription, getTitle } from '../../Utils';
 
 export class ClassToggleSettingComponent extends AbstractSettingComponent {
 	settingEl: Setting;
@@ -15,10 +15,13 @@ export class ClassToggleSettingComponent extends AbstractSettingComponent {
 
 		this.settingEl = new Setting(containerEl);
 		this.settingEl.setName(title);
-		this.settingEl.setDesc(description ?? "");
+		this.settingEl.setDesc(description ?? '');
 
 		this.settingEl.addToggle((toggle) => {
-			const value = this.settingsManager.getSetting(this.sectionId, this.setting.id);
+			const value = this.settingsManager.getSetting(
+				this.sectionId,
+				this.setting.id
+			);
 
 			toggle.setValue(value !== undefined ? !!value : !!this.setting.default);
 			toggle.onChange((value) => {
@@ -35,7 +38,7 @@ export class ClassToggleSettingComponent extends AbstractSettingComponent {
 		});
 
 		this.settingEl.addExtraButton((b) => {
-			b.setIcon("reset");
+			b.setIcon('reset');
 			b.onClick(() => {
 				const value = !!this.setting.default;
 
@@ -53,7 +56,6 @@ export class ClassToggleSettingComponent extends AbstractSettingComponent {
 		});
 
 		this.settingEl.settingEl.dataset.id = this.setting.id;
-
 	}
 
 	destroy(): void {
