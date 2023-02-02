@@ -18,7 +18,6 @@ import {
 	settingRegExp,
 	SettingsSeachResource,
 } from './Utils';
-import {tr} from "./lang/locale/tr";
 
 export default class CSSSettingsPlugin extends Plugin {
 	settingsManager: CSSSettingsManager;
