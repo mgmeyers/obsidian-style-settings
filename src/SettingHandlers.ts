@@ -67,9 +67,13 @@ export interface Heading extends Meta {
 	resetFn?: () => void;
 }
 
+export interface InfoText extends Meta {
+	markdown?: boolean;
+}
+
 export interface ClassToggle extends Meta {
 	default?: boolean;
-	addCommand: boolean;
+	addCommand?: boolean;
 }
 
 export interface SelectOption {
@@ -143,6 +147,7 @@ export interface VariableThemedColor extends Meta {
 
 export type CSSSetting =
 	| Heading
+	| InfoText
 	| ClassToggle
 	| ClassMultiToggle
 	| VariableText

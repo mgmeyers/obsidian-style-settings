@@ -1,5 +1,6 @@
 export const SettingType = {
 	HEADING: 'heading',
+	INFO_TEXT: 'info-text',
 	CLASS_TOGGLE: 'class-toggle',
 	CLASS_SELECT: 'class-select',
 	VARIABLE_TEXT: 'variable-text',

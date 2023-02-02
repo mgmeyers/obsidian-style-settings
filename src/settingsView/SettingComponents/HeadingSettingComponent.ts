@@ -12,6 +12,7 @@ import { VariableNumberSliderSettingComponent } from './VariableNumberSliderSett
 import { VariableSelectSettingComponent } from './VariableSelectSettingComponent';
 import { VariableColorSettingComponent } from './VariableColorSettingComponent';
 import { VariableThemedColorSettingComponent } from './VariableThemedColorSettingComponent';
+import { InfoTextSettingComponent } from './InfoTextSettingComponent';
 
 export function createSettingComponent(
 	sectionId: string,
@@ -22,6 +23,14 @@ export function createSettingComponent(
 ): AbstractSettingComponent | undefined {
 	if (setting.type === SettingType.HEADING) {
 		return new HeadingSettingComponent(
+			sectionId,
+			sectionName,
+			setting,
+			settingsManager,
+			isView
+		);
+	} else if (setting.type === SettingType.INFO_TEXT) {
+		return new InfoTextSettingComponent(
 			sectionId,
 			sectionName,
 			setting,
