@@ -1,8 +1,12 @@
-import {AbstractSettingComponent} from "./AbstractSettingComponent";
-import {DropdownComponent, Setting} from "obsidian";
-import {resetTooltip, SelectOption, VariableSelect} from "../../SettingHandlers";
-import {createDescription, getDescription, getTitle} from "../../Utils";
-import {t} from "../../lang/helpers";
+import { AbstractSettingComponent } from './AbstractSettingComponent';
+import { DropdownComponent, Setting } from 'obsidian';
+import {
+	resetTooltip,
+	SelectOption,
+	VariableSelect,
+} from '../../SettingHandlers';
+import { createDescription, getDescription, getTitle } from '../../Utils';
+import { t } from '../../lang/helpers';
 
 export class VariableSelectSettingComponent extends AbstractSettingComponent {
 	settingEl: Setting;
@@ -14,30 +18,37 @@ export class VariableSelectSettingComponent extends AbstractSettingComponent {
 		const title = getTitle(this.setting);
 		const description = getDescription(this.setting);
 
-		if (typeof this.setting.default !== "string") {
+		if (typeof this.setting.default !== 'string') {
 			return console.error(
-				`${t("Error:")} ${title} ${t("missing default value")}`,
+				`${t('Error:')} ${title} ${t('missing default value')}`
 			);
 		}
 
-		let defaultLabel = this.getDefaultOptionLabel();
+		const defaultLabel = this.getDefaultOptionLabel();
 
 		this.settingEl = new Setting(containerEl);
 		this.settingEl.setName(title);
-		this.settingEl.setDesc(createDescription(description, this.setting.default, defaultLabel));
+		this.settingEl.setDesc(
+			createDescription(description, this.setting.default, defaultLabel)
+		);
 
 		this.settingEl.addDropdown((dropdown) => {
-			const value = this.settingsManager.getSetting(this.sectionId, this.setting.id);
+			const value = this.settingsManager.getSetting(
+				this.sectionId,
+				this.setting.id
+			);
 
 			for (const o of this.setting.options) {
-				if (typeof o === "string") {
+				if (typeof o === 'string') {
 					dropdown.addOption(o, o);
 				} else {
 					dropdown.addOption(o.value, o.label);
 				}
 			}
 
-			dropdown.setValue(value !== undefined ? (value as string) : this.setting.default);
+			dropdown.setValue(
+				value !== undefined ? (value as string) : this.setting.default
+			);
 			dropdown.onChange((value) => {
 				this.settingsManager.setSetting(this.sectionId, this.setting.id, value);
 			});
@@ -46,7 +57,7 @@ export class VariableSelectSettingComponent extends AbstractSettingComponent {
 		});
 
 		this.settingEl.addExtraButton((b) => {
-			b.setIcon("reset");
+			b.setIcon('reset');
 			b.onClick(() => {
 				this.dropdownComponent.setValue(this.setting.default);
 				this.settingsManager.clearSetting(this.sectionId, this.setting.id);
@@ -55,7 +66,6 @@ export class VariableSelectSettingComponent extends AbstractSettingComponent {
 		});
 
 		this.settingEl.settingEl.dataset.id = this.setting.id;
-
 	}
 
 	destroy(): void {
@@ -64,8 +74,8 @@ export class VariableSelectSettingComponent extends AbstractSettingComponent {
 
 	private getDefaultOption(): string | SelectOption | undefined {
 		if (this.setting.default) {
-			return this.setting.options.find(o => {
-				if (typeof o === "string") {
+			return this.setting.options.find((o) => {
+				if (typeof o === 'string') {
 					return o === this.setting.default;
 				}
 
@@ -80,7 +90,7 @@ export class VariableSelectSettingComponent extends AbstractSettingComponent {
 		const defaultOption = this.getDefaultOption();
 
 		if (defaultOption) {
-			if (typeof defaultOption === "string") {
+			if (typeof defaultOption === 'string') {
 				return defaultOption;
 			}
 			return defaultOption.label;
