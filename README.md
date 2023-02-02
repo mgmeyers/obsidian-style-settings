@@ -77,9 +77,29 @@ settings:
 */
 ```
 
+## `info-text`
+
+`info-text` displays arbitrary informational text to users. The `description` may contain markdown if `markdown` is set to `true`.
+
+```css
+/* @settings
+
+name: Your Section Name Here
+id: a-unique-id
+settings:
+    - 
+        id: my-info-text
+        title: Information
+        description: "This is *informational* text"
+        type: info-text
+        markdown: true
+
+*/
+```
+
 ## `class-toggle`
 
-`class-toggle`s will toggle a css class on and off of the `body` element, allowing CSS themes and snippets to toggle features on and off. The `id` of the setting will be used as the class name. The `default` parameter can optionally be set to `true`.
+`class-toggle`s will toggle a css class on and off of the `body` element, allowing CSS themes and snippets to toggle features on and off. The `id` of the setting will be used as the class name. The `default` parameter can optionally be set to `true`. `class-toggle` also supports the `addCommand` property. When set to `true` a command will be added to obsidian to toggle the class via a hotkey or the command palette.
 
 ```css
 /* @settings
@@ -483,6 +503,10 @@ settings:
 
 */
 ```
+
+## Plugin Support
+
+Plugins can specify a style setting config in the plugin's CSS. Plugins must call `app.workspace.trigger("parse-style-settings")` when the plugin loads in order for Style Settings to be notified of CSS changes.
 
 ## Localization Support
 
