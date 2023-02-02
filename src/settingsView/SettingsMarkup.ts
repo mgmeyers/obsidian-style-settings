@@ -221,4 +221,10 @@ export class SettingsMarkup {
 			settingsComponentTree.render(this.settingsContainerEl);
 		}
 	}
+
+	rerender() {
+		for (const settingsComponentTree of this.settingsComponentTrees) {
+			settingsComponentTree.render(this.settingsContainerEl);
+		}
+	}
 }

@@ -69,6 +69,7 @@ export interface Heading extends Meta {
 
 export interface ClassToggle extends Meta {
 	default?: boolean;
+	addCommand: boolean;
 }
 
 export interface SelectOption {
