@@ -1,7 +1,7 @@
 import { AbstractSettingComponent } from './AbstractSettingComponent';
 import { setIcon, Setting } from 'obsidian';
 import { getDescription, getTitle } from '../../Utils';
-import { CSSSetting, Heading, Meta } from '../../SettingHandlers';
+import { CSSSetting, Heading } from '../../SettingHandlers';
 import { SettingType } from './types';
 import { CSSSettingsManager } from 'src/SettingsManager';
 import { ClassToggleSettingComponent } from './ClassToggleSettingComponent';
@@ -314,7 +314,7 @@ export function buildSettingComponentTree(opts: {
 	isView: boolean;
 	sectionId: string;
 	sectionName: string;
-	settings: Meta[];
+	settings: CSSSetting[];
 	settingsManager: CSSSettingsManager;
 }): HeadingSettingComponent {
 	const { isView, sectionId, settings, settingsManager, sectionName } = opts;
@@ -338,9 +338,15 @@ export function buildSettingComponentTree(opts: {
 					currentHeading = currentHeading.parent;
 				}
 
-				currentHeading = currentHeading.parent.addChild(
-					newHeading
-				) as HeadingSettingComponent;
+				if (currentHeading.setting.id === root.setting.id) {
+					currentHeading = currentHeading.addChild(
+						newHeading
+					) as HeadingSettingComponent;
+				} else {
+					currentHeading = currentHeading.parent.addChild(
+						newHeading
+					) as HeadingSettingComponent;
+				}
 			} else if (newHeading.level === currentHeading.setting.level) {
 				currentHeading = currentHeading.parent.addChild(
 					newHeading

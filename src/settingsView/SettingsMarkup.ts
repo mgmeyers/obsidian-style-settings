@@ -184,17 +184,23 @@ export class SettingsMarkup {
 				...s.settings,
 			];
 
-			const settingsComponentTree = buildSettingComponentTree({
-				isView: this.isView,
-				sectionId: s.id,
-				sectionName: s.name,
-				settings: options,
-				settingsManager: plugin.settingsManager,
-			});
+			console.log(s);
 
-			settingsComponentTree.render(this.settingsContainerEl);
+			try {
+				const settingsComponentTree = buildSettingComponentTree({
+					isView: this.isView,
+					sectionId: s.id,
+					sectionName: s.name,
+					settings: options,
+					settingsManager: plugin.settingsManager,
+				});
 
-			this.settingsComponentTrees.push(settingsComponentTree);
+				settingsComponentTree.render(this.settingsContainerEl);
+
+				this.settingsComponentTrees.push(settingsComponentTree);
+			} catch (e) {
+				console.error('Style Settings | Failed to render section', e);
+			}
 		}
 	}
 
