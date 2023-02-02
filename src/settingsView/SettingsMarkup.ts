@@ -175,7 +175,7 @@ export class SettingsMarkup {
 					type: 'heading',
 					title: s.name,
 					level: 0,
-					collapsed: s.collapsed,
+					collapsed: s.collapsed ?? true,
 					resetFn: () => {
 						plugin.settingsManager.clearSection(s.id);
 						this.generate(this.settings);
