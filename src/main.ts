@@ -18,6 +18,7 @@ import {
 	settingRegExp,
 	SettingsSeachResource,
 } from './Utils';
+import {tr} from "./lang/locale/tr";
 
 export default class CSSSettingsPlugin extends Plugin {
 	settingsManager: CSSSettingsManager;
@@ -245,13 +246,11 @@ export default class CSSSettingsPlugin extends Plugin {
 
 	async activateView() {
 		this.deactivateView();
-		const leaf = this.app.workspace.createLeafBySplit(
-			this.app.workspace.activeLeaf,
-			'vertical'
-		);
+		const leaf = this.app.workspace.getLeaf('tab');
 
 		await leaf.setViewState({
 			type: viewType,
+			active: true,
 		});
 
 		(leaf.view as SettingsView).settingsMarkup.setSettings(
