@@ -184,8 +184,6 @@ export class SettingsMarkup {
 				...s.settings,
 			];
 
-			console.log(s);
-
 			try {
 				const settingsComponentTree = buildSettingComponentTree({
 					isView: this.isView,
