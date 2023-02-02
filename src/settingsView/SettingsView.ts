@@ -1,8 +1,8 @@
-import {ItemView, WorkspaceLeaf} from "obsidian";
-import {SettingsMarkup} from "./SettingsMarkup";
-import CSSSettingsPlugin from "../main";
+import { ItemView, WorkspaceLeaf } from 'obsidian';
+import { SettingsMarkup } from './SettingsMarkup';
+import CSSSettingsPlugin from '../main';
 
-export const viewType = "style-settings";
+export const viewType = 'style-settings';
 
 export class SettingsView extends ItemView {
 	settingsMarkup: SettingsMarkup;
@@ -15,7 +15,7 @@ export class SettingsView extends ItemView {
 			plugin.app,
 			plugin,
 			this.contentEl,
-			true,
+			true
 		);
 	}
 
@@ -24,11 +24,11 @@ export class SettingsView extends ItemView {
 	}
 
 	getIcon() {
-		return "gear";
+		return 'gear';
 	}
 
 	getDisplayText() {
-		return "Style Settings";
+		return 'Style Settings';
 	}
 
 	async onOpen() {

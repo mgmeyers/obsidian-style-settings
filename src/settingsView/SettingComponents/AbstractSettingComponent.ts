@@ -1,7 +1,7 @@
-import {CSSSettingsManager} from "../../SettingsManager";
-import {CSSSetting} from "../../SettingHandlers";
-import {getDescription, getTitle} from "../../Utils";
-import fuzzysort from "fuzzysort";
+import { CSSSettingsManager } from '../../SettingsManager';
+import { CSSSetting } from '../../SettingHandlers';
+import { getDescription, getTitle } from '../../Utils';
+import fuzzysort from 'fuzzysort';
 
 export abstract class AbstractSettingComponent {
 	sectionId: string;
@@ -10,8 +10,13 @@ export abstract class AbstractSettingComponent {
 	settingsManager: CSSSettingsManager;
 	isView: boolean;
 
-
-	constructor(sectionId: string, sectionName: string, setting: CSSSetting, settingsManager: CSSSettingsManager, isView: boolean) {
+	constructor(
+		sectionId: string,
+		sectionName: string,
+		setting: CSSSetting,
+		settingsManager: CSSSettingsManager,
+		isView: boolean
+	) {
 		this.sectionId = sectionId;
 		this.sectionName = sectionName;
 		this.setting = setting;
@@ -21,9 +26,7 @@ export abstract class AbstractSettingComponent {
 		this.onInit();
 	}
 
-	onInit(): void {
-
-	}
+	onInit(): void {}
 
 	/**
 	 * Matches the Component against `str`. A perfect match returns 0, no match returns negative infinity.
@@ -36,8 +39,10 @@ export abstract class AbstractSettingComponent {
 		}
 
 		return Math.max(
-			fuzzysort.single(str, getTitle(this.setting))?.score ?? Number.NEGATIVE_INFINITY,
-			fuzzysort.single(str, getDescription(this.setting))?.score ?? Number.NEGATIVE_INFINITY,
+			fuzzysort.single(str, getTitle(this.setting))?.score ??
+				Number.NEGATIVE_INFINITY,
+			fuzzysort.single(str, getDescription(this.setting))?.score ??
+				Number.NEGATIVE_INFINITY
 		);
 	}
 

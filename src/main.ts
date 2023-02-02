@@ -1,15 +1,23 @@
-import {Plugin} from "obsidian";
-import {CSSSettingsManager} from "./SettingsManager";
-import {ParsedCSSSettings} from "./SettingHandlers";
-import yaml from "js-yaml";
-import detectIndent from "detect-indent";
+import '@simonwep/pickr/dist/themes/nano.min.css';
+import './css/pickerOverrides.css';
+import './css/settings.css';
 
-import "@simonwep/pickr/dist/themes/nano.min.css";
-import "./css/pickerOverrides.css";
-import "./css/settings.css";
-import {CSSSettingsTab} from "./settingsView/CSSSettingsTab";
-import {SettingsView, viewType} from "./settingsView/SettingsView";
-import {ErrorList, getDescription, getTitle, nameRegExp, settingRegExp, SettingsSeachResource} from "./Utils";
+import { Plugin } from 'obsidian';
+import { CSSSettingsManager } from './SettingsManager';
+import { ParsedCSSSettings } from './SettingHandlers';
+import yaml from 'js-yaml';
+import detectIndent from 'detect-indent';
+
+import { CSSSettingsTab } from './settingsView/CSSSettingsTab';
+import { SettingsView, viewType } from './settingsView/SettingsView';
+import {
+	ErrorList,
+	getDescription,
+	getTitle,
+	nameRegExp,
+	settingRegExp,
+	SettingsSeachResource,
+} from './Utils';
 
 export default class CSSSettingsPlugin extends Plugin {
 	settingsManager: CSSSettingsManager;
@@ -31,29 +39,29 @@ export default class CSSSettingsPlugin extends Plugin {
 		this.registerView(viewType, (leaf) => new SettingsView(this, leaf));
 
 		this.addCommand({
-			id: "show-style-settings-leaf",
-			name: "Show style settings view",
+			id: 'show-style-settings-leaf',
+			name: 'Show style settings view',
 			callback: () => {
 				this.activateView();
 			},
 		});
 
 		this.registerEvent(
-			this.app.workspace.on("css-change", () => {
+			this.app.workspace.on('css-change', () => {
 				this.parseCSS();
-			}),
+			})
 		);
 
 		this.registerEvent(
-			(this.app.workspace as any).on("parse-style-settings", () => {
+			(this.app.workspace as any).on('parse-style-settings', () => {
 				this.parseCSS();
-			}),
+			})
 		);
 
-		this.lightEl = document.body.createDiv("theme-light style-settings-ref");
-		this.darkEl = document.body.createDiv("theme-dark style-settings-ref");
+		this.lightEl = document.body.createDiv('theme-light style-settings-ref');
+		this.darkEl = document.body.createDiv('theme-dark style-settings-ref');
 
-		document.body.classList.add("css-settings-manager");
+		document.body.classList.add('css-settings-manager');
 
 		this.parseCSS();
 	}
@@ -62,8 +70,7 @@ export default class CSSSettingsPlugin extends Plugin {
 		const light = getComputedStyle(this.lightEl).getPropertyValue(`--${id}`);
 		const dark = getComputedStyle(this.darkEl).getPropertyValue(`--${id}`);
 		const current = getComputedStyle(document.body).getPropertyValue(`--${id}`);
-
-		return {light, dark, current};
+		return { light, dark, current };
 	}
 
 	debounceTimer = 0;
@@ -87,12 +94,12 @@ export default class CSSSettingsPlugin extends Plugin {
 
 			this.settingsTab.settingsMarkup.setSettings(
 				this.settingsList,
-				this.errorList,
+				this.errorList
 			);
 			this.app.workspace.getLeavesOfType(viewType).forEach((leaf) => {
 				(leaf.view as SettingsView).settingsMarkup.setSettings(
 					this.settingsList,
-					this.errorList,
+					this.errorList
 				);
 			});
 			this.settingsManager.initClasses();
@@ -107,33 +114,33 @@ export default class CSSSettingsPlugin extends Plugin {
 	 */
 	private registerSettingsToSettingsSearch() {
 		const onSettingsSearchLoaded = () => {
-			console.log("style settings | registered settings to the settings search plugin");
-
 			if ((window as any).SettingsSearch) {
 				const settingsSearch: any = (window as any).SettingsSearch;
 
-				settingsSearch.removeTabResources("obsidian-style-settings");
+				settingsSearch.removeTabResources('obsidian-style-settings');
 
 				for (const parsedCSSSetting of this.settingsList) {
-					settingsSearch.addResources(...parsedCSSSetting.settings.map(x => {
-						const settingsSearchResource: SettingsSeachResource = {
-							tab: "obsidian-style-settings",
-							name: "Style Settings",
-							text: getTitle(x) ?? "",
-							desc: getDescription(x) ?? "",
-						};
-						return settingsSearchResource;
-					}));
+					settingsSearch.addResources(
+						...parsedCSSSetting.settings.map((x) => {
+							const settingsSearchResource: SettingsSeachResource = {
+								tab: 'obsidian-style-settings',
+								name: 'Style Settings',
+								text: getTitle(x) ?? '',
+								desc: getDescription(x) ?? '',
+							};
+							return settingsSearchResource;
+						})
+					);
 				}
 			}
 		};
 
 		// @ts-ignore TODO: expand obsidian types, so that the ts-ignore is not needed
-		if (this.app.plugins.plugins["settings-search"]?.loaded) {
+		if (this.app.plugins.plugins['settings-search']?.loaded) {
 			onSettingsSearchLoaded();
 		} else {
 			// @ts-ignore
-			this.app.workspace.on("settings-search-loaded", () => {
+			this.app.workspace.on('settings-search-loaded', () => {
 				onSettingsSearchLoaded();
 			});
 		}
@@ -146,9 +153,9 @@ export default class CSSSettingsPlugin extends Plugin {
 	 */
 	private unregisterSettingsFromSettingsSearch() {
 		// @ts-ignore TODO: expand obsidian types, so that the ts-ignore is not needed
-		if (this.app.plugins.plugins["settings-search"]?.loaded) {
+		if (this.app.plugins.plugins['settings-search']?.loaded) {
 			// @ts-ignore
-			window.SettingsSearch.removeTabResources("obsidian-style-settings");
+			window.SettingsSearch.removeTabResources('obsidian-style-settings');
 		}
 	}
 
@@ -175,7 +182,7 @@ export default class CSSSettingsPlugin extends Plugin {
 
 					if (
 						settings &&
-						typeof settings === "object" &&
+						typeof settings === 'object' &&
 						settings.name &&
 						settings.id &&
 						settings.settings &&
@@ -184,7 +191,7 @@ export default class CSSSettingsPlugin extends Plugin {
 						this.settingsList.push(settings);
 					}
 				} catch (e) {
-					this.errorList.push({name, error: `${e}`});
+					this.errorList.push({ name, error: `${e}` });
 				}
 			} while ((match = settingRegExp.exec(text)) !== null);
 		}
@@ -197,24 +204,22 @@ export default class CSSSettingsPlugin extends Plugin {
 	 * @param name the name of the file
 	 * @private
 	 */
-	private parseCSSSettings(str: string, name: string): ParsedCSSSettings | undefined {
+	private parseCSSSettings(
+		str: string,
+		name: string
+	): ParsedCSSSettings | undefined {
 		const indent = detectIndent(str);
 
 		const settings: ParsedCSSSettings = yaml.load(
-			str.replace(
-				/\t/g,
-				indent.type === "space" ? indent.indent : "    ",
-			),
+			str.replace(/\t/g, indent.type === 'space' ? indent.indent : '    '),
 			{
 				filename: name,
-			},
+			}
 		) as ParsedCSSSettings;
 
 		if (!settings.settings) return undefined;
 
-		settings.settings = settings.settings.filter(
-			(setting) => setting,
-		);
+		settings.settings = settings.settings.filter((setting) => setting);
 		return settings;
 	}
 
@@ -225,7 +230,7 @@ export default class CSSSettingsPlugin extends Plugin {
 		this.lightEl = null;
 		this.darkEl = null;
 
-		document.body.classList.remove("css-settings-manager");
+		document.body.classList.remove('css-settings-manager');
 
 		this.settingsManager.cleanup();
 		this.settingsTab.settingsMarkup.cleanup();
@@ -242,7 +247,7 @@ export default class CSSSettingsPlugin extends Plugin {
 		this.deactivateView();
 		const leaf = this.app.workspace.createLeafBySplit(
 			this.app.workspace.activeLeaf,
-			"vertical",
+			'vertical'
 		);
 
 		await leaf.setViewState({
@@ -251,7 +256,7 @@ export default class CSSSettingsPlugin extends Plugin {
 
 		(leaf.view as SettingsView).settingsMarkup.setSettings(
 			this.settingsList,
-			this.errorList,
+			this.errorList
 		);
 	}
 }
