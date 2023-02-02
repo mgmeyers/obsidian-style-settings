@@ -154,5 +154,6 @@ export type CSSSetting =
 export interface ParsedCSSSettings {
 	name: string;
 	id: string;
+	collapsed: boolean;
 	settings: Array<CSSSetting>;
 }

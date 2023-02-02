@@ -193,11 +193,11 @@ function getCSSVariables(
 
 		if (!section) continue;
 
-		const setting = config[sectionId][settingId];
+		const setting: CSSSetting = config[sectionId][settingId];
 
 		if (!setting) continue;
 
-		const value = settings[key];
+		const value: SettingValue = settings[key];
 
 		switch (setting.type) {
 			case SettingType.VARIABLE_NUMBER:
