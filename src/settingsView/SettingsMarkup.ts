@@ -175,7 +175,7 @@ export class SettingsMarkup {
 					type: 'heading',
 					title: s.name,
 					level: 0,
-					collapsed: true,
+					collapsed: s.collapsed ?? true,
 					resetFn: () => {
 						plugin.settingsManager.clearSection(s.id);
 						this.generate(this.settings);
@@ -184,17 +184,21 @@ export class SettingsMarkup {
 				...s.settings,
 			];
 
-			const settingsComponentTree = buildSettingComponentTree({
-				isView: this.isView,
-				sectionId: s.id,
-				sectionName: s.name,
-				settings: options,
-				settingsManager: plugin.settingsManager,
-			});
+			try {
+				const settingsComponentTree = buildSettingComponentTree({
+					isView: this.isView,
+					sectionId: s.id,
+					sectionName: s.name,
+					settings: options,
+					settingsManager: plugin.settingsManager,
+				});
 
-			settingsComponentTree.render(this.settingsContainerEl);
+				settingsComponentTree.render(this.settingsContainerEl);
 
-			this.settingsComponentTrees.push(settingsComponentTree);
+				this.settingsComponentTrees.push(settingsComponentTree);
+			} catch (e) {
+				console.error('Style Settings | Failed to render section', e);
+			}
 		}
 	}
 
@@ -218,6 +222,12 @@ export class SettingsMarkup {
 
 		for (const settingsComponentTree of this.settingsComponentTrees) {
 			settingsComponentTree.clearFilter();
+			settingsComponentTree.render(this.settingsContainerEl);
+		}
+	}
+
+	rerender() {
+		for (const settingsComponentTree of this.settingsComponentTrees) {
 			settingsComponentTree.render(this.settingsContainerEl);
 		}
 	}

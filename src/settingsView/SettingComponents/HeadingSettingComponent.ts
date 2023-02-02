@@ -1,7 +1,7 @@
 import { AbstractSettingComponent } from './AbstractSettingComponent';
 import { setIcon, Setting } from 'obsidian';
 import { getDescription, getTitle } from '../../Utils';
-import { CSSSetting, Heading, Meta } from '../../SettingHandlers';
+import { CSSSetting, Heading } from '../../SettingHandlers';
 import { SettingType } from './types';
 import { CSSSettingsManager } from 'src/SettingsManager';
 import { ClassToggleSettingComponent } from './ClassToggleSettingComponent';
@@ -12,6 +12,7 @@ import { VariableNumberSliderSettingComponent } from './VariableNumberSliderSett
 import { VariableSelectSettingComponent } from './VariableSelectSettingComponent';
 import { VariableColorSettingComponent } from './VariableColorSettingComponent';
 import { VariableThemedColorSettingComponent } from './VariableThemedColorSettingComponent';
+import { InfoTextSettingComponent } from './InfoTextSettingComponent';
 
 export function createSettingComponent(
 	sectionId: string,
@@ -22,6 +23,14 @@ export function createSettingComponent(
 ): AbstractSettingComponent | undefined {
 	if (setting.type === SettingType.HEADING) {
 		return new HeadingSettingComponent(
+			sectionId,
+			sectionName,
+			setting,
+			settingsManager,
+			isView
+		);
+	} else if (setting.type === SettingType.INFO_TEXT) {
+		return new InfoTextSettingComponent(
 			sectionId,
 			sectionName,
 			setting,
@@ -305,7 +314,7 @@ export function buildSettingComponentTree(opts: {
 	isView: boolean;
 	sectionId: string;
 	sectionName: string;
-	settings: Meta[];
+	settings: CSSSetting[];
 	settingsManager: CSSSettingsManager;
 }): HeadingSettingComponent {
 	const { isView, sectionId, settings, settingsManager, sectionName } = opts;
@@ -329,9 +338,15 @@ export function buildSettingComponentTree(opts: {
 					currentHeading = currentHeading.parent;
 				}
 
-				currentHeading = currentHeading.parent.addChild(
-					newHeading
-				) as HeadingSettingComponent;
+				if (currentHeading.setting.id === root.setting.id) {
+					currentHeading = currentHeading.addChild(
+						newHeading
+					) as HeadingSettingComponent;
+				} else {
+					currentHeading = currentHeading.parent.addChild(
+						newHeading
+					) as HeadingSettingComponent;
+				}
 			} else if (newHeading.level === currentHeading.setting.level) {
 				currentHeading = currentHeading.parent.addChild(
 					newHeading

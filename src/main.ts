@@ -4,7 +4,7 @@ import './css/settings.css';
 
 import { Plugin } from 'obsidian';
 import { CSSSettingsManager } from './SettingsManager';
-import { ParsedCSSSettings } from './SettingHandlers';
+import { ClassToggle, ParsedCSSSettings } from './SettingHandlers';
 import yaml from 'js-yaml';
 import detectIndent from 'detect-indent';
 
@@ -18,6 +18,7 @@ import {
 	settingRegExp,
 	SettingsSeachResource,
 } from './Utils';
+import { SettingType } from './settingsView/SettingComponents/types';
 
 export default class CSSSettingsPlugin extends Plugin {
 	settingsManager: CSSSettingsManager;
@@ -103,6 +104,7 @@ export default class CSSSettingsPlugin extends Plugin {
 				);
 			});
 			this.settingsManager.initClasses();
+			this.registerSettingCommands();
 		}, 100);
 	}
 
@@ -223,6 +225,47 @@ export default class CSSSettingsPlugin extends Plugin {
 		return settings;
 	}
 
+	private registerSettingCommands() {
+		for (const section of this.settingsList) {
+			for (const setting of section.settings) {
+				if (
+					setting.type === SettingType.CLASS_TOGGLE &&
+					(setting as ClassToggle).addCommand
+				) {
+					this.addClassToggleCommand(section, setting as ClassToggle);
+				}
+			}
+		}
+	}
+
+	private addClassToggleCommand(
+		section: ParsedCSSSettings,
+		setting: ClassToggle
+	) {
+		this.addCommand({
+			id: `settings-search-toggle-${section.id}-${setting.id}`,
+			name: `Toggle ${setting.title}`,
+			callback: () => {
+				const value = !(this.settingsManager.getSetting(
+					section.id,
+					setting.id
+				) as boolean);
+				this.settingsManager.setSetting(section.id, setting.id, value);
+
+				if (value) {
+					document.body.classList.add(setting.id);
+				} else {
+					document.body.classList.remove(setting.id);
+				}
+
+				this.settingsTab.settingsMarkup.rerender();
+				for (const leaf of this.app.workspace.getLeavesOfType(viewType)) {
+					(leaf.view as SettingsView).settingsMarkup.rerender();
+				}
+			},
+		});
+	}
+
 	onunload() {
 		this.lightEl.remove();
 		this.darkEl.remove();
@@ -245,13 +288,11 @@ export default class CSSSettingsPlugin extends Plugin {
 
 	async activateView() {
 		this.deactivateView();
-		const leaf = this.app.workspace.createLeafBySplit(
-			this.app.workspace.activeLeaf,
-			'vertical'
-		);
+		const leaf = this.app.workspace.getLeaf('tab');
 
 		await leaf.setViewState({
 			type: viewType,
+			active: true,
 		});
 
 		(leaf.view as SettingsView).settingsMarkup.setSettings(
