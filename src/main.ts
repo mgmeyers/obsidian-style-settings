@@ -2,7 +2,7 @@ import '@simonwep/pickr/dist/themes/nano.min.css';
 import './css/pickerOverrides.css';
 import './css/settings.css';
 
-import { Plugin } from 'obsidian';
+import { Command, Plugin } from 'obsidian';
 import { CSSSettingsManager } from './SettingsManager';
 import { ClassToggle, ParsedCSSSettings } from './SettingHandlers';
 import yaml from 'js-yaml';
@@ -25,6 +25,7 @@ export default class CSSSettingsPlugin extends Plugin {
 	settingsTab: CSSSettingsTab;
 	settingsList: ParsedCSSSettings[] = [];
 	errorList: ErrorList = [];
+	commandList: Command[] = [];
 	lightEl: HTMLElement;
 	darkEl: HTMLElement;
 
@@ -81,6 +82,14 @@ export default class CSSSettingsPlugin extends Plugin {
 
 		this.settingsList = [];
 		this.errorList = [];
+
+		// remove registered theme commands (sadly undocumented API)
+		for (const command of this.commandList) {
+			// @ts-ignore
+			this.app.commands.removeCommand(command.id);
+		}
+
+		this.commandList = [];
 
 		this.debounceTimer = window.setTimeout(() => {
 			const styleSheets = document.styleSheets;
@@ -225,7 +234,7 @@ export default class CSSSettingsPlugin extends Plugin {
 		return settings;
 	}
 
-	private registerSettingCommands() {
+	private registerSettingCommands(): void {
 		for (const section of this.settingsList) {
 			for (const setting of section.settings) {
 				if (
@@ -241,29 +250,31 @@ export default class CSSSettingsPlugin extends Plugin {
 	private addClassToggleCommand(
 		section: ParsedCSSSettings,
 		setting: ClassToggle
-	) {
-		this.addCommand({
-			id: `settings-search-toggle-${section.id}-${setting.id}`,
-			name: `Toggle ${setting.title}`,
-			callback: () => {
-				const value = !(this.settingsManager.getSetting(
-					section.id,
-					setting.id
-				) as boolean);
-				this.settingsManager.setSetting(section.id, setting.id, value);
+	): void {
+		this.commandList.push(
+			this.addCommand({
+				id: `style-settings-class-toggle-${section.id}-${setting.id}`,
+				name: `Toggle ${setting.title}`,
+				callback: () => {
+					const value = !(this.settingsManager.getSetting(
+						section.id,
+						setting.id
+					) as boolean);
+					this.settingsManager.setSetting(section.id, setting.id, value);
 
-				if (value) {
-					document.body.classList.add(setting.id);
-				} else {
-					document.body.classList.remove(setting.id);
-				}
+					if (value) {
+						document.body.classList.add(setting.id);
+					} else {
+						document.body.classList.remove(setting.id);
+					}
 
-				this.settingsTab.settingsMarkup.rerender();
-				for (const leaf of this.app.workspace.getLeavesOfType(viewType)) {
-					(leaf.view as SettingsView).settingsMarkup.rerender();
-				}
-			},
-		});
+					this.settingsTab.settingsMarkup.rerender();
+					for (const leaf of this.app.workspace.getLeavesOfType(viewType)) {
+						(leaf.view as SettingsView).settingsMarkup.rerender();
+					}
+				},
+			})
+		);
 	}
 
 	onunload() {
