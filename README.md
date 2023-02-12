@@ -379,7 +379,7 @@ body.theme-dark.css-settings-manager { --accent: #2DB253; }
 
 ### `variable-color` formatting options
 
-There are 7 formatting options:
+There are 8 formatting options:
 
 - `hex`
 
@@ -472,6 +472,23 @@ When `opacity` is set to `true`:
 --accent-h: 211;
 --accent-s: 100%;
 --accent-l: 50%;
+--accent-a: 1;
+```
+
+- `hsl-split-decimal`
+
+```
+--accent-h: 211;
+--accent-s: 1;
+--accent-l: 0.5;
+```
+
+When `opacity` is set to `true`:
+
+```
+--accent-h: 211;
+--accent-s: 1;
+--accent-l: 0.5;
 --accent-a: 1;
 ```
 
