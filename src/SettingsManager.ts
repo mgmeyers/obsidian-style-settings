@@ -98,6 +98,33 @@ function generateColorVariables(
 
 			return out;
 		}
+		case 'hsl-split-decimal': {
+			const hsl = parsedColor.hsl();
+			const h = isNaN(hsl[0]) ? 0 : hsl[0];
+			const out = [
+				{
+					key: `${key}-h`,
+					value: h.toString(),
+				},
+				{
+					key: `${key}-s`,
+					value: hsl[1].toString(),
+				},
+				{
+					key: `${key}-l`,
+					value: hsl[2].toString(),
+				},
+				...alts,
+			];
+
+			if (opacity)
+				out.push({
+					key: `${key}-a`,
+					value: parsedColor.alpha().toString(),
+				});
+
+			return out;
+		}
 		case 'rgb':
 			return [
 				{
