@@ -558,7 +558,6 @@ ar: العربية (جزئي)
 
 For example:
 
-````
 ```css
 /* @settings
 
@@ -577,4 +576,3 @@ settings:
 
 */
 ```
-````
