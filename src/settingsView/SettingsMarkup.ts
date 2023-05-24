@@ -61,8 +61,6 @@ export class SettingsMarkup extends Component {
 		this.settings = settings;
 		this.errorList = errorList;
 
-		this.plugin.settingsManager.setConfig(settings);
-
 		if (this.containerEl.parentNode) {
 			this.generate(settings);
 		}

@@ -66,6 +66,17 @@ export default class CSSSettingsPlugin extends Plugin {
 		document.body.classList.add('css-settings-manager');
 
 		this.parseCSS();
+
+		this.app.workspace.onLayoutReady(() => {
+			if (this.settingsList) {
+				this.app.workspace.getLeavesOfType(viewType).forEach((leaf) => {
+					(leaf.view as SettingsView).setSettings(
+						this.settingsList,
+						this.errorList
+					);
+				});
+			}
+		});
 	}
 
 	getCSSVar(id: string) {
@@ -79,19 +90,19 @@ export default class CSSSettingsPlugin extends Plugin {
 
 	parseCSS() {
 		clearTimeout(this.debounceTimer);
-
-		this.settingsList = [];
-		this.errorList = [];
-
-		// remove registered theme commands (sadly undocumented API)
-		for (const command of this.commandList) {
-			// @ts-ignore
-			this.app.commands.removeCommand(command.id);
-		}
-
-		this.commandList = [];
-
 		this.debounceTimer = activeWindow.setTimeout(() => {
+			this.settingsList = [];
+			this.errorList = [];
+
+			// remove registered theme commands (sadly undocumented API)
+			for (const command of this.commandList) {
+				// @ts-ignore
+				this.app.commands.removeCommand(command.id);
+			}
+
+			this.commandList = [];
+			this.settingsManager.removeClasses();
+
 			const styleSheets = document.styleSheets;
 
 			for (let i = 0, len = styleSheets.length; i < len; i++) {
@@ -109,6 +120,7 @@ export default class CSSSettingsPlugin extends Plugin {
 					this.errorList
 				);
 			});
+			this.settingsManager.setConfig(this.settingsList);
 			this.settingsManager.initClasses();
 			this.registerSettingCommands();
 		}, 100);
@@ -258,13 +270,6 @@ export default class CSSSettingsPlugin extends Plugin {
 						setting.id
 					) as boolean);
 					this.settingsManager.setSetting(section.id, setting.id, value);
-
-					if (value) {
-						document.body.classList.add(setting.id);
-					} else {
-						document.body.classList.remove(setting.id);
-					}
-
 					this.settingsTab.settingsMarkup.rerender();
 					for (const leaf of this.app.workspace.getLeavesOfType(viewType)) {
 						(leaf.view as SettingsView).settingsMarkup.rerender();

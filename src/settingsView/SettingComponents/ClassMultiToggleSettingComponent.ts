@@ -50,15 +50,6 @@ export class ClassMultiToggleSettingComponent extends AbstractSettingComponent {
 
 			dropdown.onChange((value) => {
 				this.settingsManager.setSetting(this.sectionId, this.setting.id, value);
-
-				if (value !== 'none') {
-					document.body.classList.add(value);
-				}
-
-				if (prevValue) {
-					document.body.classList.remove(prevValue);
-				}
-
 				prevValue = value;
 			});
 
@@ -68,18 +59,7 @@ export class ClassMultiToggleSettingComponent extends AbstractSettingComponent {
 		this.settingEl.addExtraButton((b) => {
 			b.setIcon('reset');
 			b.onClick(() => {
-				const value = this.setting.default || 'none';
-
 				this.dropdownComponent.setValue(this.setting.default || 'none');
-
-				if (value !== 'none') {
-					document.body.classList.add(value);
-				}
-
-				if (prevValue) {
-					document.body.classList.remove(prevValue);
-				}
-
 				this.settingsManager.clearSetting(this.sectionId, this.setting.id);
 			});
 			b.setTooltip(resetTooltip);

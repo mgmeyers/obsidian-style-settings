@@ -446,9 +446,16 @@ export class CSSSettingsManager {
 				const setting = config[settingId];
 
 				if (setting.type === SettingType.CLASS_TOGGLE) {
-					if (this.getSetting(section, settingId)) {
-						document.body.classList.remove(setting.id);
-					}
+					document.body.classList.remove(setting.id);
+				} else if (setting.type === SettingType.CLASS_SELECT) {
+					const multiToggle = setting as ClassMultiToggle;
+					multiToggle.options.forEach((v) => {
+						if (typeof v === 'string') {
+							document.body.classList.remove(v);
+						} else {
+							document.body.classList.remove(v.value);
+						}
+					});
 				}
 			});
 		});
@@ -547,6 +554,8 @@ export class CSSSettingsManager {
 	setSetting(sectionId: string, settingId: string, value: SettingValue) {
 		this.settings[`${sectionId}@@${settingId}`] = value;
 		this.save();
+		this.removeClasses();
+		this.initClasses();
 	}
 
 	setSettings(settings: Record<string, SettingValue>) {
@@ -554,12 +563,17 @@ export class CSSSettingsManager {
 			this.settings[id] = settings[id];
 		});
 
+		this.removeClasses();
+		this.initClasses();
+
 		return this.save();
 	}
 
 	clearSetting(sectionId: string, settingId: string) {
 		delete this.settings[`${sectionId}@@${settingId}`];
 		this.save();
+		this.removeClasses();
+		this.initClasses();
 	}
 
 	clearSection(sectionId: string) {
@@ -570,6 +584,8 @@ export class CSSSettingsManager {
 			}
 		});
 		this.save();
+		this.removeClasses();
+		this.initClasses();
 	}
 
 	export(section: string, config: Record<string, SettingValue>) {
