@@ -91,7 +91,7 @@ export default class CSSSettingsPlugin extends Plugin {
 
 		this.commandList = [];
 
-		this.debounceTimer = window.setTimeout(() => {
+		this.debounceTimer = activeWindow.setTimeout(() => {
 			const styleSheets = document.styleSheets;
 
 			for (let i = 0, len = styleSheets.length; i < len; i++) {
@@ -102,12 +102,9 @@ export default class CSSSettingsPlugin extends Plugin {
 			// compatability with Settings Search Plugin
 			this.registerSettingsToSettingsSearch();
 
-			this.settingsTab.settingsMarkup.setSettings(
-				this.settingsList,
-				this.errorList
-			);
+			this.settingsTab.setSettings(this.settingsList, this.errorList);
 			this.app.workspace.getLeavesOfType(viewType).forEach((leaf) => {
-				(leaf.view as SettingsView).settingsMarkup.setSettings(
+				(leaf.view as SettingsView).setSettings(
 					this.settingsList,
 					this.errorList
 				);
@@ -287,9 +284,7 @@ export default class CSSSettingsPlugin extends Plugin {
 		document.body.classList.remove('css-settings-manager');
 
 		this.settingsManager.cleanup();
-		this.settingsTab.settingsMarkup.cleanup();
 		this.deactivateView();
-
 		this.unregisterSettingsFromSettingsSearch();
 	}
 
@@ -306,9 +301,6 @@ export default class CSSSettingsPlugin extends Plugin {
 			active: true,
 		});
 
-		(leaf.view as SettingsView).settingsMarkup.setSettings(
-			this.settingsList,
-			this.errorList
-		);
+		(leaf.view as SettingsView).setSettings(this.settingsList, this.errorList);
 	}
 }

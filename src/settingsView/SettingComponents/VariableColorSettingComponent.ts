@@ -14,12 +14,10 @@ import Pickr from '@simonwep/pickr';
 
 export class VariableColorSettingComponent extends AbstractSettingComponent {
 	settingEl: Setting;
-
 	setting: VariableColor;
-
 	pickr: Pickr;
 
-	render(containerEl: HTMLElement): void {
+	render(): void {
 		const title = getTitle(this.setting);
 		const description = getDescription(this.setting);
 
@@ -57,7 +55,7 @@ export class VariableColorSettingComponent extends AbstractSettingComponent {
 			swatches.push(value as string);
 		}
 
-		this.settingEl = new Setting(containerEl);
+		this.settingEl = new Setting(this.containerEl);
 		this.settingEl.setName(title);
 		this.settingEl.setDesc(
 			createDescription(description, this.setting.default)
@@ -66,13 +64,13 @@ export class VariableColorSettingComponent extends AbstractSettingComponent {
 		// fix, so that the color is correctly shown before the color picker has been opened
 		const defaultColor =
 			value !== undefined ? (value as string) : this.setting.default;
-		containerEl.style.setProperty('--pcr-color', defaultColor);
+		this.containerEl.style.setProperty('--pcr-color', defaultColor);
 
 		this.pickr = Pickr.create(
 			getPickrSettings({
 				isView: this.isView,
 				el: this.settingEl.controlEl.createDiv({ cls: 'picker' }),
-				containerEl: containerEl,
+				containerEl: this.containerEl,
 				swatches: swatches,
 				opacity: this.setting.opacity,
 				defaultColor: defaultColor,
@@ -94,8 +92,9 @@ export class VariableColorSettingComponent extends AbstractSettingComponent {
 
 		this.pickr.on('show', () => {
 			const { result } = (this.pickr.getRoot() as any).interaction;
-
-			requestAnimationFrame(() => requestAnimationFrame(() => result.select()));
+			activeWindow.requestAnimationFrame(() => {
+				activeWindow.requestAnimationFrame(() => result.select());
+			});
 		});
 
 		this.pickr.on('cancel', onPickrCancel);

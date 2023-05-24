@@ -1,6 +1,8 @@
 import { ItemView, WorkspaceLeaf } from 'obsidian';
 import { SettingsMarkup } from './SettingsMarkup';
 import CSSSettingsPlugin from '../main';
+import { ParsedCSSSettings } from 'src/SettingHandlers';
+import { ErrorList } from 'src/Utils';
 
 export const viewType = 'style-settings';
 
@@ -11,12 +13,29 @@ export class SettingsView extends ItemView {
 	constructor(plugin: CSSSettingsPlugin, leaf: WorkspaceLeaf) {
 		super(leaf);
 		this.plugin = plugin;
-		this.settingsMarkup = new SettingsMarkup(
-			plugin.app,
-			plugin,
-			this.contentEl,
-			true
+	}
+
+	settings: ParsedCSSSettings[];
+	errorList: ErrorList;
+	setSettings(settings: ParsedCSSSettings[], errorList: ErrorList) {
+		this.settings = settings;
+		this.errorList = errorList;
+		if (this.settingsMarkup) {
+			this.settingsMarkup.setSettings(settings, errorList);
+		}
+	}
+
+	onload(): void {
+		this.settingsMarkup = this.addChild(
+			new SettingsMarkup(this.plugin.app, this.plugin, this.contentEl, true)
 		);
+		if (this.settings) {
+			this.settingsMarkup.setSettings(this.settings, this.errorList);
+		}
+	}
+
+	onunload(): void {
+		this.settingsMarkup = null;
 	}
 
 	getViewType() {
@@ -29,13 +48,5 @@ export class SettingsView extends ItemView {
 
 	getDisplayText() {
 		return 'Style Settings';
-	}
-
-	async onOpen() {
-		return this.settingsMarkup.display();
-	}
-
-	async onClose() {
-		return this.settingsMarkup.cleanup();
 	}
 }

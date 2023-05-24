@@ -13,13 +13,11 @@ import Pickr from '@simonwep/pickr';
 
 export class VariableThemedColorSettingComponent extends AbstractSettingComponent {
 	settingEl: Setting;
-
 	setting: VariableThemedColor;
-
 	pickrLight: Pickr;
 	pickrDark: Pickr;
 
-	render(containerEl: HTMLElement): void {
+	render(): void {
 		const title = getTitle(this.setting);
 		const description = getDescription(this.setting);
 
@@ -68,7 +66,7 @@ export class VariableThemedColorSettingComponent extends AbstractSettingComponen
 			swatchesDark.push(valueDark as string);
 		}
 
-		this.settingEl = new Setting(containerEl);
+		this.settingEl = new Setting(this.containerEl);
 		this.settingEl.setName(title);
 
 		// Construct description
@@ -97,7 +95,7 @@ export class VariableThemedColorSettingComponent extends AbstractSettingComponen
 		// Create light color picker
 		this.createColorPickerLight(
 			wrapper,
-			containerEl,
+			this.containerEl,
 			swatchesLight,
 			valueLight,
 			idLight
@@ -106,7 +104,7 @@ export class VariableThemedColorSettingComponent extends AbstractSettingComponen
 		// Create dark color picker
 		this.createColorPickerDark(
 			wrapper,
-			containerEl,
+			this.containerEl,
 			swatchesDark,
 			valueDark,
 			idDark
@@ -152,8 +150,9 @@ export class VariableThemedColorSettingComponent extends AbstractSettingComponen
 
 		this.pickrLight.on('show', () => {
 			const { result } = (this.pickrLight.getRoot() as any).interaction;
-
-			requestAnimationFrame(() => requestAnimationFrame(() => result.select()));
+			activeWindow.requestAnimationFrame(() =>
+				activeWindow.requestAnimationFrame(() => result.select())
+			);
 		});
 
 		this.pickrLight.on('save', (color: Pickr.HSVaColor, instance: Pickr) =>
@@ -202,8 +201,9 @@ export class VariableThemedColorSettingComponent extends AbstractSettingComponen
 
 		this.pickrDark.on('show', () => {
 			const { result } = (this.pickrDark.getRoot() as any).interaction;
-
-			requestAnimationFrame(() => requestAnimationFrame(() => result.select()));
+			activeWindow.requestAnimationFrame(() =>
+				activeWindow.requestAnimationFrame(() => result.select())
+			);
 		});
 
 		this.pickrDark.on('save', (color: Pickr.HSVaColor, instance: Pickr) =>

@@ -101,15 +101,6 @@ export function createDescription(
 	return fragment;
 }
 
-let timer: ReturnType<typeof setTimeout>;
-
-export function customDebounce(cb: () => void, timeout: number = 300): void {
-	clearTimeout(timer);
-	timer = setTimeout(() => {
-		cb();
-	}, timeout);
-}
-
 /*
  * compatability with Settings Search Plugin
  */

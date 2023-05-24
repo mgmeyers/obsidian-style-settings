@@ -2,8 +2,11 @@ import { CSSSettingsManager } from '../../SettingsManager';
 import { CSSSetting } from '../../SettingHandlers';
 import { getDescription, getTitle } from '../../Utils';
 import fuzzysort from 'fuzzysort';
+import { Component } from 'obsidian';
 
-export abstract class AbstractSettingComponent {
+export abstract class AbstractSettingComponent extends Component {
+	parent: AbstractSettingComponent | HTMLElement;
+	childEl: HTMLElement | null = null;
 	sectionId: string;
 	sectionName: string;
 	setting: CSSSetting;
@@ -11,22 +14,35 @@ export abstract class AbstractSettingComponent {
 	isView: boolean;
 
 	constructor(
+		parent: AbstractSettingComponent | HTMLElement,
 		sectionId: string,
 		sectionName: string,
 		setting: CSSSetting,
 		settingsManager: CSSSettingsManager,
 		isView: boolean
 	) {
+		super();
+		this.parent = parent;
 		this.sectionId = sectionId;
 		this.sectionName = sectionName;
 		this.setting = setting;
 		this.settingsManager = settingsManager;
 		this.isView = isView;
-
-		this.onInit();
 	}
 
-	onInit(): void {}
+	get containerEl() {
+		return this.parent instanceof HTMLElement
+			? this.parent
+			: this.parent.childEl;
+	}
+
+	onload(): void {
+		this.render();
+	}
+
+	onunload(): void {
+		this.destroy();
+	}
 
 	/**
 	 * Matches the Component against `str`. A perfect match returns 0, no match returns negative infinity.
@@ -57,10 +73,8 @@ export abstract class AbstractSettingComponent {
 
 	/**
 	 * Renders the Component and all it's children into `containerEl`.
-	 *
-	 * @param containerEl
 	 */
-	abstract render(containerEl: HTMLElement): void;
+	abstract render(): void;
 
 	/**
 	 * Destroys the component and all it's children.

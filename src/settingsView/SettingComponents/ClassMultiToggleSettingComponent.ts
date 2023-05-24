@@ -11,10 +11,9 @@ import { createDescription, getDescription, getTitle } from '../../Utils';
 export class ClassMultiToggleSettingComponent extends AbstractSettingComponent {
 	settingEl: Setting;
 	dropdownComponent: DropdownComponent;
-
 	setting: ClassMultiToggle;
 
-	render(containerEl: HTMLElement): void {
+	render(): void {
 		const title = getTitle(this.setting);
 		const description = getDescription(this.setting);
 
@@ -28,7 +27,7 @@ export class ClassMultiToggleSettingComponent extends AbstractSettingComponent {
 
 		const defaultLabel = this.getDefaultOptionLabel();
 
-		this.settingEl = new Setting(containerEl);
+		this.settingEl = new Setting(this.containerEl);
 		this.settingEl.setName(title);
 		this.settingEl.setDesc(
 			createDescription(description, this.setting.default, defaultLabel)

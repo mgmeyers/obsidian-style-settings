@@ -12,10 +12,9 @@ import { t } from '../../lang/helpers';
 export class VariableTextSettingComponent extends AbstractSettingComponent {
 	settingEl: Setting;
 	textComponent: TextComponent;
-
 	setting: VariableText;
 
-	render(containerEl: HTMLElement): void {
+	render(): void {
 		const title = getTitle(this.setting);
 		const description = getDescription(this.setting);
 
@@ -25,7 +24,7 @@ export class VariableTextSettingComponent extends AbstractSettingComponent {
 			);
 		}
 
-		this.settingEl = new Setting(containerEl);
+		this.settingEl = new Setting(this.containerEl);
 		this.settingEl.setName(title);
 		this.settingEl.setDesc(
 			createDescription(description, this.setting.default)

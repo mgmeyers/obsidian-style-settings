@@ -8,11 +8,11 @@ export class InfoTextSettingComponent extends AbstractSettingComponent {
 
 	setting: InfoText;
 
-	render(containerEl: HTMLElement): void {
+	render(): void {
 		const title = getTitle(this.setting);
 		const description = getDescription(this.setting);
 
-		this.settingEl = new Setting(containerEl);
+		this.settingEl = new Setting(this.containerEl);
 		this.settingEl.setClass('style-settings-info-text');
 		if (title) {
 			this.settingEl.setName(title);
@@ -23,7 +23,7 @@ export class InfoTextSettingComponent extends AbstractSettingComponent {
 					description,
 					this.settingEl.descEl,
 					'',
-					undefined
+					this
 				);
 				this.settingEl.descEl.addClass('style-settings-markdown');
 			} else {

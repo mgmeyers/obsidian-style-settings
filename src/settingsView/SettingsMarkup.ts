@@ -1,13 +1,13 @@
-import { App, SearchComponent, Setting } from 'obsidian';
+import { App, Component, SearchComponent, Setting, debounce } from 'obsidian';
 import { CSSSetting, ParsedCSSSettings } from '../SettingHandlers';
 import CSSSettingsPlugin from '../main';
-import { customDebounce, ErrorList } from '../Utils';
+import { ErrorList } from '../Utils';
 import {
 	buildSettingComponentTree,
 	HeadingSettingComponent,
 } from './SettingComponents/HeadingSettingComponent';
 
-export class SettingsMarkup {
+export class SettingsMarkup extends Component {
 	app: App;
 	plugin: CSSSettingsPlugin;
 	settingsComponentTrees: HeadingSettingComponent[] = [];
@@ -24,23 +24,36 @@ export class SettingsMarkup {
 		containerEl: HTMLElement,
 		isView?: boolean
 	) {
+		super();
 		this.app = app;
 		this.plugin = plugin;
 		this.containerEl = containerEl;
 		this.isView = !!isView;
 	}
 
+	onload(): void {
+		this.display();
+	}
+
+	onunload(): void {
+		this.settingsComponentTrees = [];
+	}
+
 	display(): void {
 		this.generate(this.settings);
+	}
+
+	removeChildren() {
+		for (const settingsComponentTree of this.settingsComponentTrees) {
+			this.removeChild(settingsComponentTree);
+		}
 	}
 
 	/**
 	 * Recursively destroys all setting elements.
 	 */
 	cleanup() {
-		for (const settingsComponentTree of this.settingsComponentTrees) {
-			settingsComponentTree.destroy();
-		}
+		this.removeChildren();
 		this.settingsContainerEl?.empty();
 	}
 
@@ -151,21 +164,24 @@ export class SettingsMarkup {
 			setting.nameEl.appendChild(setting.controlEl.lastChild);
 
 			searchComponent.setValue(this.filterString);
-			searchComponent.onChange((value: string) => {
-				customDebounce(() => {
-					this.filterString = value;
-					if (value) {
-						this.filter();
-					} else {
-						this.clearFilter();
-					}
-				}, 250);
-			});
+			searchComponent.onChange(
+				debounce(
+					(value) => {
+						this.filterString = value;
+						if (value) {
+							this.filter();
+						} else {
+							this.clearFilter();
+						}
+					},
+					250,
+					true
+				)
+			);
 			searchComponent.setPlaceholder('Search Style Settings...');
 		});
 
 		this.settingsContainerEl = containerEl.createDiv();
-
 		this.settingsComponentTrees = [];
 
 		for (const s of settings) {
@@ -178,7 +194,7 @@ export class SettingsMarkup {
 					collapsed: s.collapsed ?? true,
 					resetFn: () => {
 						plugin.settingsManager.clearSection(s.id);
-						this.generate(this.settings);
+						this.rerender();
 					},
 				},
 				...s.settings,
@@ -186,6 +202,7 @@ export class SettingsMarkup {
 
 			try {
 				const settingsComponentTree = buildSettingComponentTree({
+					containerEl: this.settingsContainerEl,
 					isView: this.isView,
 					sectionId: s.id,
 					sectionName: s.name,
@@ -193,8 +210,7 @@ export class SettingsMarkup {
 					settingsManager: plugin.settingsManager,
 				});
 
-				settingsComponentTree.render(this.settingsContainerEl);
-
+				this.addChild(settingsComponentTree);
 				this.settingsComponentTrees.push(settingsComponentTree);
 			} catch (e) {
 				console.error('Style Settings | Failed to render section', e);
@@ -206,11 +222,8 @@ export class SettingsMarkup {
 	 * Recursively filter all setting elements based on `filterString` and then re-renders.
 	 */
 	filter() {
-		this.cleanup();
-
 		for (const settingsComponentTree of this.settingsComponentTrees) {
 			settingsComponentTree.filter(this.filterString);
-			settingsComponentTree.render(this.settingsContainerEl);
 		}
 	}
 
@@ -218,17 +231,13 @@ export class SettingsMarkup {
 	 * Recursively clears the filter and then re-renders.
 	 */
 	clearFilter() {
-		this.cleanup();
-
 		for (const settingsComponentTree of this.settingsComponentTrees) {
 			settingsComponentTree.clearFilter();
-			settingsComponentTree.render(this.settingsContainerEl);
 		}
 	}
 
 	rerender() {
-		for (const settingsComponentTree of this.settingsComponentTrees) {
-			settingsComponentTree.render(this.settingsContainerEl);
-		}
+		this.cleanup();
+		this.display();
 	}
 }

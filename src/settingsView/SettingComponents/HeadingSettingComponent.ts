@@ -15,6 +15,7 @@ import { VariableThemedColorSettingComponent } from './VariableThemedColorSettin
 import { InfoTextSettingComponent } from './InfoTextSettingComponent';
 
 export function createSettingComponent(
+	parent: AbstractSettingComponent,
 	sectionId: string,
 	sectionName: string,
 	setting: CSSSetting,
@@ -23,6 +24,7 @@ export function createSettingComponent(
 ): AbstractSettingComponent | undefined {
 	if (setting.type === SettingType.HEADING) {
 		return new HeadingSettingComponent(
+			parent,
 			sectionId,
 			sectionName,
 			setting,
@@ -31,6 +33,7 @@ export function createSettingComponent(
 		);
 	} else if (setting.type === SettingType.INFO_TEXT) {
 		return new InfoTextSettingComponent(
+			parent,
 			sectionId,
 			sectionName,
 			setting,
@@ -39,6 +42,7 @@ export function createSettingComponent(
 		);
 	} else if (setting.type === SettingType.CLASS_TOGGLE) {
 		return new ClassToggleSettingComponent(
+			parent,
 			sectionId,
 			sectionName,
 			setting,
@@ -47,6 +51,7 @@ export function createSettingComponent(
 		);
 	} else if (setting.type === SettingType.CLASS_SELECT) {
 		return new ClassMultiToggleSettingComponent(
+			parent,
 			sectionId,
 			sectionName,
 			setting,
@@ -55,6 +60,7 @@ export function createSettingComponent(
 		);
 	} else if (setting.type === SettingType.VARIABLE_TEXT) {
 		return new VariableTextSettingComponent(
+			parent,
 			sectionId,
 			sectionName,
 			setting,
@@ -63,6 +69,7 @@ export function createSettingComponent(
 		);
 	} else if (setting.type === SettingType.VARIABLE_NUMBER) {
 		return new VariableNumberSettingComponent(
+			parent,
 			sectionId,
 			sectionName,
 			setting,
@@ -71,6 +78,7 @@ export function createSettingComponent(
 		);
 	} else if (setting.type === SettingType.VARIABLE_NUMBER_SLIDER) {
 		return new VariableNumberSliderSettingComponent(
+			parent,
 			sectionId,
 			sectionName,
 			setting,
@@ -79,6 +87,7 @@ export function createSettingComponent(
 		);
 	} else if (setting.type === SettingType.VARIABLE_SELECT) {
 		return new VariableSelectSettingComponent(
+			parent,
 			sectionId,
 			sectionName,
 			setting,
@@ -87,6 +96,7 @@ export function createSettingComponent(
 		);
 	} else if (setting.type === SettingType.VARIABLE_COLOR) {
 		return new VariableColorSettingComponent(
+			parent,
 			sectionId,
 			sectionName,
 			setting,
@@ -95,6 +105,7 @@ export function createSettingComponent(
 		);
 	} else if (setting.type === SettingType.VARIABLE_THEMED_COLOR) {
 		return new VariableThemedColorSettingComponent(
+			parent,
 			sectionId,
 			sectionName,
 			setting,
@@ -106,28 +117,84 @@ export function createSettingComponent(
 	}
 }
 
-export class HeadingSettingComponent extends AbstractSettingComponent {
-	setting: Heading;
-	childEl: HTMLElement | undefined;
-	settingEl: Setting;
-	parent: HeadingSettingComponent;
-	children: AbstractSettingComponent[];
-	filteredChildren: AbstractSettingComponent[];
-	filterMode: boolean;
-	filterResultCount: number;
+export function buildSettingComponentTree(opts: {
+	containerEl: HTMLElement;
+	isView: boolean;
+	sectionId: string;
+	sectionName: string;
+	settings: CSSSetting[];
+	settingsManager: CSSSettingsManager;
+}): HeadingSettingComponent {
+	const {
+		containerEl,
+		isView,
+		sectionId,
+		settings,
+		settingsManager,
+		sectionName,
+	} = opts;
 
-	onInit() {
-		this.children = [];
-		this.filteredChildren = [];
-		this.filterMode = false;
-		this.filterResultCount = 0;
+	const root: HeadingSettingComponent = new HeadingSettingComponent(
+		containerEl,
+		sectionId,
+		sectionName,
+		settings[0],
+		settingsManager,
+		isView
+	);
+
+	let currentHeading: HeadingSettingComponent = root;
+
+	for (const setting of settings.splice(1)) {
+		if (setting.type === 'heading') {
+			const newHeading: Heading = setting as Heading;
+
+			if (newHeading.level < currentHeading.setting.level) {
+				while (newHeading.level < currentHeading.setting.level) {
+					currentHeading = currentHeading.parent;
+				}
+
+				if (currentHeading.setting.id === root.setting.id) {
+					currentHeading = currentHeading.addSettingChild(
+						newHeading
+					) as HeadingSettingComponent;
+				} else {
+					currentHeading = currentHeading.parent.addSettingChild(
+						newHeading
+					) as HeadingSettingComponent;
+				}
+			} else if (newHeading.level === currentHeading.setting.level) {
+				currentHeading = currentHeading.parent.addSettingChild(
+					newHeading
+				) as HeadingSettingComponent;
+			} else {
+				currentHeading = currentHeading.addSettingChild(
+					newHeading
+				) as HeadingSettingComponent;
+			}
+		} else {
+			currentHeading.addSettingChild(setting);
+		}
 	}
 
-	render(containerEl: HTMLElement): void {
+	return root;
+}
+
+export class HeadingSettingComponent extends AbstractSettingComponent {
+	setting: Heading;
+	settingEl: Setting;
+	parent: HeadingSettingComponent;
+	children: AbstractSettingComponent[] = [];
+	filteredChildren: AbstractSettingComponent[] = [];
+	filterMode: boolean = false;
+	filterResultCount: number = 0;
+	resultsEl: HTMLElement;
+
+	render(): void {
 		const title = getTitle(this.setting);
 		const description = getDescription(this.setting);
 
-		this.settingEl = new Setting(containerEl);
+		this.settingEl = new Setting(this.containerEl);
 		this.settingEl.setHeading();
 		this.settingEl.setClass('style-settings-heading');
 		this.settingEl.setName(title);
@@ -144,31 +211,28 @@ export class HeadingSettingComponent extends AbstractSettingComponent {
 
 		this.settingEl.nameEl.prepend(iconContainer);
 
-		if (this.filterMode) {
-			this.settingEl.nameEl.createSpan({
-				cls: 'style-settings-filter-result-count',
-				text: `${this.filterResultCount} Results`,
-			});
-		}
+		this.resultsEl = this.settingEl.nameEl.createSpan({
+			cls: 'style-settings-filter-result-count',
+			text: this.filterMode ? `${this.filterResultCount} Results` : undefined,
+		});
 
 		this.settingEl.settingEl.addEventListener('click', () => {
 			this.toggleVisible();
 		});
 
 		this.addResetButton();
-
 		this.addExportButton();
 
-		this.childEl = containerEl.createDiv({ cls: 'style-settings-container' });
-
+		this.childEl = this.containerEl.createDiv({
+			cls: 'style-settings-container',
+		});
 		this.setCollapsed(this.setting.collapsed);
 	}
 
 	destroy(): void {
-		if (!this.setting.collapsed) {
-			this.destroyChildren();
-		}
+		this.removeChildren();
 		this.settingEl?.settingEl.remove();
+		this.childEl.remove();
 	}
 
 	filter(filterString: string): number {
@@ -193,7 +257,13 @@ export class HeadingSettingComponent extends AbstractSettingComponent {
 		}
 
 		this.filterMode = true;
-		this.setting.collapsed = false;
+		if (this.filterResultCount) {
+			this.setCollapsed(false);
+		} else {
+			this.setCollapsed(true);
+		}
+		this.renderChildren();
+		this.resultsEl?.setText(`${this.filterResultCount} Results`);
 
 		return this.filterResultCount;
 	}
@@ -208,27 +278,28 @@ export class HeadingSettingComponent extends AbstractSettingComponent {
 		}
 
 		this.filterMode = false;
-		this.setting.collapsed = true;
+		this.setCollapsed(true);
+		this.renderChildren();
+		this.resultsEl?.empty();
 	}
 
 	private renderChildren() {
-		this.destroyChildren();
+		this.removeChildren();
 		if (this.filterMode) {
 			for (const child of this.filteredChildren) {
-				child.render(this.childEl);
+				this.addChild(child);
 			}
 		} else {
 			for (const child of this.children) {
-				child.render(this.childEl);
+				this.addChild(child);
 			}
 		}
 	}
 
-	private destroyChildren() {
+	private removeChildren() {
 		for (const child of this.children) {
-			child.destroy();
+			this.removeChild(child);
 		}
-		this.childEl?.empty();
 	}
 
 	private toggleVisible() {
@@ -237,11 +308,10 @@ export class HeadingSettingComponent extends AbstractSettingComponent {
 
 	private setCollapsed(collapsed: boolean) {
 		this.setting.collapsed = collapsed;
-
-		this.settingEl.settingEl.toggleClass('is-collapsed', collapsed);
+		this.settingEl?.settingEl.toggleClass('is-collapsed', collapsed);
 
 		if (collapsed) {
-			this.destroyChildren();
+			this.removeChildren();
 		} else {
 			this.renderChildren();
 		}
@@ -277,8 +347,9 @@ export class HeadingSettingComponent extends AbstractSettingComponent {
 		});
 	}
 
-	addChild(child: CSSSetting): AbstractSettingComponent {
+	addSettingChild(child: CSSSetting): AbstractSettingComponent {
 		const newSettingComponent = createSettingComponent(
+			this,
 			this.sectionId,
 			this.sectionName,
 			child,
@@ -289,9 +360,6 @@ export class HeadingSettingComponent extends AbstractSettingComponent {
 			return undefined;
 		}
 
-		if (newSettingComponent.setting.type === SettingType.HEADING) {
-			(newSettingComponent as HeadingSettingComponent).parent = this;
-		}
 		this.children.push(newSettingComponent);
 		return newSettingComponent;
 	}
@@ -308,58 +376,4 @@ export class HeadingSettingComponent extends AbstractSettingComponent {
 		}
 		return children;
 	}
-}
-
-export function buildSettingComponentTree(opts: {
-	isView: boolean;
-	sectionId: string;
-	sectionName: string;
-	settings: CSSSetting[];
-	settingsManager: CSSSettingsManager;
-}): HeadingSettingComponent {
-	const { isView, sectionId, settings, settingsManager, sectionName } = opts;
-
-	const root: HeadingSettingComponent = new HeadingSettingComponent(
-		sectionId,
-		sectionName,
-		settings[0],
-		settingsManager,
-		isView
-	);
-
-	let currentHeading: HeadingSettingComponent = root;
-
-	for (const setting of settings.splice(1)) {
-		if (setting.type === 'heading') {
-			const newHeading: Heading = setting as Heading;
-
-			if (newHeading.level < currentHeading.setting.level) {
-				while (newHeading.level < currentHeading.setting.level) {
-					currentHeading = currentHeading.parent;
-				}
-
-				if (currentHeading.setting.id === root.setting.id) {
-					currentHeading = currentHeading.addChild(
-						newHeading
-					) as HeadingSettingComponent;
-				} else {
-					currentHeading = currentHeading.parent.addChild(
-						newHeading
-					) as HeadingSettingComponent;
-				}
-			} else if (newHeading.level === currentHeading.setting.level) {
-				currentHeading = currentHeading.parent.addChild(
-					newHeading
-				) as HeadingSettingComponent;
-			} else {
-				currentHeading = currentHeading.addChild(
-					newHeading
-				) as HeadingSettingComponent;
-			}
-		} else {
-			currentHeading.addChild(setting);
-		}
-	}
-
-	return root;
 }
