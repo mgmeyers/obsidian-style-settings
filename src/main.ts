@@ -49,8 +49,10 @@ export default class CSSSettingsPlugin extends Plugin {
 		});
 
 		this.registerEvent(
-			this.app.workspace.on('css-change', () => {
-				this.parseCSS();
+			(this.app.workspace as any).on('css-change', (data?: { source: string }) => {
+				if (data?.source !== 'style-settings') {
+					this.parseCSS();
+				}
 			})
 		);
 

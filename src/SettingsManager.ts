@@ -470,26 +470,28 @@ export class CSSSettingsManager {
 		);
 
 		this.styleTag.innerText = `
-      body.css-settings-manager {
-        ${vars.reduce((combined, current) => {
-					return combined + `--${current.key}: ${current.value}; `;
-				}, '')}
-      }
+			body.css-settings-manager {
+				${vars.reduce((combined, current) => {
+			return combined + `--${current.key}: ${current.value}; `;
+		}, '')}
+			}
 
-      body.theme-light.css-settings-manager {
-        ${themedLight.reduce((combined, current) => {
-					return combined + `--${current.key}: ${current.value}; `;
-				}, '')}
-      }
+			body.theme-light.css-settings-manager {
+				${themedLight.reduce((combined, current) => {
+			return combined + `--${current.key}: ${current.value}; `;
+		}, '')}
+			}
 
-      body.theme-dark.css-settings-manager {
-        ${themedDark.reduce((combined, current) => {
-					return combined + `--${current.key}: ${current.value}; `;
-				}, '')}
-      }
-    `
+			body.theme-dark.css-settings-manager {
+				${themedDark.reduce((combined, current) => {
+			return combined + `--${current.key}: ${current.value}; `;
+		}, '')}
+			}
+			`
 			.trim()
 			.replace(/[\r\n\s]+/g, ' ');
+
+		this.plugin.app.workspace.trigger('css-change', { source: 'style-settings' });
 	}
 
 	setConfig(settings: ParsedCSSSettings[]) {
