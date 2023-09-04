@@ -1,15 +1,5 @@
-import '@simonwep/pickr/dist/themes/nano.min.css';
-import './css/pickerOverrides.css';
-import './css/settings.css';
-
-import { Command, Plugin } from 'obsidian';
-import { CSSSettingsManager } from './SettingsManager';
 import { ClassToggle, ParsedCSSSettings } from './SettingHandlers';
-import yaml from 'js-yaml';
-import detectIndent from 'detect-indent';
-
-import { CSSSettingsTab } from './settingsView/CSSSettingsTab';
-import { SettingsView, viewType } from './settingsView/SettingsView';
+import { CSSSettingsManager } from './SettingsManager';
 import {
 	ErrorList,
 	getDescription,
@@ -18,7 +8,15 @@ import {
 	settingRegExp,
 	SettingsSeachResource,
 } from './Utils';
+import './css/pickerOverrides.css';
+import './css/settings.css';
+import { CSSSettingsTab } from './settingsView/CSSSettingsTab';
 import { SettingType } from './settingsView/SettingComponents/types';
+import { SettingsView, viewType } from './settingsView/SettingsView';
+import '@simonwep/pickr/dist/themes/nano.min.css';
+import detectIndent from 'detect-indent';
+import yaml from 'js-yaml';
+import { Command, Plugin } from 'obsidian';
 
 export default class CSSSettingsPlugin extends Plugin {
 	settingsManager: CSSSettingsManager;
@@ -49,11 +47,14 @@ export default class CSSSettingsPlugin extends Plugin {
 		});
 
 		this.registerEvent(
-			(this.app.workspace as any).on('css-change', (data?: { source: string }) => {
-				if (data?.source !== 'style-settings') {
-					this.parseCSS();
+			(this.app.workspace as any).on(
+				'css-change',
+				(data?: { source: string }) => {
+					if (data?.source !== 'style-settings') {
+						this.parseCSS();
+					}
 				}
-			})
+			)
 		);
 
 		this.registerEvent(

@@ -1,5 +1,3 @@
-import { AbstractSettingComponent } from './AbstractSettingComponent';
-import { Setting } from 'obsidian';
 import { resetTooltip, VariableColor } from '../../SettingHandlers';
 import {
 	createDescription,
@@ -10,7 +8,9 @@ import {
 	onPickrCancel,
 } from '../../Utils';
 import { t } from '../../lang/helpers';
+import { AbstractSettingComponent } from './AbstractSettingComponent';
 import Pickr from '@simonwep/pickr';
+import { Setting } from 'obsidian';
 
 export class VariableColorSettingComponent extends AbstractSettingComponent {
 	settingEl: Setting;

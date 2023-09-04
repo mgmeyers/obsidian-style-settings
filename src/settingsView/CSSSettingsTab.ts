@@ -1,8 +1,8 @@
-import { App, PluginSettingTab } from 'obsidian';
-import { SettingsMarkup } from './SettingsMarkup';
 import CSSSettingsPlugin from '../main';
-import { ErrorList } from 'src/Utils';
+import { SettingsMarkup } from './SettingsMarkup';
+import { App, PluginSettingTab } from 'obsidian';
 import { ParsedCSSSettings } from 'src/SettingHandlers';
+import { ErrorList } from 'src/Utils';
 
 export class CSSSettingsTab extends PluginSettingTab {
 	settingsMarkup: SettingsMarkup;

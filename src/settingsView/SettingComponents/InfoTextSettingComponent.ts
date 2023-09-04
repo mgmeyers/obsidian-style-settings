@@ -1,7 +1,7 @@
-import { AbstractSettingComponent } from './AbstractSettingComponent';
-import { MarkdownRenderer, Setting } from 'obsidian';
 import { InfoText } from '../../SettingHandlers';
 import { getDescription, getTitle } from '../../Utils';
+import { AbstractSettingComponent } from './AbstractSettingComponent';
+import { MarkdownRenderer, Setting } from 'obsidian';
 
 export class InfoTextSettingComponent extends AbstractSettingComponent {
 	settingEl: Setting;

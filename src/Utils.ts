@@ -1,5 +1,5 @@
-import { lang, t } from './lang/helpers';
 import { Meta, WithDescription, WithTitle } from './SettingHandlers';
+import { lang, t } from './lang/helpers';
 import Pickr from '@simonwep/pickr';
 
 export const settingRegExp = /\/\*!?\s*@settings[\r\n]+?([\s\S]+?)\*\//g;

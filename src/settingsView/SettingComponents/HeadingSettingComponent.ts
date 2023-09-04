@@ -1,18 +1,18 @@
-import { AbstractSettingComponent } from './AbstractSettingComponent';
-import { setIcon, Setting } from 'obsidian';
-import { getDescription, getTitle } from '../../Utils';
 import { CSSSetting, Heading } from '../../SettingHandlers';
-import { SettingType } from './types';
-import { CSSSettingsManager } from 'src/SettingsManager';
-import { ClassToggleSettingComponent } from './ClassToggleSettingComponent';
+import { getDescription, getTitle } from '../../Utils';
+import { AbstractSettingComponent } from './AbstractSettingComponent';
 import { ClassMultiToggleSettingComponent } from './ClassMultiToggleSettingComponent';
-import { VariableTextSettingComponent } from './VariableTextSettingComponent';
+import { ClassToggleSettingComponent } from './ClassToggleSettingComponent';
+import { InfoTextSettingComponent } from './InfoTextSettingComponent';
+import { VariableColorSettingComponent } from './VariableColorSettingComponent';
 import { VariableNumberSettingComponent } from './VariableNumberSettingComponent';
 import { VariableNumberSliderSettingComponent } from './VariableNumberSliderSettingComponent';
 import { VariableSelectSettingComponent } from './VariableSelectSettingComponent';
-import { VariableColorSettingComponent } from './VariableColorSettingComponent';
+import { VariableTextSettingComponent } from './VariableTextSettingComponent';
 import { VariableThemedColorSettingComponent } from './VariableThemedColorSettingComponent';
-import { InfoTextSettingComponent } from './InfoTextSettingComponent';
+import { SettingType } from './types';
+import { setIcon, Setting } from 'obsidian';
+import { CSSSettingsManager } from 'src/SettingsManager';
 
 export function createSettingComponent(
 	parent: AbstractSettingComponent,

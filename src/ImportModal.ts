@@ -1,3 +1,5 @@
+import { SettingValue } from './SettingsManager';
+import CSSSettingsPlugin from './main';
 import {
 	App,
 	ButtonComponent,
@@ -5,8 +7,6 @@ import {
 	Setting,
 	TextAreaComponent,
 } from 'obsidian';
-import CSSSettingsPlugin from './main';
-import { SettingValue } from './SettingsManager';
 
 export class ImportModal extends Modal {
 	plugin: CSSSettingsPlugin;

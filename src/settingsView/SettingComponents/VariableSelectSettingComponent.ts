@@ -1,5 +1,3 @@
-import { AbstractSettingComponent } from './AbstractSettingComponent';
-import { DropdownComponent, Setting } from 'obsidian';
 import {
 	resetTooltip,
 	SelectOption,
@@ -7,6 +5,8 @@ import {
 } from '../../SettingHandlers';
 import { createDescription, getDescription, getTitle } from '../../Utils';
 import { t } from '../../lang/helpers';
+import { AbstractSettingComponent } from './AbstractSettingComponent';
+import { DropdownComponent, Setting } from 'obsidian';
 
 export class VariableSelectSettingComponent extends AbstractSettingComponent {
 	settingEl: Setting;

@@ -1,6 +1,6 @@
 {
   "name": "obsidian-style-settings",
-  "version": "0.0.1",
+  "version": "1.0.7",
   "description": "Offers controls for adjusting theme, plugin, and CSS snippet styles.",
   "main": "main.js",
   "scripts": {
@@ -9,7 +9,10 @@
     "prettier": "prettier --write \"./src/**/*.{ts,tsx}\"",
     "lint": "eslint ./src",
     "lint:fix": "eslint ./src --fix",
-    "clean": "yarn prettier && yarn lint:fix"
+    "clean": "yarn prettier && yarn lint:fix",
+    "rlnotes": "git log $(git describe --tags --abbrev=0)..HEAD --oneline > release-notes.md && git add release-notes.md",
+		"bump": "node version-bump.mjs && git add manifest.json versions.json && yarn rlnotes",
+		"release": "git commit -m $npm_package_version && git tag $npm_package_version && git push && git push --tags"
   },
   "keywords": [],
   "author": "",
@@ -18,6 +21,7 @@
     "@rollup/plugin-commonjs": "^15.1.0",
     "@rollup/plugin-node-resolve": "^9.0.0",
     "@rollup/plugin-typescript": "^6.0.0",
+    "@trivago/prettier-plugin-sort-imports": "^4.2.0",
     "@types/node": "^14.14.2",
     "eslint": "^8.33.0",
     "obsidian": "^1.1.1",

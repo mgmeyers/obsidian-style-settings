@@ -1,3 +1,5 @@
+import { ExportModal } from './ExportModal';
+import { ImportModal } from './ImportModal';
 import {
 	AltFormatList,
 	ClassMultiToggle,
@@ -13,12 +15,9 @@ import {
 	VariableText,
 	VariableThemedColor,
 } from './SettingHandlers';
-
 import CSSSettingsPlugin from './main';
-import chroma from 'chroma-js';
-import { ImportModal } from './ImportModal';
-import { ExportModal } from './ExportModal';
 import { SettingType } from './settingsView/SettingComponents/types';
+import chroma from 'chroma-js';
 
 type VariableKV = Array<{ key: string; value: string }>;
 
@@ -472,26 +471,28 @@ export class CSSSettingsManager {
 		this.styleTag.innerText = `
 			body.css-settings-manager {
 				${vars.reduce((combined, current) => {
-			return combined + `--${current.key}: ${current.value}; `;
-		}, '')}
+					return combined + `--${current.key}: ${current.value}; `;
+				}, '')}
 			}
 
 			body.theme-light.css-settings-manager {
 				${themedLight.reduce((combined, current) => {
-			return combined + `--${current.key}: ${current.value}; `;
-		}, '')}
+					return combined + `--${current.key}: ${current.value}; `;
+				}, '')}
 			}
 
 			body.theme-dark.css-settings-manager {
 				${themedDark.reduce((combined, current) => {
-			return combined + `--${current.key}: ${current.value}; `;
-		}, '')}
+					return combined + `--${current.key}: ${current.value}; `;
+				}, '')}
 			}
 			`
 			.trim()
 			.replace(/[\r\n\s]+/g, ' ');
 
-		this.plugin.app.workspace.trigger('css-change', { source: 'style-settings' });
+		this.plugin.app.workspace.trigger('css-change', {
+			source: 'style-settings',
+		});
 	}
 
 	setConfig(settings: ParsedCSSSettings[]) {

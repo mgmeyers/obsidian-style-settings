@@ -1,12 +1,12 @@
-import { AbstractSettingComponent } from './AbstractSettingComponent';
-import { DropdownComponent, Setting } from 'obsidian';
 import {
 	ClassMultiToggle,
 	resetTooltip,
 	SelectOption,
 } from '../../SettingHandlers';
-import { t } from '../../lang/helpers';
 import { createDescription, getDescription, getTitle } from '../../Utils';
+import { t } from '../../lang/helpers';
+import { AbstractSettingComponent } from './AbstractSettingComponent';
+import { DropdownComponent, Setting } from 'obsidian';
 
 export class ClassMultiToggleSettingComponent extends AbstractSettingComponent {
 	settingEl: Setting;

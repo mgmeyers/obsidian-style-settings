@@ -1,11 +1,11 @@
-import { App, Component, SearchComponent, Setting, debounce } from 'obsidian';
 import { CSSSetting, ParsedCSSSettings } from '../SettingHandlers';
-import CSSSettingsPlugin from '../main';
 import { ErrorList } from '../Utils';
+import CSSSettingsPlugin from '../main';
 import {
 	buildSettingComponentTree,
 	HeadingSettingComponent,
 } from './SettingComponents/HeadingSettingComponent';
+import { App, Component, SearchComponent, Setting, debounce } from 'obsidian';
 
 export class SettingsMarkup extends Component {
 	app: App;
