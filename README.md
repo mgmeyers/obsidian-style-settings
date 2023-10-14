@@ -171,7 +171,7 @@ settings:
 
 ## `variable-text`
 
-`variable-text` represents any text based CSS value. The `id` of the setting will be used as the variable name. `variable-text` settings require a `default` attribute.
+`variable-text` represents any text based CSS value. The `id` of the setting will be used as the variable name. The output will be wrapped in quotes if `quotes` is set to true. `variable-text` settings require a `default` attribute.
 
 ```css
 /* @settings
@@ -193,6 +193,30 @@ This will output the variable:
 
 ```
 --text: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+```
+
+Using `quotes`:
+
+```css
+/* @settings
+
+name: Your Section Name Here
+id: a-unique-id
+settings:
+    -
+        id: icon
+        title: Bullet Icon
+        description: Text used in bullet points
+        type: variable-text
+        default: •
+        quotes: true
+*/
+```
+
+This will output the variable:
+
+```
+--icon: '•'
 ```
 
 ## `variable-number`
