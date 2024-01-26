@@ -4,7 +4,7 @@ This plugin allows snippet, theme, and plugin CSS files to define a set of confi
 
 **[This CSS Snippet](obsidian-default-theme.css) can be used to adjust every CSS variable of the default Obsidian theme.** 
 
-Configurable settings are defined by comments within CSS files beginning with `/* @settings`. These comments must contain YAML with `name`, `id`, and `settings` properties. Style Settings will scan all CSS loaded by Obsidian for these comments. Obsidian will load CSS from the `snippets`, `themes`, and `plugins` directories under your vault's configuration directory (`%yourVault%/.obsidian/`).  Please see the [Obsidian Docs](https://help.obsidian.md/Home) for more information.
+Configurable settings are defined by comments within CSS files beginning with `/* @settings`. These comments must contain YAML with `name`, `id`, and `settings` properties. Style Settings will scan for these comments in all CSS loaded by Obsidian from the `snippets`, `themes`, and `plugins` directories under your vault's configuration directory (`%yourVault%/.obsidian/`).  Please see the [Obsidian Docs](https://help.obsidian.md/Home) for more information.
 
 For example, adding this to a CSS snippet in your vault's snippets directory (`%yourVault%/.obsidian/snippets`):
 
