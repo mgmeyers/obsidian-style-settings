@@ -273,9 +273,9 @@ export default class CSSSettingsPlugin extends Plugin {
 						setting.id
 					) as boolean);
 					this.settingsManager.setSetting(section.id, setting.id, value);
-					this.settingsTab.settingsMarkup.rerender();
+					this.settingsTab.rerender();
 					for (const leaf of this.app.workspace.getLeavesOfType(viewType)) {
-						(leaf.view as SettingsView).settingsMarkup.rerender();
+						(leaf.view as SettingsView).rerender();
 					}
 				},
 			})

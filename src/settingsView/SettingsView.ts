@@ -15,6 +15,10 @@ export class SettingsView extends ItemView {
 		this.plugin = plugin;
 	}
 
+	rerender() {
+		this.settingsMarkup?.rerender();
+	}
+
 	settings: ParsedCSSSettings[];
 	errorList: ErrorList;
 	setSettings(settings: ParsedCSSSettings[], errorList: ErrorList) {
