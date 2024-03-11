@@ -15,6 +15,10 @@ export class CSSSettingsTab extends PluginSettingTab {
 		this.plugin = plugin;
 	}
 
+	rerender() {
+		this.settingsMarkup?.rerender();
+	}
+
 	setSettings(settings: ParsedCSSSettings[], errorList: ErrorList) {
 		this.settings = settings;
 		this.errorList = errorList;
