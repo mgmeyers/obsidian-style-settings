@@ -76,6 +76,8 @@ export class VariableColorSettingComponent extends AbstractSettingComponent {
 				defaultColor: defaultColor,
 			})
 		);
+		// fix: display the correct color without needing to interact
+		this.pickr.setColor(defaultColor);
 
 		this.pickr.on('save', (color: Pickr.HSVaColor, instance: Pickr) => {
 			if (!color) return;
