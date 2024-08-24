@@ -15,9 +15,10 @@ import { Setting } from 'obsidian';
 export class VariableColorSettingComponent extends AbstractSettingComponent {
 	settingEl: Setting;
 	setting: VariableColor;
-	pickr: Pickr;
+	pickr: Pickr | null;
 
 	render(): void {
+		if (!this.containerEl) return;
 		const title = getTitle(this.setting);
 		const description = getDescription(this.setting);
 
@@ -66,7 +67,7 @@ export class VariableColorSettingComponent extends AbstractSettingComponent {
 			value !== undefined ? (value as string) : this.setting.default;
 		this.containerEl.style.setProperty('--pcr-color', defaultColor);
 
-		this.pickr = Pickr.create(
+		const pickr = (this.pickr = Pickr.create(
 			getPickrSettings({
 				isView: this.isView,
 				el: this.settingEl.controlEl.createDiv({ cls: 'picker' }),
@@ -75,9 +76,9 @@ export class VariableColorSettingComponent extends AbstractSettingComponent {
 				opacity: this.setting.opacity,
 				defaultColor: defaultColor,
 			})
-		);
+		));
 
-		this.pickr.on('save', (color: Pickr.HSVaColor, instance: Pickr) => {
+		pickr.on('save', (color: Pickr.HSVaColor, instance: Pickr) => {
 			if (!color) return;
 
 			this.settingsManager.setSetting(
@@ -90,19 +91,19 @@ export class VariableColorSettingComponent extends AbstractSettingComponent {
 			instance.addSwatch(color.toHEXA().toString());
 		});
 
-		this.pickr.on('show', () => {
-			const { result } = (this.pickr.getRoot() as any).interaction;
+		pickr.on('show', () => {
+			const { result } = (pickr.getRoot() as any).interaction;
 			activeWindow.requestAnimationFrame(() => {
 				activeWindow.requestAnimationFrame(() => result.select());
 			});
 		});
 
-		this.pickr.on('cancel', onPickrCancel);
+		pickr.on('cancel', onPickrCancel);
 
 		this.settingEl.addExtraButton((b) => {
 			b.setIcon('reset');
 			b.onClick(() => {
-				this.pickr.setColor(this.setting.default);
+				pickr.setColor(this.setting.default || null);
 				this.settingsManager.clearSetting(this.sectionId, this.setting.id);
 			});
 			b.setTooltip(resetTooltip);
@@ -113,7 +114,7 @@ export class VariableColorSettingComponent extends AbstractSettingComponent {
 
 	destroy(): void {
 		this.pickr?.destroyAndRemove();
-		this.pickr = undefined;
+		this.pickr = null;
 		this.settingEl?.settingEl.remove();
 	}
 }
