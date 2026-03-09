@@ -31,14 +31,27 @@ export class VariableNumberSettingComponent extends AbstractSettingComponent {
 				this.sectionId,
 				this.setting.id
 			);
+
 			const onChange = debounce(
 				(value: string) => {
-					const isFloat = /\./.test(value);
-					this.settingsManager.setSetting(
-						this.sectionId,
-						this.setting.id,
-						isFloat ? parseFloat(value) : parseInt(value, 10)
-					);
+					const trimmedValue = value.trim(); // remove white space
+
+					const numericValue = parseFloat(trimmedValue); // Use parsefoat to handle integers and decimals
+
+					// CRUCIAL PART: Only save numbers by validating input before saving. Without this, users are able to input
+					// and save non-numeric values for CSS variables which only accept numbers as values. 
+					// This causes the associated settings to permanently break, and is irreversible, except for resetting all settings!
+					if (!isNaN(numericValue) && isFinite(numericValue)) {
+						this.settingsManager.setSetting(
+							this.sectionId,
+							this.setting.id,
+							numericValue
+						);
+					} else {
+						console.warn(`Style Settings: Invalid number input ignored for ${this.setting.id}: ${value}`);
+						const lastValidValue = this.settingsManager.getSetting(this.sectionId, this.setting.id);
+						text.setValue(lastValidValue !== undefined ? lastValidValue.toString() : this.setting.default.toString());
+					}
 				},
 				250,
 				true
@@ -47,6 +60,7 @@ export class VariableNumberSettingComponent extends AbstractSettingComponent {
 			text.setValue(
 				value !== undefined ? value.toString() : this.setting.default.toString()
 			);
+
 			text.onChange(onChange);
 
 			this.textComponent = text;
@@ -67,4 +81,6 @@ export class VariableNumberSettingComponent extends AbstractSettingComponent {
 	destroy(): void {
 		this.settingEl?.settingEl.remove();
 	}
+
+
 }
